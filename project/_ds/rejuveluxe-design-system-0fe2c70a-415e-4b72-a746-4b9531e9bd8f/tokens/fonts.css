@@ -1,0 +1,5 @@
+/* No brand font binaries were provided. Google Fonts substitutes (see readme.md → Visual foundations → Type):
+   Cinzel ≈ the Trajan-style small-caps wordmark on the tins
+   Playfair Display Italic ≈ the script product names ("White Tea", "Matcha")
+   Figtree = body / UI sans (chosen for the web; not on packaging) */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Figtree:wght@300;400;500;600&display=swap");

@@ -1,0 +1,27 @@
+:root{
+/* Base palette — sampled from the tins */
+--gold-100:#F1E6CE;--gold-200:#E2CFA3;--gold-300:#D2B77A;--gold-400:#C0A062;--gold-500:#B08A4C;--gold-600:#8E6D34;--gold-700:#6B5124;
+--ink-900:#141311;--ink-800:#26231F;--ink-700:#3D3831;--ink-600:#5C554B;--ink-500:#7D766B;--ink-400:#A39B8E;--ink-300:#C9C1B3;--ink-200:#E1DACD;
+--bone-50:#FBF9F4;--bone-100:#F7F3EA;--bone-200:#F3EEE4;--bone-300:#EBE4D6;--bone-400:#DED4C1;
+/* Tea palette — one pair per expression (tin body / tin ink) */
+--tea-silver-tin:#FFFFFF;--tea-silver-ink:#B8975A;
+--tea-matcha-tin:#C9CB92;--tea-matcha-ink:#2F4A1E;
+--tea-golden-tin:#151515;--tea-golden-ink:#C5A76A;
+--tea-ube-tin:#D9B8D6;--tea-ube-ink:#7B4A7E;
+--tea-green-tin:#B4BE8E;--tea-green-ink:#1F4A2A;
+--tea-ctc-tin:#4A2A1A;--tea-ctc-ink:#D9B57A;
+/* Semantic status (muted, never neon) */
+--status-success:#3E6B3A;--status-success-soft:#E4EBDF;
+--status-warning:#B8862B;--status-warning-soft:#F4EAD2;
+--status-error:#9B3B2E;--status-error-soft:#F3E0DB;
+--status-info:#4A5B7C;--status-info-soft:#E1E5EC;
+/* Semantic aliases */
+--bg-page:var(--bone-200);--bg-page-alt:var(--bone-100);--bg-inverse:var(--ink-900);
+--surface-card:var(--bone-50);--surface-raised:#FFFFFF;--surface-inverse:var(--ink-800);--surface-overlay:rgba(20,19,17,.55);
+--text-primary:var(--ink-900);--text-secondary:var(--ink-600);--text-tertiary:var(--ink-500);--text-inverse:var(--bone-100);--text-accent:var(--gold-600);--text-disabled:var(--ink-400);
+--border-subtle:var(--ink-200);--border-default:var(--ink-300);--border-strong:var(--ink-900);--border-accent:var(--gold-400);
+--accent:var(--gold-500);--accent-hover:var(--gold-600);--accent-soft:var(--gold-100);
+--action-primary:var(--ink-900);--action-primary-hover:var(--ink-700);--action-primary-text:var(--bone-100);
+--focus-ring:var(--gold-400);
+--link:var(--ink-900);--link-hover:var(--gold-600);
+}

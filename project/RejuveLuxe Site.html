@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>RejuveLuxe — Site prototype</title><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/tokens/colors.css">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/tokens/typography.css">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/tokens/effects.css">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/tokens/base.css">
+<link rel="stylesheet" href="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/styles.css">
+<link rel="stylesheet" href="rjx.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/rejuveluxe-design-system-0fe2c70a-415e-4b72-a746-4b9531e9bd8f/_ds_bundle.js"></script>
+<style id="__om-edit-overrides"></style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="rjx-data.jsx"></script>
+<script type="text/babel" src="rjx-shell.jsx"></script>
+<script type="text/babel" src="rjx-home.jsx"></script>
+<script type="text/babel" src="rjx-showcase.jsx"></script>
+<script type="text/babel" src="rjx-home-ref.jsx"></script>
+<script type="text/babel" src="rjx-product.jsx"></script>
+<script type="text/babel" src="rjx-pages.jsx"></script>
+<script type="text/babel" src="rjx-specs.jsx"></script>
+<script type="text/babel">
+const { Toast, ToastStack, Button } = window.RejuveluxeDesignSystem_0fe2c7;
+const LS = 'rjx-proto';
+const load = () => { try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch (e) { return {}; } };
+function App() {
+  const init = load();
+  const [page, setPageRaw] = React.useState(init.page || 'home');
+  const [pid, setPid] = React.useState(init.pid || 'golden');
+  const [scrollTo, setScrollTo] = React.useState(null);
+  const [theme, setTheme] = React.useState(init.theme || 'light');
+  const [mobile, setMobile] = React.useState(!!init.mobile);
+  const [homeV, setHomeV] = React.useState(init.homeV || 'ref');
+  const [items, setItems] = React.useState(init.items || []);
+  const [cartOpen, setCartOpen] = React.useState(false);
+  const [popup, setPopup] = React.useState(false);
+  const [popShown, setPopShown] = React.useState(!!init.popShown);
+  const [toasts, setToasts] = React.useState([]);
+  React.useEffect(() => { localStorage.setItem(LS, JSON.stringify({ page, pid, theme, mobile, items, popShown, homeV })); }, [page, pid, theme, mobile, items, popShown, homeV]);
+  React.useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  React.useEffect(() => { if (popShown) return; let done = false; const fire = () => { if (done) return; done = true; setPopup(true); setPopShown(true); }; const t = setTimeout(fire, 45000); const onScroll = () => { if (window.scrollY / (document.body.scrollHeight - innerHeight) > .6) fire(); }; const onLeave = (e) => { if (e.clientY <= 0 && !mobile) fire(); }; window.addEventListener('scroll', onScroll); document.addEventListener('mouseleave', onLeave); return () => { clearTimeout(t); window.removeEventListener('scroll', onScroll); document.removeEventListener('mouseleave', onLeave); }; }, [popShown, mobile]);
+  const go = (p, arg) => { setPageRaw(p); if (p === 'product' && arg) setPid(arg); setScrollTo(p === 'home' && arg === 'collection' ? 'collection-' + Date.now() : null); if (!(p === 'home' && arg === 'collection')) window.scrollTo(0, 0); };
+  const toast = (t) => { const id = Date.now() + Math.random(); setToasts((ts) => [...ts, { ...t, id }]); setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== id)), 3800); };
+  const onAdd = (p, qty = 1) => { setItems((its) => { const ex = its.find((i) => i.id === p.id); return ex ? its.map((i) => i.id === p.id ? { ...i, qty: i.qty + qty } : i) : [...its, { id: p.id, qty }]; }); toast({ tone: 'success', title: 'Added to cart', description: `${p.name} · ${p.weight}${qty > 1 ? ' × ' + qty : ''}` }); };
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const pages = [['home', 'Home'], ['product', 'Product'], ['craft', 'Craft'], ['garden', 'Garden'], ['specs', 'Specs']];
+  return <>
+    <div className="toolbar" role="toolbar" aria-label="Prototype controls">
+      <span className="lbl hide-tb">RejuveLuxe</span>
+      <div className="tg">{pages.map(([k, l]) => <button key={k} className={page === k ? 'on' : ''} onClick={() => go(k)}>{l}</button>)}</div>
+      <div className="tg"><button className={homeV === 'ref' ? 'on' : ''} onClick={() => setHomeV('ref')} title="Reference flow, centred nav">Home B</button><button className={homeV === 'brief' ? 'on' : ''} onClick={() => setHomeV('brief')} title="Brief section order">Home A</button></div>
+      <span className="sp" />
+      <div className="tg"><button className={theme === 'light' ? 'on' : ''} onClick={() => setTheme('light')} title="Light theme">Light</button><button className={theme === 'dark' ? 'on' : ''} onClick={() => setTheme('dark')} title="Dark theme">Dark</button></div>
+      <div className="tg"><button className={!mobile ? 'on' : ''} onClick={() => setMobile(false)} title="Desktop">1280</button><button className={mobile ? 'on' : ''} onClick={() => setMobile(true)} title="Mobile">390</button></div>
+      <div className="tg"><button onClick={() => setPopup(true)}>Popup</button><button onClick={() => setCartOpen(true)}>Cart</button></div>
+    </div>
+    <div className={'rjx-app' + (mobile ? ' mobile' : '')}>
+      <Announcement />
+      <Nav page={page} go={go} cartCount={count} onCart={() => setCartOpen(true)} toast={toast} centred={homeV === 'ref'} />
+      {page === 'home' && homeV === 'ref' && <HomeRef go={go} onAdd={onAdd} toast={toast} scrollTo={scrollTo && scrollTo.startsWith('collection') ? 'collection' : null} key={scrollTo || 'home'} />}
+      {page === 'home' && homeV === 'brief' && <Home go={go} onAdd={onAdd} toast={toast} scrollTo={scrollTo && scrollTo.startsWith('collection') ? 'collection' : null} key={scrollTo || 'home'} />}
+      {page === 'product' && <ProductPage p={byId(pid)} onAdd={onAdd} go={go} toast={toast} />}
+      {page === 'craft' && <CraftPage go={go} onAdd={onAdd} />}
+      {page === 'garden' && <GardenPage go={go} />}
+      {page === 'specs' && <SpecsPage onAdd={onAdd} openCart={() => setCartOpen(true)} setItems={setItems} toast={toast} />}
+      <Footer go={go} toast={toast} />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={items} setItems={setItems} onAdd={onAdd} toast={toast} mobile={mobile} />
+      <Popup open={popup} onClose={() => setPopup(false)} toast={toast} />
+      <ToastStack>{toasts.map((t) => <Toast key={t.id} tone={t.tone} title={t.title} description={t.description} onDismiss={() => setToasts((ts) => ts.filter((x) => x.id !== t.id))} action={t.tone === 'success' && t.title === 'Added to cart' ? <Button variant="inverse" size="sm" onClick={() => setCartOpen(true)}>View cart</Button> : null} />)}</ToastStack>
+    </div>
+  </>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script></body></html>
