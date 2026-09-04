@@ -53,7 +53,7 @@ export type ProductPhotos = {
  */
 export const SITE_PHOTOS = {
   /** Homepage hero, full-bleed behind the headline. 21:9. */
-  hero: '/assets/tea-field.jpeg',
+  hero: '/assets/hero.jpg',
   /** Dark story band, mid-homepage. 21:9. */
   storyBand: '/assets/tea-field.jpeg',
   /** The stand-in itself. */
@@ -111,6 +111,10 @@ export const PRODUCTS: Product[] = [
     tin: 'var(--tea-silver-tin)',
     ink: 'var(--tea-silver-ink)',
     image: '/assets/silver-needle-900.png',
+    photos: {
+      dryLeaf: '/assets/silver-needle-dry-leaf.webp',
+      liquor: '/assets/silver-needle-liquor.jpg',
+    },
     weight: '50 g',
     cups: '≈ 16',
     body: 1,

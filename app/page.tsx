@@ -79,8 +79,11 @@ export default function HomePage() {
             style={{
               position: 'absolute',
               inset: 0,
+              // Sized so the eyebrow, headline and subhead all clear 4.5:1
+              // against this photograph (brief §12). Measured, not eyeballed —
+              // a lighter hero image will need this re-checked.
               background:
-                'linear-gradient(90deg, rgba(20,19,17,.72) 0%, rgba(20,19,17,.45) 55%, rgba(20,19,17,.2) 100%)',
+                'linear-gradient(90deg, rgba(20,19,17,.86) 0%, rgba(20,19,17,.60) 55%, rgba(20,19,17,.30) 100%)',
             }}
           />
           {isInterim(SITE_PHOTOS.hero) && (
