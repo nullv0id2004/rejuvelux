@@ -1,25 +1,92 @@
-# CODING AGENTS: READ THIS FIRST
+# RejuveLuxe
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Single-origin Assam tea, built as a Next.js site from the Claude Design handoff in
+[`project/`](project/) — the original prototype, design-system bundle, chat
+transcripts and its own [handoff notes](project/HANDOFF.md) are kept there as the
+reference for what this implements.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # static prerender of every route
+npm run typecheck
+```
 
-## What you should do — IMPORTANT
+## Routes
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+| Route | What it is |
+|---|---|
+| `/` | Homepage — full-bleed hero, three cards, dark story band, scroll-driven collection showcase, "why" row, newsletter band |
+| `/shop/[slug]` | Product page, one per SKU. Gallery, evidence panel, brew parameters, accordions, reviews, cross-sells, FAQs |
+| `/craft` | Three chapters, one per tea, as a vertical process timeline |
+| `/garden` | Long-form editorial, single 720px column with full-bleed photography breaking it |
+| `/alt-home` | The homepage in the brief's fixed section order (deliverable 1). `noindex` |
+| `/specs` | Component sheet and colour/type specimen, both themes (deliverables 4, 5, 8, 9, 10). `noindex` |
+| `/wholesale`, `/contact` | Nav destinations the brief specifies; content pending, slots visibly empty |
 
-**Read `project/RejuveLuxe Site.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Layout
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+```
+app/            routes; globals.css carries the ported stylesheet
+components/ds/  the design system's components as typed React modules
+components/site/ chrome and shared primitives (evidence rows, ladder, greybox, showcase)
+lib/            product data, cart / toast / theme state
+styles/tokens/  design tokens, copied unchanged from the handoff bundle
+```
 
-## About the design files
+### The design system
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+`components/ds/` is a faithful transliteration of
+`project/_ds/rejuveluxe-design-system-…/_ds_bundle.js` — same styles, props and
+behaviour, typed and importable rather than attached to `window`. Two deliberate
+changes:
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+- **`Icon`** resolves glyphs from `lucide-react` instead of fetching the Lucide
+  UMD build from a CDN at runtime, so icons render on the server.
+- **`Button`** takes an optional `href` and renders a real anchor. The bundle's
+  general-purpose `as` prop is narrowed to the one case the site needs.
 
-## Bundle contents
+Tokens in `styles/tokens/` are byte-identical to the bundle's, except
+`fonts.css`: the three families are loaded and self-hosted by `next/font` in
+`app/layout.tsx` rather than imported from Google Fonts at runtime.
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `System design deliverables` project files (HTML prototypes, assets, components)
+### Themes
+
+The full light palette lives on `:root`; `[data-theme="dark"]` redefines only
+the semantic aliases. A small inline script in `<head>` applies the stored theme
+before first paint, so there is no flash. The toggle sits in the nav.
+
+### Responsiveness
+
+Breakpoint rules are container queries on the app shell (`.rjx-app`) rather than
+viewport media queries — carried over from the prototype, where the same
+stylesheet had to drive a 390px device frame. Wide content (the collection
+ladder, the brew table) scrolls inside its own container; the page body never
+scrolls sideways.
+
+## Placeholders
+
+Everything the brief marks as a known gap is a visible slot, not an invented
+value. Bracketed text (`[ESTATE]`, `[LOT-0000]`, `[000 m]`) renders in the accent
+colour so an unfilled slot reads as empty rather than as fact.
+
+- **Prices** — one dummy value (₹1,250) on every SKU, marked with `*`.
+- **Photography** — none exists. Every image slot shows the interim tea-field
+  photograph at the correct aspect ratio, captioned with the shot it stands in
+  for. It is a golden-hour image, which the brief's photography direction rules
+  out; replace it when the flat-daylight garden shots arrive.
+- **Reviews, awards, stockists** — modules are built, content is marked "example".
+- **Ube** — the sixth expression. Its tin colourway is confirmed
+  (`--tea-ube-tin` / `--tea-ube-ink`) but no copy and no tin render were
+  supplied, so its `image` is `null` and the tin frame draws a labelled
+  placeholder. Drop the render at `public/assets/ube-900.png` and set `image` in
+  `lib/data.ts` to wire it in.
+
+Adding or removing a SKU in `lib/data.ts` is enough: routes, the ladder, the
+showcase, the footer and the range-size copy all derive from that list.
+
+## What is not built
+
+Checkout, wholesale and contact content, the full brew-guide page, and set and
+gift configuration. The cart is client-side only — quantities persist in
+`localStorage`; the Checkout button is a stub.

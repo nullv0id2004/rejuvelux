@@ -1,0 +1,295 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import type { CSSProperties, ReactNode } from 'react';
+import type { Product } from '@/lib/data';
+
+/* --------------------------------------------------------------- labels -- */
+
+export function Eyebrow({
+  children,
+  muted,
+  style,
+}: {
+  children?: ReactNode;
+  muted?: boolean;
+  style?: CSSProperties;
+}) {
+  return (
+    <div className={'eyebrow' + (muted ? ' muted' : '')} style={style}>
+      {children}
+    </div>
+  );
+}
+
+/** An unfilled content slot, rendered in the accent colour so gaps stay visible. */
+export function Ph({ children }: { children?: ReactNode }) {
+  return <span className="ph">{children}</span>;
+}
+
+/** Renders a value, wrapping it as a placeholder if it reads as `[SLOT]`. */
+export function Slot({ v }: { v: string }) {
+  return /^\[.*\]$/.test(String(v)) ? <Ph>{v}</Ph> : <>{v}</>;
+}
+
+/** Splits a sentence so any embedded [SLOT] renders as a placeholder. */
+export function withSlots(text: string) {
+  return text
+    .split(/(₹?\[[^\]]+\])/)
+    .map((part, i) => (/\[/.test(part) ? <Ph key={i}>{part}</Ph> : <span key={i}>{part}</span>));
+}
+
+/* ------------------------------------------------------------- wordmark -- */
+
+export function Wordmark({
+  stacked,
+  size = 22,
+  href,
+  inverse,
+}: {
+  stacked?: boolean;
+  size?: number;
+  href?: string;
+  inverse?: boolean;
+}) {
+  const color = inverse ? 'var(--bone-100)' : 'var(--text-primary)';
+  const strap = inverse ? 'var(--gold-300)' : 'var(--text-accent)';
+
+  const content = stacked ? (
+    <span
+      style={{
+        display: 'inline-flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 6,
+        color,
+      }}
+    >
+      <span className="wordmark" style={{ fontSize: size }}>
+        Rejuveluxe
+      </span>
+      <span className="strap" style={{ color: strap, fontSize: Math.max(8, size * 0.36) }}>
+        ◆ Earned not indulged ◆
+      </span>
+    </span>
+  ) : (
+    <span className="wm" style={{ color }}>
+      <span className="wordmark" style={{ fontSize: size }}>
+        Rejuveluxe
+      </span>
+      <span className="strap hide-m" style={{ color: strap, fontSize: 8 }}>
+        ◆ Earned not indulged ◆
+      </span>
+    </span>
+  );
+
+  if (!href) return content;
+  return (
+    <Link href={href} aria-label="RejuveLuxe — home" style={{ display: 'inline-flex', color }}>
+      {content}
+    </Link>
+  );
+}
+
+/* ------------------------------------------------------------- greybox --- */
+
+/**
+ * Photography placeholder at a stated aspect ratio. No estate, process or
+ * liquor photography exists yet (brief §14), so every slot carries the same
+ * interim field photo plus a label naming the shot it is standing in for.
+ */
+export function Greybox({
+  label,
+  ratio = '3 / 2',
+  style,
+  className = '',
+  sizes = '(max-width: 800px) 100vw, 50vw',
+  priority,
+}: {
+  label: string;
+  ratio?: string;
+  style?: CSSProperties;
+  className?: string;
+  sizes?: string;
+  priority?: boolean;
+}) {
+  return (
+    <div
+      className={'greybox photo ' + className}
+      style={{ aspectRatio: ratio, ...style }}
+      role="img"
+      aria-label={label + ' — interim photograph'}
+    >
+      <Image src="/assets/tea-field.jpeg" alt="" fill sizes={sizes} priority={priority} />
+      <div className="gl">
+        {label} · {ratio.replace(/\s/g, '')} · Interim
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------- evidence rows --- */
+
+/** Label left, tabular value right, hairline between. The core repeating object. */
+export function Evidence({
+  rows,
+  inverse,
+  style,
+}: {
+  rows: [string, string][];
+  inverse?: boolean;
+  style?: CSSProperties;
+}) {
+  return (
+    <div className={'ev' + (inverse ? ' inv' : '')} style={style}>
+      {rows.map(([k, v]) => (
+        <div className="ev-row" key={k}>
+          <span className="k">{k}</span>
+          <span className="v">
+            <Slot v={v} />
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* --------------------------------------------------- swatch and scales --- */
+
+export function Swatch({ p, size = 24, style }: { p: Product; size?: number; style?: CSSProperties }) {
+  return (
+    <span
+      className="swatch"
+      title={p.name}
+      style={{
+        width: size,
+        height: size,
+        background: p.tin,
+        boxShadow: `inset 0 0 0 1px ${p.ink}`,
+        ...style,
+      }}
+    />
+  );
+}
+
+/**
+ * Five segments filled in the SKU's ink colour (inherited via currentColor).
+ * A value of 0 means the tea has not been cupped yet, and reads as an empty
+ * slot rather than as a genuine score of zero.
+ */
+export function Scale({ label, value }: { label: string; value: number }) {
+  const rated = value > 0;
+  return (
+    <div className="stack g2" style={{ minWidth: 0 }}>
+      <div className="between">
+        <span className="eyebrow muted">{label}</span>
+        <span className="cap num">{rated ? `${value}/5` : <Ph>[0]/5</Ph>}</span>
+      </div>
+      <div
+        className="scale"
+        aria-label={rated ? `${label} ${value} of 5` : `${label} — not yet rated`}
+      >
+        {[1, 2, 3, 4, 5].map((i) => (
+          <i key={i} className={i <= value ? 'on' : ''} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------- tin figure --- */
+
+/**
+ * A product tin floating on its own tin colour. Where no render has been
+ * supplied, the frame states which one is missing instead of breaking.
+ */
+export function TinBox({
+  p,
+  className = '',
+  style,
+  imgStyle,
+  sizes = '(max-width: 800px) 90vw, 400px',
+  priority,
+  alt,
+}: {
+  p: Product;
+  className?: string;
+  style?: CSSProperties;
+  imgStyle?: CSSProperties;
+  sizes?: string;
+  priority?: boolean;
+  alt?: string;
+}) {
+  return (
+    <div
+      className={'tinbox ' + className}
+      style={{ background: p.tin, ...style }}
+      role={p.image ? undefined : 'img'}
+      aria-label={p.image ? undefined : `${p.name} tin — render pending`}
+    >
+      {p.image ? (
+        <Image
+          src={p.image}
+          alt={alt ?? ''}
+          width={900}
+          height={900}
+          sizes={sizes}
+          priority={priority}
+          style={{ height: 'auto', ...imgStyle }}
+        />
+      ) : (
+        <span className="tin-pending" style={{ color: p.ink }}>
+          Tin render
+          <br />
+          pending
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------- section header -- */
+
+export function SectionHead({
+  eyebrow,
+  title,
+  aside,
+  children,
+}: {
+  eyebrow: ReactNode;
+  title: ReactNode;
+  aside?: ReactNode;
+  children?: ReactNode;
+}) {
+  return (
+    <div
+      className="between wrapm"
+      style={{
+        alignItems: 'flex-end',
+        paddingBottom: 24,
+        borderBottom: 'var(--rule)',
+        marginBottom: 40,
+      }}
+    >
+      <div className="stack g3">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h2 className="h1">{title}</h2>
+      </div>
+      {aside && (
+        <p className="small" style={{ maxWidth: 360 }}>
+          {aside}
+        </p>
+      )}
+      {children}
+    </div>
+  );
+}
+
+/** Star-equivalent rating row. The brand's only permitted ornament is ◆. */
+export function Rating({ value, style }: { value: number; style?: CSSProperties }) {
+  return (
+    <span className="cap num" aria-label={`${value} of 5`} style={style}>
+      {'◆'.repeat(value)}
+      <span style={{ opacity: 0.3 }}>{'◆'.repeat(5 - value)}</span>
+    </span>
+  );
+}

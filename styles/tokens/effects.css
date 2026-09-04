@@ -1,0 +1,22 @@
+:root{
+/* Shadows — soft, warm, used only for floating objects (product tins, dialogs, toasts). Cards use borders, not shadows. */
+--shadow-tin:0 40px 60px -20px rgba(20,19,17,.45),0 18px 24px -14px rgba(20,19,17,.3);
+--shadow-float:0 24px 48px -16px rgba(20,19,17,.28);
+--shadow-sm:0 2px 6px rgba(20,19,17,.10);
+--shadow-focus:0 0 0 3px rgba(192,160,98,.45);
+/* Hairlines & rules */
+--rule:1px solid var(--border-subtle);--rule-strong:1px solid var(--border-strong);--rule-gold:1px solid var(--border-accent);
+/* Motion */
+--ease-out:cubic-bezier(.22,1,.36,1); /* @kind other */
+--ease-in-out:cubic-bezier(.65,0,.35,1); /* @kind other */
+--ease-wipe:cubic-bezier(.77,0,.18,1); /* @kind other */
+--dur-fast:160ms; /* @kind other */
+--dur-base:280ms; /* @kind other */
+--dur-slow:600ms; /* @kind other */
+--dur-wipe:900ms; /* @kind other */
+/* Overlays */
+--overlay-scrim:rgba(20,19,17,.55);
+--blur-glass:blur(14px); /* @kind other */
+--opacity-hover:.72; /* @kind other */
+--opacity-disabled:.4; /* @kind other */
+}

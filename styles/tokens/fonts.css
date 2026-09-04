@@ -1,0 +1,11 @@
+/* No brand font binaries were provided. Google Fonts substitutes (see the design
+   system readme → Visual foundations → Type):
+     Cinzel                 ≈ the Trajan-style small-caps wordmark on the tins
+     Playfair Display Italic ≈ the script product names ("White Tea", "Matcha")
+     Figtree                 = body / UI sans (chosen for the web; not on packaging)
+
+   The prototype pulled these over an @import from fonts.googleapis.com. Here they
+   are loaded and self-hosted by `next/font/google` in `app/layout.tsx`, which
+   assigns them to --font-wordmark / --font-display / --font-body in globals.css.
+   That removes a render-blocking request and the layout shift that came with it;
+   the families themselves are unchanged. */
