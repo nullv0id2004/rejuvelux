@@ -3,7 +3,7 @@ import { Button, Card, Icon, type IconName } from '@/components/ds';
 import { NewsletterBand } from '@/components/site/NewsletterBand';
 import { Evidence, Eyebrow, Greybox, Ph, withSlots } from '@/components/site/primitives';
 import { ScrollShowcase } from '@/components/site/ScrollShowcase';
-import { RANGE_WORD, RANGE_WORD_CAP, SLOT, STORY } from '@/lib/data';
+import { RANGE_WORD, RANGE_WORD_CAP, SITE_PHOTOS, SLOT, STORY, isInterim } from '@/lib/data';
 
 const CARDS: { eyebrow: string; title: string; body: string; shot: string; href: string; cta: string }[] =
   [
@@ -65,10 +65,10 @@ export default function HomePage() {
           className="greybox"
           style={{ position: 'absolute', inset: 0 }}
           role="img"
-          aria-label="The garden — interim photograph"
+          aria-label={isInterim(SITE_PHOTOS.hero) ? "The garden — interim photograph" : "RejuveLuxe hero photograph"}
         >
           <Image
-            src="/assets/tea-field.jpeg"
+            src={SITE_PHOTOS.hero}
             alt=""
             fill
             priority
@@ -83,20 +83,22 @@ export default function HomePage() {
                 'linear-gradient(90deg, rgba(20,19,17,.72) 0%, rgba(20,19,17,.45) 55%, rgba(20,19,17,.2) 100%)',
             }}
           />
-          <div
-            className="gl"
-            style={{
-              position: 'absolute',
-              right: 16,
-              bottom: 12,
-              padding: '5px 8px',
-              background: 'rgba(20,19,17,.6)',
-              color: 'var(--bone-100)',
-              fontSize: 9,
-            }}
-          >
-            Hero · 21:9 · Interim
-          </div>
+          {isInterim(SITE_PHOTOS.hero) && (
+            <div
+              className="gl"
+              style={{
+                position: 'absolute',
+                right: 16,
+                bottom: 12,
+                padding: '5px 8px',
+                background: 'rgba(20,19,17,.6)',
+                color: 'var(--bone-100)',
+                fontSize: 9,
+              }}
+            >
+              Hero · 21:9 · Interim
+            </div>
+          )}
         </div>
 
         <div className="wrap" style={{ position: 'relative', padding: '96px var(--gutter-lg)' }}>
@@ -172,30 +174,32 @@ export default function HomePage() {
           className="greybox"
           style={{ position: 'absolute', inset: 0 }}
           role="img"
-          aria-label="The garden — interim photograph"
+          aria-label={isInterim(SITE_PHOTOS.storyBand) ? "The garden — interim photograph" : "The garden"}
         >
           <Image
-            src="/assets/tea-field.jpeg"
+            src={SITE_PHOTOS.storyBand}
             alt=""
             fill
             sizes="100vw"
             style={{ objectFit: 'cover', objectPosition: '50% 70%' }}
           />
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,19,17,.62)' }} />
-          <div
-            className="gl"
-            style={{
-              position: 'absolute',
-              right: 16,
-              bottom: 12,
-              padding: '5px 8px',
-              background: 'rgba(20,19,17,.6)',
-              color: 'var(--bone-100)',
-              fontSize: 9,
-            }}
-          >
-            The garden · 21:9 · Interim
-          </div>
+          {isInterim(SITE_PHOTOS.storyBand) && (
+            <div
+              className="gl"
+              style={{
+                position: 'absolute',
+                right: 16,
+                bottom: 12,
+                padding: '5px 8px',
+                background: 'rgba(20,19,17,.6)',
+                color: 'var(--bone-100)',
+                fontSize: 9,
+              }}
+            >
+              The garden · 21:9 · Interim
+            </div>
+          )}
         </div>
 
         <div className="wrap" style={{ position: 'relative', padding: '80px var(--gutter-lg)' }}>

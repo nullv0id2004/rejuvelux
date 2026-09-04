@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import type { Product } from '@/lib/data';
+import { SITE_PHOTOS, type Product } from '@/lib/data';
 
 /* --------------------------------------------------------------- labels -- */
 
@@ -130,7 +130,7 @@ export function Greybox({
       aria-label={real ? (alt ?? label) : label + ' — interim photograph'}
     >
       <Image
-        src={src ?? '/assets/tea-field.jpeg'}
+        src={src ?? SITE_PHOTOS.interim}
         alt=""
         fill
         sizes={sizes}

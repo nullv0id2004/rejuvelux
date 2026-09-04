@@ -43,6 +43,25 @@ export type ProductPhotos = {
   lot?: string;
 };
 
+/**
+ * Shared editorial photography, as distinct from the per-SKU shots below.
+ *
+ * `interim` is the stand-in used wherever no real photograph exists yet. Any
+ * slot still pointing at it renders with an "Interim" caption, so a stand-in is
+ * never mistaken for the real shot; give a slot its own file and the caption
+ * disappears on its own.
+ */
+export const SITE_PHOTOS = {
+  /** Homepage hero, full-bleed behind the headline. 21:9. */
+  hero: '/assets/tea-field.jpeg',
+  /** Dark story band, mid-homepage. 21:9. */
+  storyBand: '/assets/tea-field.jpeg',
+  /** The stand-in itself. */
+  interim: '/assets/tea-field.jpeg',
+} as const;
+
+export const isInterim = (src: string) => src === SITE_PHOTOS.interim;
+
 export type Brew = {
   temp: string;
   g: string;
