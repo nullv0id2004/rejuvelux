@@ -18,6 +18,9 @@ export function CraftView() {
   const c = CRAFT[tea];
   const p = byId(tea)!;
   const chapter = CRAFT_ORDER.indexOf(tea as (typeof CRAFT_ORDER)[number]) + 1;
+  // The chapter's macro slots take this tea's own photography in order, and
+  // fall back to the labelled stand-in once it runs out.
+  const macros = [p.photos?.dryLeaf, p.photos?.wetLeaf, p.photos?.liquor].filter(Boolean) as string[];
 
   return (
     <main>
@@ -112,6 +115,8 @@ export function CraftView() {
                       label={`Macro · after step ${String(i + 1).padStart(2, '0')} · ${n.toLowerCase()}`}
                       ratio="3 / 2"
                       sizes="(max-width: 800px) 100vw, 600px"
+                      src={macros[Math.floor((i + 1) / 3) - 1]}
+                      alt={`${p.name} — ${n.toLowerCase()}`}
                     />
                   </div>
                 )}

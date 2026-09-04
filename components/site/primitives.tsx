@@ -93,9 +93,12 @@ export function Wordmark({
 /* ------------------------------------------------------------- greybox --- */
 
 /**
- * Photography placeholder at a stated aspect ratio. No estate, process or
- * liquor photography exists yet (brief §14), so every slot carries the same
- * interim field photo plus a label naming the shot it is standing in for.
+ * A photography slot at a stated aspect ratio.
+ *
+ * Given a `src`, it shows that photograph. Without one it falls back to the
+ * interim field photo, captioned with the shot it is standing in for — most
+ * estate, process and liquor photography does not exist yet (brief §14), and a
+ * labelled stand-in is more honest than a picture pretending to be the thing.
  */
 export function Greybox({
   label,
@@ -104,6 +107,8 @@ export function Greybox({
   className = '',
   sizes = '(max-width: 800px) 100vw, 50vw',
   priority,
+  src,
+  alt,
 }: {
   label: string;
   ratio?: string;
@@ -111,18 +116,32 @@ export function Greybox({
   className?: string;
   sizes?: string;
   priority?: boolean;
+  /** Real photograph for this slot. Omit to get the labelled interim stand-in. */
+  src?: string;
+  /** Description of the real photograph, for assistive technology. */
+  alt?: string;
 }) {
+  const real = Boolean(src);
   return (
     <div
       className={'greybox photo ' + className}
       style={{ aspectRatio: ratio, ...style }}
       role="img"
-      aria-label={label + ' — interim photograph'}
+      aria-label={real ? (alt ?? label) : label + ' — interim photograph'}
     >
-      <Image src="/assets/tea-field.jpeg" alt="" fill sizes={sizes} priority={priority} />
-      <div className="gl">
-        {label} · {ratio.replace(/\s/g, '')} · Interim
-      </div>
+      <Image
+        src={src ?? '/assets/tea-field.jpeg'}
+        alt=""
+        fill
+        sizes={sizes}
+        priority={priority}
+        style={real ? { objectFit: 'cover' } : undefined}
+      />
+      {!real && (
+        <div className="gl">
+          {label} · {ratio.replace(/\s/g, '')} · Interim
+        </div>
+      )}
     </div>
   );
 }

@@ -81,6 +81,9 @@ export function AltHome() {
   const { add } = useCart();
   const { toast } = useToast();
   const a = byId(active)!;
+  // The hero's one permitted motion: a slow crossfade from dry leaf to brewed
+  // liquor. Silver Needle is the SKU whose pair of shots exists first.
+  const hero = byId('silver');
 
   return (
     <main>
@@ -114,12 +117,20 @@ export function AltHome() {
             />
           </div>
           <div className="xfade" aria-label="Dry leaf crossfading to brewed liquor">
-            <Greybox label="Dry leaf macro · scale reference in frame" ratio="4 / 5" priority />
+            <Greybox
+              label="Dry leaf macro · scale reference in frame"
+              ratio="4 / 5"
+              priority
+              src={hero?.photos?.dryLeaf}
+              alt={`${hero?.name} dry leaf at real scale`}
+            />
             <div className="b">
               <Greybox
                 label="Brewed liquor · clear glass · white ground"
                 ratio="4 / 5"
                 style={{ background: 'var(--bone-400)' }}
+                src={hero?.photos?.liquor}
+                alt={`${hero?.name} brewed, showing the colour of the liquor`}
               />
             </div>
           </div>

@@ -24,6 +24,25 @@ export const SLOT = {
   grade: '[GRADE]',
 } as const;
 
+/**
+ * Real photography for a SKU, keyed by the shot it fills. Every key is
+ * optional — an absent one falls back to the labelled interim stand-in, so
+ * photography can land one shot at a time.
+ *
+ * Shot direction is set by brief §9: flat neutral daylight throughout, no
+ * golden hour, no steam, no styling props.
+ */
+export type ProductPhotos = {
+  /** Dry leaf at real scale, with a scale reference in frame. The proof shot. */
+  dryLeaf?: string;
+  /** Brewed liquor in clear straight-sided glass on white, shot straight on. */
+  liquor?: string;
+  /** Wet leaf after the first steep. */
+  wetLeaf?: string;
+  /** The tin as an object, showing its printed lot number and pluck date. */
+  lot?: string;
+};
+
 export type Brew = {
   temp: string;
   g: string;
@@ -49,6 +68,8 @@ export type Product = {
    * broken image.
    */
   image: string | null;
+  /** Real photography, filled in per shot as it arrives. */
+  photos?: ProductPhotos;
   weight: string;
   cups: string;
   /** Intensity scale, 1–5. */

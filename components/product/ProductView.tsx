@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Icon, RadioGroup } from '@/components/ds';
@@ -23,15 +24,41 @@ import { useCart } from '@/lib/cart';
 /** Subscription discount is a placeholder alongside the placeholder price. */
 const SUBSCRIBE_SAVING = 100;
 
-/** Gallery plan: 6 shots, with image 3 establishing real scale (brief §11.2). */
-const SHOTS: { label: string; ratio: string; tin?: boolean }[] = [
-  { label: 'Tin · front', ratio: '4 / 5', tin: true },
-  { label: 'Tin · lot number and pluck date', ratio: '4 / 5' },
-  { label: 'Dry leaf at scale · coin in frame', ratio: '4 / 5' },
-  { label: 'Brewed liquor · clear glass', ratio: '4 / 5' },
-  { label: 'Wet leaf after first steep', ratio: '4 / 5' },
-  { label: 'Garden · overcast', ratio: '4 / 5' },
-];
+/**
+ * Gallery plan: 6 shots, with image 3 establishing real scale (brief §11.2).
+ * Each slot takes the SKU's own photograph where one exists and falls back to
+ * the labelled interim stand-in where it does not.
+ */
+function galleryShots(p: Product): { label: string; ratio: string; tin?: boolean; src?: string; alt?: string }[] {
+  return [
+    { label: 'Tin · front', ratio: '4 / 5', tin: true },
+    {
+      label: 'Tin · lot number and pluck date',
+      ratio: '4 / 5',
+      src: p.photos?.lot,
+      alt: `${p.name} tin, showing the printed lot number and pluck date`,
+    },
+    {
+      label: 'Dry leaf at scale · coin in frame',
+      ratio: '4 / 5',
+      src: p.photos?.dryLeaf,
+      alt: `${p.name} dry leaf at real scale`,
+    },
+    {
+      label: 'Brewed liquor · clear glass',
+      ratio: '4 / 5',
+      src: p.photos?.liquor,
+      alt: `${p.name} brewed, showing the colour of the liquor`,
+    },
+    {
+      label: 'Wet leaf after first steep',
+      ratio: '4 / 5',
+      src: p.photos?.wetLeaf,
+      alt: `${p.name} leaf after the first steep`,
+    },
+    { label: 'Garden · overcast', ratio: '4 / 5' },
+  ];
+}
 
 export function ProductView({ p }: { p: Product }) {
   const [img, setImg] = useState(0);
@@ -47,7 +74,8 @@ export function ProductView({ p }: { p: Product }) {
     : null;
   const linePrice = plan === 'sub' ? PRICE - SUBSCRIBE_SAVING : PRICE;
   const others = PRODUCTS.filter((q) => q.id !== p.id).slice(0, 3);
-  const shot = SHOTS[img];
+  const shots = galleryShots(p);
+  const shot = shots[img];
 
   return (
     <main>
@@ -67,7 +95,7 @@ export function ProductView({ p }: { p: Product }) {
         <div className="pdp">
           <div className="gallery">
             <div className="thumbs">
-              {SHOTS.map((s, i) => (
+              {shots.map((s, i) => (
                 <button
                   key={s.label}
                   className={i === img ? 'on' : ''}
@@ -77,6 +105,8 @@ export function ProductView({ p }: { p: Product }) {
                 >
                   {s.tin ? (
                     <TinBox p={p} sizes="72px" imgStyle={{ width: '70%' }} />
+                  ) : s.src ? (
+                    <Image src={s.src} alt="" width={72} height={90} sizes="72px" className="thumb-img" />
                   ) : (
                     <span className="cap num">{i + 1}</span>
                   )}
@@ -93,7 +123,13 @@ export function ProductView({ p }: { p: Product }) {
                   priority
                 />
               ) : (
-                <Greybox label={shot.label} ratio={shot.ratio} sizes="(max-width: 800px) 100vw, 520px" />
+                <Greybox
+                  label={shot.label}
+                  ratio={shot.ratio}
+                  src={shot.src}
+                  alt={shot.alt}
+                  sizes="(max-width: 800px) 100vw, 520px"
+                />
               )}
             </div>
           </div>

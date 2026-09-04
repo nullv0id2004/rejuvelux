@@ -1438,3 +1438,10 @@ button {
     opacity: 1;
   }
 }
+
+/* Real photography in a gallery thumbnail fills the frame. */
+.thumbs button > .thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
