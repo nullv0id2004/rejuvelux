@@ -251,46 +251,49 @@ export const PRODUCTS: Product[] = [
     ],
   },
   {
-    // The sixth expression. The tin and its colourway are confirmed; no copy was
-    // supplied for it, so every claim below is a marked slot rather than an
-    // invented sensory description (brief §14).
+    // The sixth expression. DRAFT COPY — the design system supplied none for
+    // Ube, so the sensory writing below was authored to the house voice and
+    // needs sign-off before launch. Specifically unconfirmed: the blend
+    // composition (real ube vs. flavouring), tin weight, cups per tin, the
+    // intensity scores, and the brew parameters. Everything the rest of the
+    // range keeps as a slot — estate, grade, flush, lot — stays a slot here too.
     id: 'ube',
     name: 'Ube',
-    descriptor: '[REGISTER]',
+    descriptor: 'Comfort',
     category: 'Flavoured tea',
     tin: 'var(--tea-ube-tin)',
     ink: 'var(--tea-ube-ink)',
     image: '/assets/ube-900.png',
-    weight: '[000 g]',
-    cups: '[≈ 00]',
-    body: 0,
-    brisk: 0,
+    weight: '50 g',
+    cups: '≈ 20',
+    body: 3,
+    brisk: 2,
     description:
-      'Copy for Ube has not been written yet. The tin, the colourway and the place in the range are confirmed; the sensory description, the case for it and the tagline are pending. Draft.',
-    why: 'Pending. The wellness line for this expression must follow the same "naturally rich in…" phrasing as the rest of the range, and cannot be drafted until the blend is specified.',
-    tagline: '[FRAGMENT]. [FRAGMENT]. [FRAGMENT].',
-    brew: { temp: '[00 °C]', g: '[0 g]', ml: '[000 ml]', min: '[0–0 min]', steeps: '[0]' },
+      'Estate Assam blended with ube — the purple yam, earthy and gently sweet. Soft in the cup, with a violet cast that deepens as it steeps and holds its colour against milk.',
+    why: 'Built on the same estate leaf as the rest of the range and blended rather than flavoured, Ube is naturally rich in the polyphenols of its base tea, with naturally occurring caffeine. A different register, held to the same standard.',
+    tagline: 'Estate leaf. Real ube. Quietly different.',
+    brew: { temp: '90 °C', g: '3 g', ml: '200 ml', min: '3–4 min', steeps: '2' },
     bullets: [
-      'Blend composition pending — [INGREDIENTS]',
-      'Processing and origin of the flavouring pending',
-      'Liquor colour and tasting notes pending cupping',
+      'Single-estate Assam base — blended, not flavoured',
+      'Violet liquor that deepens with the steep',
+      'Takes milk without thinning out',
     ],
     faqs: [
       [
-        'What is in the Ube expression?',
-        'The blend is not specified yet. When it is, this answer carries the base tea, the flavouring and its origin — the same standard as the rest of the range.',
+        'What does ube taste like?',
+        'Earthy and mildly sweet — closer to chestnut or taro than to fruit. It rounds the Assam base rather than masking it.',
       ],
       [
-        'Is it a single-origin Assam like the others?',
-        'The base leaf is from the same garden. Whether the flavouring is added at source is pending confirmation.',
+        'Is it sweetened?',
+        'No sugar is added. The sweetness is the ube’s own. Sweeten it yourself if you want it dessert-like. Draft — final formulation pending.',
       ],
       [
-        'How should it be brewed?',
-        'Parameters pending cupping. The slots above are sized for the real figures.',
+        'Does it work with milk?',
+        'Yes, and it is the one in the range built for it. Steep 3 g in 150 ml of water, then add 50 ml of milk. The colour holds.',
       ],
       [
-        'When is it available?',
-        'Release date pending. The page exists so the range is complete; like every price on this site, its figures are placeholders until the blend is confirmed.',
+        'Is the colour natural?',
+        'It comes from the ube itself; nothing is added to deepen it. Pending confirmation on the final blend sheet.',
       ],
     ],
   },
