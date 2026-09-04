@@ -83,7 +83,7 @@ export function Nav() {
             </IconButton>
           </span>
 
-          <Wordmark stacked size={20} href="/" />
+          <Wordmark stacked size={20} href="/" crest crestWidth={46} />
 
           <div className="row g6" style={{ justifyContent: 'flex-end' }}>
             <nav className="nav-links" aria-label="Secondary">

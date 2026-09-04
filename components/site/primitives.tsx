@@ -45,16 +45,21 @@ export function Wordmark({
   size = 22,
   href,
   inverse,
+  crest,
+  crestWidth = 46,
 }: {
   stacked?: boolean;
   size?: number;
   href?: string;
   inverse?: boolean;
+  /** Sets the crest beside the type. The type carries the name; the crest is the mark. */
+  crest?: boolean;
+  crestWidth?: number;
 }) {
   const color = inverse ? 'var(--bone-100)' : 'var(--text-primary)';
   const strap = inverse ? 'var(--gold-300)' : 'var(--text-accent)';
 
-  const content = stacked ? (
+  const type = stacked ? (
     <span
       style={{
         display: 'inline-flex',
@@ -64,22 +69,37 @@ export function Wordmark({
         color,
       }}
     >
-      <span className="wordmark" style={{ fontSize: size }}>
+      <span className="wordmark" style={{ '--wm-size': `${size}px` } as CSSProperties}>
         Rejuveluxe
       </span>
-      <span className="strap" style={{ color: strap, fontSize: Math.max(8, size * 0.36) }}>
+      <span
+        className="strap"
+        style={{ color: strap, '--strap-size': `${Math.max(8, size * 0.36)}px` } as CSSProperties}
+      >
         ◆ Earned not indulged ◆
       </span>
     </span>
   ) : (
     <span className="wm" style={{ color }}>
-      <span className="wordmark" style={{ fontSize: size }}>
+      <span className="wordmark" style={{ '--wm-size': `${size}px` } as CSSProperties}>
         Rejuveluxe
       </span>
-      <span className="strap hide-m" style={{ color: strap, fontSize: 8 }}>
+      <span
+        className="strap hide-m"
+        style={{ color: strap, '--strap-size': '8px' } as CSSProperties}
+      >
         ◆ Earned not indulged ◆
       </span>
     </span>
+  );
+
+  const content = crest ? (
+    <span className="nav-mark">
+      <Logo width={crestWidth} priority />
+      {type}
+    </span>
+  ) : (
+    type
   );
 
   if (!href) return content;
