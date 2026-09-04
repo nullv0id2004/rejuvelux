@@ -260,7 +260,7 @@ export const PRODUCTS: Product[] = [
     category: 'Flavoured tea',
     tin: 'var(--tea-ube-tin)',
     ink: 'var(--tea-ube-ink)',
-    image: null,
+    image: '/assets/ube-900.png',
     weight: '[000 g]',
     cups: '[≈ 00]',
     body: 0,
