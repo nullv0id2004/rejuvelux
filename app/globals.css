@@ -399,6 +399,7 @@ button {
 }
 .tinbox img {
   width: 70%;
+  height: auto;
   max-width: 340px;
   filter: drop-shadow(0 30px 30px rgba(20, 19, 17, 0.35));
 }

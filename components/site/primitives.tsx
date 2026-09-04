@@ -234,7 +234,9 @@ export function TinBox({
           height={900}
           sizes={sizes}
           priority={priority}
-          style={{ height: 'auto', ...imgStyle }}
+          // Sizing lives in CSS (`.tinbox img`, and the per-context overrides
+          // that follow it) so context rules are not beaten by inline styles.
+          style={imgStyle}
         />
       ) : (
         <span className="tin-pending" style={{ color: p.ink }}>
