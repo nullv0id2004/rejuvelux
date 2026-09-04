@@ -25,8 +25,27 @@ const figtree = Figtree({
   display: 'swap',
 });
 
+/**
+ * Absolute base for Open Graph URLs. Social scrapers will not resolve a
+ * relative image path, so this has to be the real deployed origin: set
+ * NEXT_PUBLIC_SITE_URL once a custom domain exists, otherwise Vercel's own
+ * production URL is used, and local development falls back to localhost.
+ */
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'http://localhost:3000');
+
+const OG_IMAGE = {
+  url: '/assets/og.jpg',
+  width: 1200,
+  height: 630,
+  alt: 'RejuveLuxe — Earned, not indulged. Single-origin Assam tea.',
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://rejuveluxe.example'),
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'RejuveLuxe — Earned, not indulged',
     template: '%s · RejuveLuxe',
@@ -38,6 +57,13 @@ export const metadata: Metadata = {
     siteName: 'RejuveLuxe',
     title: 'RejuveLuxe — Earned, not indulged',
     description: 'Single-origin Assam tea. One garden, one flush, one lot.',
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'RejuveLuxe — Earned, not indulged',
+    description: 'Single-origin Assam tea. One garden, one flush, one lot.',
+    images: [OG_IMAGE.url],
   },
 };
 

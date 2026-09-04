@@ -23,6 +23,7 @@ npm run typecheck
 | `/alt-home` | The homepage in the brief's fixed section order (deliverable 1). `noindex` |
 | `/specs` | Component sheet and colour/type specimen, both themes (deliverables 4, 5, 8, 9, 10). `noindex` |
 | `/wholesale`, `/contact` | Nav destinations the brief specifies; content pending, slots visibly empty |
+| `/og-preview` | Source for the link-preview card. `noindex`, unlinked — see below |
 
 ## Layout
 
@@ -63,6 +64,20 @@ viewport media queries — carried over from the prototype, where the same
 stylesheet had to drive a 390px device frame. Wide content (the collection
 ladder, the brew table) scrolls inside its own container; the page body never
 scrolls sideways.
+
+## Link previews
+
+`public/assets/og.jpg` is a static 1200×630 card, rendered once by screenshotting
+`/og-preview` so it is built from the site's own tokens and self-hosted faces.
+To regenerate it after a brand change, screenshot the `#og-card` element on that
+route at scale 1 and re-encode to JPEG.
+
+`metadataBase` resolves from `NEXT_PUBLIC_SITE_URL`, falling back to Vercel's
+`VERCEL_PROJECT_PRODUCTION_URL`, then localhost. Social scrapers will not follow
+a relative image path, so set `NEXT_PUBLIC_SITE_URL` once a custom domain exists.
+
+The favicon stays a plain gold `R` rather than the crest: at 32px every crop of
+the crest is illegible, and a favicon has to read as a silhouette.
 
 ## Placeholders
 
