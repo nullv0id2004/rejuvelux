@@ -90,6 +90,37 @@ export function Wordmark({
   );
 }
 
+/**
+ * The brand crest — the full lockup from the tins: Mughal arch, crown, cup,
+ * leaves, wordmark and strapline.
+ *
+ * It carries its own detail and its own colour (gold gradients on a cream
+ * ground), so it does not take the page's ink colour and it needs room. Below
+ * roughly 120px tall the wordmark inside it turns to mush; use `Wordmark` in
+ * type for anything smaller, which is what the nav does.
+ */
+export function Logo({
+  width = 150,
+  priority,
+  style,
+}: {
+  width?: number;
+  priority?: boolean;
+  style?: CSSProperties;
+}) {
+  const RATIO = 1345.1 / 1253.7; // the SVG's own viewBox
+  return (
+    <Image
+      src="/assets/logo.svg"
+      alt="RejuveLuxe"
+      width={width}
+      height={Math.round(width * RATIO)}
+      priority={priority}
+      style={{ height: 'auto', ...style }}
+    />
+  );
+}
+
 /* ------------------------------------------------------------- greybox --- */
 
 /**
