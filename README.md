@@ -86,16 +86,22 @@ value. Bracketed text (`[ESTATE]`, `[LOT-0000]`, `[000 m]`) renders in the accen
 colour so an unfilled slot reads as empty rather than as fact.
 
 - **Prices** — one dummy value (₹1,250) on every SKU, marked with `*`.
-- **Photography** — none exists. Every image slot shows the interim tea-field
-  photograph at the correct aspect ratio, captioned with the shot it stands in
-  for. It is a golden-hour image, which the brief's photography direction rules
-  out; replace it when the flat-daylight garden shots arrive.
+- **Photography** — partial. All six tin renders are in, plus a hero and Silver
+  Needle's dry-leaf and liquor shots. Every other slot still shows the interim
+  field photograph at the correct ratio, captioned with the shot it stands in
+  for. Both the hero and that stand-in are golden-hour images, which the brief's
+  photography direction rules out — replace them when flat-daylight shots exist.
+  Per-SKU shots go in `photos` on the product (`dryLeaf`, `liquor`, `wetLeaf`,
+  `lot`); shared editorial photography goes in `SITE_PHOTOS`. A slot with no
+  file keeps its caption; giving it one removes the caption automatically.
 - **Reviews, awards, stockists** — modules are built, content is marked "example".
-- **Ube** — the sixth expression. Its tin colourway is confirmed
-  (`--tea-ube-tin` / `--tea-ube-ink`) but no copy and no tin render were
-  supplied, so its `image` is `null` and the tin frame draws a labelled
-  placeholder. Drop the render at `public/assets/ube-900.png` and set `image` in
-  `lib/data.ts` to wire it in.
+- **Ube copy** — the sixth expression's tin and colourway are confirmed, but the
+  design system supplied no copy, so its description, tagline, weight, cups,
+  intensity scores and brew figures are drafted and need sign-off. Flagged in a
+  comment above the entry in `lib/data.ts`.
+- **Hero contrast** — the hero overlay is sized so the eyebrow, headline and
+  subhead all clear 4.5:1 against the current photograph. Swap the hero and
+  re-measure; a lighter image will fail.
 
 Adding or removing a SKU in `lib/data.ts` is enough: routes, the ladder, the
 showcase, the footer and the range-size copy all derive from that list.
