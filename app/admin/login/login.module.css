@@ -1,0 +1,100 @@
+/*
+ * Admin sign-in. Uses the brand tokens from globals.css — the admin is
+ * functional and dense, but features/admin.md §9 is explicit that it is not
+ * exempt from the brand's typography and palette.
+ */
+
+.shell {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--page-x);
+  background: var(--ground);
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 36px 32px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: -12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-quiet);
+}
+
+.error {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--gold);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: rgba(175, 135, 70, 0.1);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-quiet);
+}
+
+.input {
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Visible focus is not optional — features/accessibility.md governs, and the
+   admin's own target is R-68, undecided. Erring toward the stricter side. */
+.input:focus-visible,
+.submit:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.submit {
+  margin-top: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-on);
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.submit:hover {
+  background: var(--accent-quiet);
+}

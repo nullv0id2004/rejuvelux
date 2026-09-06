@@ -1,0 +1,96 @@
+/* The admin worklist. Dense rows, no ornament — every line is a task. */
+
+.clear {
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--line-quiet);
+  border-radius: 2px;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+.block {
+  margin: 0 0 28px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  max-width: 760px;
+}
+
+.blockTitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.blockNote {
+  margin: 0 0 16px;
+  max-width: var(--measure);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-quiet);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-quiet);
+  font-size: 14px;
+}
+
+.rowName {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowMeta {
+  color: var(--ink-quiet);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Out of stock is stated in words as well as colour — colour alone would fail
+   the contrast-independence rule in features/accessibility.md. */
+.rowOut {
+  color: var(--gold);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.rowAction,
+.action {
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.action {
+  display: inline-block;
+}
+
+.rowAction:hover,
+.action:hover {
+  border-color: var(--ink-quiet);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rowAction:focus-visible,
+.action:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
