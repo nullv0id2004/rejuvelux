@@ -1,0 +1,7 @@
+# docs/ carries SHA-256 baselines computed over exact working-tree bytes
+# (docs/.base.md.sha256 and friends). Line-ending conversion on checkout would
+# break every baseline on every fresh clone and read as tampering with the
+# brand analysis. Pin the suite to LF for all platforms and all developers.
+docs/** text eol=lf
+docs/assets/*.png binary
+docs/assets/*.webp binary
