@@ -14,18 +14,16 @@ import {
   Swatch,
   withSlots,
 } from '@/components/site/primitives';
-import {
-  FAQS,
-  PRICE,
-  PRODUCTS,
-  RANGE_WORD,
-  RANGE_WORD_CAP,
-  REVIEWS,
-  SLOT,
-  STORY,
-  byId,
-  fmt,
-} from '@/lib/data';
+import { useCatalogue, useProduct } from '@/lib/catalogue-context';
+import { FAQS, rangeWord, rangeWordCap, REVIEWS, SLOT, STORY } from '@/lib/data';
+
+/** ₹ with Indian grouping, no decimals. */
+const inr = (paise: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
 import { useCart } from '@/lib/cart';
 import { useToast } from '@/lib/toast';
 
@@ -45,10 +43,10 @@ const OBJECTIONS: [string, string][] = [
   ['Dispatch', 'Packed in the tin at source. Ships within [00] hours; free above ₹[0,000].'],
 ];
 
-const SETS: [string, string, string, string][] = [
+const buildSets = (count: number): [string, string, string, string][] => [
   [
     'Tasting box',
-    `All ${RANGE_WORD}, 25 g each`,
+    `All ${rangeWord(count)}, 25 g each`,
     'Save ₹[000]',
     'Start here if you have not tasted the range.',
   ],
@@ -77,13 +75,17 @@ const GUARANTEES: [string, string, string][] = [
  * closing one objection. Kept alongside the shipped homepage as deliverable 1.
  */
 export function AltHome() {
-  const [active, setActive] = useState('golden');
+  const catalogue = useCatalogue();
+  const [active, setActive] = useState('assam-golden-tips');
   const { add } = useCart();
   const { toast } = useToast();
-  const a = byId(active)!;
+  const a = useProduct(active);
+  const rangeCap = rangeWordCap(catalogue.length);
+  const SETS = buildSets(catalogue.length);
   // The hero's one permitted motion: a slow crossfade from dry leaf to brewed
   // liquor. Silver Needle is the SKU whose pair of shots exists first.
-  const hero = byId('silver');
+  const hero = useProduct('silver-needle-assam');
+  if (!a) return null;
 
   return (
     <main>
@@ -195,7 +197,7 @@ export function AltHome() {
       <section className="wrap sec rule-t" id="collection">
         <SectionHead
           eyebrow="The collection"
-          title={`${RANGE_WORD_CAP} expressions. One garden.`}
+          title={`${rangeCap} expressions. One garden.`}
           aside="Ceremonial to everyday. CTC is the finest version of the daily cup, not the cheap one in the set."
         />
         <Ladder active={active} onSelect={setActive} />
@@ -205,7 +207,7 @@ export function AltHome() {
           </p>
           <div className="row g3">
             <Button onClick={() => add(a)}>Add {a.name}</Button>
-            <Button variant="outline" href={`/shop/${a.id}`}>
+            <Button variant="outline" href={`/shop/${a.slug}`}>
               Details
             </Button>
           </div>
@@ -225,22 +227,18 @@ export function AltHome() {
         <div className="brew-wrap">
           <div className="brew">
             <div className="hd">Tea</div>
-            <div className="hd">Temp</div>
-            <div className="hd">Leaf</div>
             <div className="hd">Water</div>
+            <div className="hd">Leaf</div>
             <div className="hd">Time</div>
-            <div className="hd">Steeps</div>
-            {PRODUCTS.map((p) => (
-              <div key={p.id} style={{ display: 'contents' }}>
+            {catalogue.map((p) => (
+              <div key={p.slug} style={{ display: 'contents' }}>
                 <div className="row g3">
                   <Swatch p={p} size={12} />
                   {p.name}
                 </div>
-                <div>{p.brew.temp}</div>
-                <div>{p.brew.g}</div>
-                <div>{p.brew.ml}</div>
-                <div>{p.brew.min}</div>
-                <div>{p.brew.steeps}</div>
+                <div>{p.brewing?.water ?? '—'}</div>
+                <div>{p.brewing?.leaf ?? '—'}</div>
+                <div>{p.brewing?.time ?? '—'}</div>
               </div>
             ))}
           </div>
@@ -268,7 +266,9 @@ export function AltHome() {
               <h3 className="h3">{d}</h3>
               <p className="small">{c}</p>
               <div className="between" style={{ marginTop: 'auto' }}>
-                <span className="price">{fmt(PRICE)}*</span>
+                <span className="cap" style={{ color: 'var(--text-accent)' }}>
+                  ₹[0,000]
+                </span>
                 <span className="cap">
                   <Ph>{s}</Ph>
                 </span>
@@ -384,7 +384,7 @@ export function AltHome() {
               rows={[
                 ['Contents', '2 × 50 g'],
                 ['Card', 'Brew parameters, both teas'],
-                ['Price', fmt(PRICE) + '*'],
+                ['Price', '₹[0,000]'],
               ]}
             />
             <div className="row g3">

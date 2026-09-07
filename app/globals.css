@@ -652,7 +652,7 @@ button {
 
 .brew {
   display: grid;
-  grid-template-columns: 1.4fr repeat(5, 1fr);
+  grid-template-columns: 1.4fr repeat(3, 1fr);
 }
 .brew > div {
   padding: 12px 12px;
@@ -662,7 +662,7 @@ button {
   text-align: right;
   color: var(--text-primary);
 }
-.brew > div:nth-child(6n + 1) {
+.brew > div:nth-child(4n + 1) {
   text-align: left;
 }
 .brew .hd {
@@ -1318,8 +1318,8 @@ button {
     min-width: 0 !important;
   }
   .brew {
-    grid-template-columns: 1.4fr repeat(5, 1fr);
-    min-width: 560px;
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+    min-width: 420px;
   }
   .brew-wrap {
     overflow-x: auto;

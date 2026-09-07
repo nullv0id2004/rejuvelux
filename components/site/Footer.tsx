@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Input } from '@/components/ds';
-import { PRODUCTS } from '@/lib/data';
+import { useCatalogue } from '@/lib/catalogue-context';
 import { useToast } from '@/lib/toast';
 import { Logo, Ph } from './primitives';
 
 export function Footer() {
+  const catalogue = useCatalogue();
   const [email, setEmail] = useState('');
   const { toast } = useToast();
 
@@ -24,8 +25,8 @@ export function Footer() {
 
           <div className="stack g2">
             <div className="eyebrow">Shop</div>
-            {PRODUCTS.map((p) => (
-              <Link key={p.id} href={`/shop/${p.id}`}>
+            {catalogue.map((p) => (
+              <Link key={p.slug} href={`/shop/${p.slug}`}>
                 {p.name}
               </Link>
             ))}

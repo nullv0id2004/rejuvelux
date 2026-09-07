@@ -1,5 +1,6 @@
 import { Logo } from '@/components/site/primitives';
-import { RANGE_WORD } from '@/lib/data';
+import { listProducts } from '@/lib/catalogue';
+import { rangeWordCap } from '@/lib/data';
 
 /**
  * Source for the static Open Graph card. Rendered once at 1200×630 and
@@ -9,7 +10,9 @@ import { RANGE_WORD } from '@/lib/data';
  */
 export const metadata = { robots: { index: false, follow: false } };
 
-export default function OgPreview() {
+export default async function OgPreview() {
+  const products = await listProducts();
+  const rangeCap = rangeWordCap(products.length);
   return (
     <div
       id="og-card"
@@ -66,7 +69,7 @@ export default function OgPreview() {
             color: 'var(--ink-300)',
           }}
         >
-          One garden. {RANGE_WORD.charAt(0).toUpperCase() + RANGE_WORD.slice(1)} expressions.
+          One garden. {rangeCap} expressions.
           <br />
           Grade, lot and pluck month on every tin.
         </p>

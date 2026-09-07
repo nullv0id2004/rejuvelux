@@ -2,6 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { Button, Toast, ToastStack } from '@/components/ds';
+import type { CatalogueProduct } from '@/lib/catalogue';
+import { CatalogueProvider } from '@/lib/catalogue-context';
 import { CartProvider, useCart } from '@/lib/cart';
 import { ThemeProvider } from '@/lib/theme';
 import { ToastProvider, useToast } from '@/lib/toast';
@@ -43,26 +45,40 @@ function Toasts() {
   );
 }
 
-/** Announcement bar, nav, page, footer, plus the cart drawer, popup and toasts. */
-export function Chrome({ children }: { children: ReactNode }) {
+/**
+ * Announcement bar, nav, page, footer, plus the cart drawer, popup and toasts.
+ *
+ * `catalogue` is resolved once by the root layout — a server component — and
+ * provided from here, because every consumer below (nav, footer, cart drawer,
+ * showcase) is a client component and cannot query the database itself.
+ */
+export function Chrome({
+  catalogue,
+  children,
+}: {
+  catalogue: CatalogueProduct[];
+  children: ReactNode;
+}) {
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <CartProvider>
-          <a className="skip-link" href="#main">
-            Skip to content
-          </a>
-          <div className="rjx-app">
-            <Announcement />
-            <Nav />
-            <div id="main">{children}</div>
-            <Footer />
-            <CartDrawer />
-            <Popup />
-            <Toasts />
-          </div>
-        </CartProvider>
-      </ToastProvider>
-    </ThemeProvider>
+    <CatalogueProvider catalogue={catalogue}>
+      <ThemeProvider>
+        <ToastProvider>
+          <CartProvider>
+            <a className="skip-link" href="#main">
+              Skip to content
+            </a>
+            <div className="rjx-app">
+              <Announcement />
+              <Nav />
+              <div id="main">{children}</div>
+              <Footer />
+              <CartDrawer />
+              <Popup />
+              <Toasts />
+            </div>
+          </CartProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </CatalogueProvider>
   );
 }

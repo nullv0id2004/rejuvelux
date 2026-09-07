@@ -198,6 +198,13 @@ work — until the paths it depends on are exercised.
 
 ### 5.1 Phase 1 — Catalogue
 
+> **DONE — 7 September, 2026.** `scripts/catalogue-test.ts` passes 32/32 against the live
+> database and the rendered pages; all four Phase 0 suites still pass. Two things the plan below
+> did not anticipate are recorded in `work_done.md`: almost every consumer turned out to be a
+> client component, so the root layout resolves the catalogue once and `CatalogueProvider` supplies
+> it; and two surfaces had to be **removed** rather than re-pointed — the subscription discount
+> (**R-76**) and two brew columns the schema cannot hold (**R-77**).
+
 The join between the two halves. This is where "the database wins" is applied.
 
 **The field split, decided here and `PROVISIONAL`.** The frontend's `Product` type and the

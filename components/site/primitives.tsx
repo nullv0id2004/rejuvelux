@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import { SITE_PHOTOS, type Product } from '@/lib/data';
+import type { CatalogueProduct } from '@/lib/catalogue';
+import { SITE_PHOTOS } from '@/lib/data';
 
 /* --------------------------------------------------------------- labels -- */
 
@@ -225,7 +226,7 @@ export function Evidence({
 
 /* --------------------------------------------------- swatch and scales --- */
 
-export function Swatch({ p, size = 24, style }: { p: Product; size?: number; style?: CSSProperties }) {
+export function Swatch({ p, size = 24, style }: { p: CatalogueProduct; size?: number; style?: CSSProperties }) {
   return (
     <span
       className="swatch"
@@ -281,7 +282,7 @@ export function TinBox({
   priority,
   alt,
 }: {
-  p: Product;
+  p: CatalogueProduct;
   className?: string;
   style?: CSSProperties;
   imgStyle?: CSSProperties;

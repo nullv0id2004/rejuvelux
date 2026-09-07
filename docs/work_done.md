@@ -30,6 +30,95 @@
 > (The build tags are reserved; no application code exists yet.)
 
 ---
+## 7 September, 2026 - Phase 1: the storefront reads the database, and two SKUs left the shelf [F][B][DOC]
+
+**The catalogue is no longer a static array.** `lib/data.ts`'s `PRODUCTS` is gone and the
+storefront resolves from Supabase through `lib/catalogue.ts`, which merges the database's commerce
+fields with a new repo-side `lib/presentation.ts`. `roadmap.md` §5.1's field split is now real
+code: **the database owns what the client team can edit** - name, description, brewing, territory,
+status, sort order, slug, SKU, price, net quantity - and **the repository owns what has no admin
+screen** - colourways, tin renders, taglines, bullets, FAQs.
+
+**[F] The problem the plan did not anticipate: almost every consumer is a client component.**
+Nav, footer, cart drawer, scroll showcase, product view, specs and alt-home are all `'use client'`,
+and a client component cannot query Postgres. Rather than push a fetch into the browser - which
+ADR-0009 makes expensive, since the database is in Sydney - the **root layout resolves the
+catalogue once** and `Chrome` provides it through a new `CatalogueProvider`. Components swapped
+`import { PRODUCTS }` for `useCatalogue()` / `useProduct(slug)`. `useCatalogue()` **throws rather
+than returning `[]`** when the provider is missing, because an empty catalogue and an unwired
+provider look identical on screen and one of them ships silently.
+
+**[F] Slugs changed, because the database is the public URL.** `/shop/silver` →
+`/shop/silver-needle-assam`, `matcha` → `assam-matcha`, `golden` → `assam-golden-tips`, `green` →
+`green-tea`. All four old slugs now 404, verified. `CRAFT`'s chapter keys moved with them.
+
+**[F] The dummy ₹1,250 is deleted and real money renders** - Assam Matcha ₹999, Green Tea ₹599,
+Assam Golden Tips ₹4,999. **Two products are deliberately unpriced and unbuyable**: Silver Needle
+(**R-04**) and the Ritual Set. They render "Price to be confirmed" with a disabled control reading
+"Not yet on sale" and a sentence saying why - never a zero, never an estimate. The refusal lives in
+`lib/cart.tsx`'s `add()`, so every caller inherits it rather than each screen remembering.
+
+**[F] CTC and Ube left the catalogue, and their copy did not.** Neither exists in the database.
+`ctc` is **R-52**, whose row forbids sharing a shelf with the heroes until the client decides;
+`ube` appears in no document in the suite and its copy was never signed off. Both now 404. Their
+assets and full editorial sit in `presentation.ts`'s `WITHHELD` map with the reason attached, so
+restoring either is a database row and a key move rather than a rewrite.
+
+**[F] The Matcha Ritual Set gained a page**, its six components listed from the database's
+`components` column, and its availability computed across all six.
+
+**[F] `/shop` exists.** The site had product pages with no index above them; the nav's "Shop"
+pointed at a homepage anchor.
+
+**[B] Two things are now derived rather than stored, so they cannot drift.** `cups` is net quantity
+÷ brewing leaf, both from the database - Golden Tips reads "≈ 16" at 50 g and 3 g, and the old
+static value said "≈ 40" against a weight the database does not hold. The range size in headline
+copy ("Five expressions. One garden.") is a function of the row count, not a constant.
+
+**[F] The subscription option was removed, and this is a correction rather than a trim.** The
+product page offered "Subscribe · save ₹100". **`product.md` §54 lists subscriptions as out of
+scope** pending R-20, and **§49/§50 bar discounting outright** - `data-model.md` §7.1 has no
+discount column *by design*, and `order`'s CHECK constraint is `total = subtotal + shipping`, so a
+discounted line is not representable. Wiring a real price to that control would have shipped a
+button computing a number the database cannot store. Raised as **R-76**.
+
+**[F] The brew table lost two columns for the same reason.** It showed Water, Leaf, Volume, Time,
+Steeps; the schema holds `brewing_leaf`, `brewing_water`, `brewing_time` and nothing else. Volume
+and steep count are now absent rather than carried as repo values the client cannot edit
+(`product.md` §4.2 - a blocked field is omitted, never placeholdered). Adding them is a migration,
+which §5.1 deliberately keeps out of Phase 1. Raised as **R-77**.
+
+**[S] `server-only` was being imported without being installed.** Next resolves it internally so
+the build passed, but an undeclared dependency that guards database credentials is not something to
+leave implicit. Installed. The guard works: it is why `scripts/catalogue-test.ts` observes the
+rendered HTML rather than importing `lib/catalogue.ts`.
+
+**[B] One correction made during the work.** `getVariantAvailability` was first called per variant;
+it is a **batch** function taking `string[]`. Fixed to one query for the whole catalogue, which
+matters because ADR-0009 makes every extra round trip a cross-region one. The catalogue resolvers
+are wrapped in React `cache()` and `/shop` and `/shop/[slug]` carry `revalidate = 3600`, so a
+client price edit appears within the hour and no visitor pays the Sydney round trip.
+
+Verified: `npm run typecheck` clean, `npm run build` green - 21 routes, `/shop` and all five
+`/shop/[slug]` pages prerendered with a 1 h revalidate. **New `scripts/catalogue-test.ts`, 32/32**,
+run against the live database and the rendered pages: five products link from `/shop`, all three
+real prices render, the dummy ₹1,250 appears nowhere, both unpriced products render as unpriced and
+cannot be added, `ctc`/`ube`/all four old slugs 404, and **the Ritual Set goes 25 → 0 → 25 when one
+of its six components is choked and restored** - the kit guarantee ADR-0006 recovered from Medusa,
+proved through the storefront path rather than assumed. All four Phase 0 suites still pass
+unchanged: inventory 12/12, cart 19/19, checkout 29/29, admin auth 15 + 2 skipped. Client bundles
+re-inspected after the catalogue began touching Postgres - `DATABASE_URL`, `postgres://`, `drizzle`,
+`listProducts`, `getVariantAvailability`, `inventory_level` and `product_variant` are absent from
+every chunk.
+
+Flagged, not committed: **R-76** (the subscription surface, removed and needing a product decision
+before it returns) and **R-77** (brew volume and steeps, needing a migration). The homepage's
+Sets and Gifting cards still show `₹[0,000]` placeholders - those are bundles with no database rows,
+which is honest but means **the gifting surface has no commerce behind it at all**. `AltHome`'s
+tasting-box copy still describes a subscription the range does not sell. Neither was in Phase 1's
+scope and neither is fixed here.
+
+---
 ## 6 September, 2026 - Phase 0: the two halves are one repository, and every suite still passes [B][DB][DOC][REPO][CFG]
 
 **Sayon asked for the backend and admin to be planned and then built against the storefront that

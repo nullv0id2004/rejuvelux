@@ -3,13 +3,23 @@ import { Button, Card, Icon, type IconName } from '@/components/ds';
 import { NewsletterBand } from '@/components/site/NewsletterBand';
 import { Evidence, Eyebrow, Greybox, Ph, withSlots } from '@/components/site/primitives';
 import { ScrollShowcase } from '@/components/site/ScrollShowcase';
-import { RANGE_WORD, RANGE_WORD_CAP, SITE_PHOTOS, SLOT, STORY, isInterim } from '@/lib/data';
+import { listProducts } from '@/lib/catalogue';
+import { rangeWord, rangeWordCap, SITE_PHOTOS, SLOT, STORY, isInterim } from '@/lib/data';
 
-const CARDS: { eyebrow: string; title: string; body: string; shot: string; href: string; cta: string }[] =
-  [
+/**
+ * Built per render rather than at module scope: the range size is a database
+ * read now (Phase 1), so copy that spells it out has to be a function of the
+ * count rather than a constant.
+ */
+const buildCards = (
+  count: number,
+): { eyebrow: string; title: string; body: string; shot: string; href: string; cta: string }[] => {
+  const cap = rangeWordCap(count);
+  const word = rangeWord(count);
+  return [
     {
       eyebrow: 'The collection',
-      title: `${RANGE_WORD_CAP} expressions of one garden`,
+      title: `${cap} expressions of one garden`,
       body: 'Silver Needle to CTC, arranged from ceremonial to everyday. Each carries its grade, lot and pluck month.',
       shot: 'Product set · tins on seamless surface',
       href: '#collection',
@@ -18,8 +28,8 @@ const CARDS: { eyebrow: string; title: string; body: string; shot: string; href:
     {
       eyebrow: 'Sets and subscription',
       title: 'Taste the ladder, or settle on a rung',
-      body: `A tasting box of all ${RANGE_WORD}, a flight of three, or one tin every four or eight weeks from the same lot.`,
-      shot: `Tasting box · open · ${RANGE_WORD} tins`,
+      body: `A tasting box of all ${word}, a flight of three, or one tin every four or eight weeks from the same lot.`,
+      shot: `Tasting box · open · ${word} tins`,
       href: '/alt-home#sets',
       cta: 'Discover',
     },
@@ -32,6 +42,7 @@ const CARDS: { eyebrow: string; title: string; body: string; shot: string; href:
       cta: 'Discover',
     },
   ];
+};
 
 const WHY: [IconName, string, string][] = [
   ['map-pin', 'One estate', 'A single garden in Assam. Its name, district and elevation are printed on every tin.'],
@@ -44,7 +55,10 @@ const WHY: [IconName, string, string][] = [
   ['package', 'Packed at source', 'Sealed in the tin at the garden. Ships within [00] hours, free above ₹[0,000].'],
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const products = await listProducts();
+  const cap = rangeWordCap(products.length);
+  const CARDS = buildCards(products.length);
   return (
     <main>
       {/* Hero — full-bleed photograph, headline overlaid. Sized to content, not
@@ -240,7 +254,7 @@ export default function HomePage() {
       <div id="collection" className="wrap" style={{ paddingTop: 96, paddingBottom: 40 }}>
         <div className="stack g3" style={{ textAlign: 'center', alignItems: 'center' }}>
           <Eyebrow>The collection</Eyebrow>
-          <h2 className="h1 it">{RANGE_WORD_CAP} expressions. One garden.</h2>
+          <h2 className="h1 it">{cap} expressions. One garden.</h2>
           <p className="small" style={{ maxWidth: 520 }}>
             Ceremonial to everyday. Scroll through the range; each tea holds the screen for one turn
             of the wheel.

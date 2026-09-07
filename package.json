@@ -12,7 +12,8 @@
     "test:checkout": "tsx --env-file=.env scripts/checkout-api-test.ts",
     "test:inventory": "tsx --env-file=.env scripts/inventory-race-test.ts",
     "test:admin": "tsx --env-file=.env scripts/admin-auth-test.ts",
-    "bootstrap:owner": "tsx --env-file=.env scripts/bootstrap-owner.ts"
+    "bootstrap:owner": "tsx --env-file=.env scripts/bootstrap-owner.ts",
+    "test:catalogue": "tsx --env-file=.env scripts/catalogue-test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
@@ -22,7 +23,8 @@
     "next": "16.3.4",
     "postgres": "^3.4.9",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

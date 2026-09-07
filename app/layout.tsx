@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Cinzel, Figtree, Playfair_Display } from 'next/font/google';
 import { Chrome } from '@/components/site/Chrome';
+import { listProducts } from '@/lib/catalogue';
 import { THEME_INIT_SCRIPT } from '@/lib/theme';
 import './globals.css';
 
@@ -74,7 +75,16 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // The single catalogue read for the whole tree. Every consumer below is a
+  // client component, so the server resolves it here and Chrome provides it;
+  // React cache() dedupes this against the page's own call in one render.
+  const catalogue = await listProducts();
+
   return (
     <html
       lang="en"
@@ -86,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>
-        <Chrome>{children}</Chrome>
+        <Chrome catalogue={catalogue}>{children}</Chrome>
       </body>
     </html>
   );
