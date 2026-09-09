@@ -1,5 +1,6 @@
 /**
- * Admin sign-in — the only unguarded admin route (features/admin.md §4).
+ * Admin sign-in — one of the two unguarded admin routes (features/admin.md §4);
+ * the other is the invitation acceptance page at /admin/invite/[token].
  *
  * A server action, not a client-side call: the session cookies are written
  * server-side, so no token is ever handled by page JavaScript. This is also why

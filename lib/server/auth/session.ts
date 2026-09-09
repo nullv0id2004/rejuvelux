@@ -135,15 +135,24 @@ export async function requireAdmin(): Promise<AdminSession> {
 }
 
 /**
- * Assert a role. `owner` implies everything `staff` may do; the reverse is
- * never true. Today only admin-user management requires `owner`.
+ * The role rule itself, as a pure function of a session already in hand.
+ * `owner` implies everything `staff` may do; the reverse is never true. Today
+ * only admin-user management requires `owner`.
+ *
+ * Kept here, beside `requireRole`, so this file stays the one place the rule
+ * is written: the admin-user domain module calls it with the session it was
+ * given rather than restating the comparison.
  */
-export async function requireRole(role: AdminRole): Promise<AdminSession> {
-  const session = await requireAdmin();
+export function assertRole(session: AdminSession, role: AdminRole): AdminSession {
   if (role === 'owner' && session.role !== 'owner') {
     throw new NotAuthorisedError('owner');
   }
   return session;
+}
+
+/** Assert a role for the signed-in admin. Pages and actions call this. */
+export async function requireRole(role: AdminRole): Promise<AdminSession> {
+  return assertRole(await requireAdmin(), role);
 }
 
 /** The signed-in customer, or null. Guest checkout never calls this. */

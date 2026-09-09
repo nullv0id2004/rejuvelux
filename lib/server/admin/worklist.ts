@@ -20,8 +20,8 @@ import {
 import { LOW_STOCK_THRESHOLD } from '../inventory/availability';
 
 export interface Worklist {
-  unpricedVariants: { productName: string; sku: string; slug: string }[];
-  lowStock: { sku: string; name: string; available: number }[];
+  unpricedVariants: { productId: string; productName: string; sku: string; slug: string }[];
+  lowStock: { inventoryItemId: string; sku: string; name: string; available: number }[];
   ordersAwaitingFulfilment: {
     orderNumber: string;
     id: string;
@@ -35,6 +35,7 @@ export async function getWorklist(): Promise<Worklist> {
   /* Unpriced, active variants — R-04's surface. */
   const unpricedVariants = await db
     .select({
+      productId: product.id,
       productName: product.name,
       sku: productVariant.sku,
       slug: product.slug,
@@ -52,6 +53,7 @@ export async function getWorklist(): Promise<Worklist> {
   /* Low or exhausted stock, computed the same way availability.ts does. */
   const levels = await db
     .select({
+      inventoryItemId: inventoryItem.id,
       sku: inventoryItem.sku,
       name: inventoryItem.name,
       stocked: inventoryLevel.stockedQuantity,
@@ -61,7 +63,12 @@ export async function getWorklist(): Promise<Worklist> {
     .innerJoin(inventoryItem, eq(inventoryItem.id, inventoryLevel.inventoryItemId));
 
   const lowStock = levels
-    .map((l) => ({ sku: l.sku, name: l.name, available: l.stocked - l.reserved }))
+    .map((l) => ({
+      inventoryItemId: l.inventoryItemId,
+      sku: l.sku,
+      name: l.name,
+      available: l.stocked - l.reserved,
+    }))
     .filter((l) => l.available < LOW_STOCK_THRESHOLD)
     .sort((a, b) => a.available - b.available);
 

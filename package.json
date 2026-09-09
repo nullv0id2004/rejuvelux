@@ -15,7 +15,8 @@
     "bootstrap:owner": "tsx --env-file=.env scripts/bootstrap-owner.ts",
     "test:catalogue": "tsx --env-file=.env scripts/catalogue-test.ts",
     "test:auth": "tsx --env-file=.env scripts/auth-test.ts",
-    "test:admin-inventory": "tsx --env-file=.env scripts/admin-inventory-test.ts"
+    "test:admin-inventory": "tsx --env-file=.env scripts/admin-inventory-test.ts",
+    "test:admin-stages": "tsx --env-file=.env scripts/admin-stages-test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

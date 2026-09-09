@@ -180,6 +180,26 @@ export async function revokeAllSessions(userId: string): Promise<void> {
 }
 
 /**
+ * End every session for ONE audience, leaving the other's alone.
+ *
+ * Disabling an admin should not sign that person out of the shop — Sayon is
+ * both a customer and an admin (features/accounts.md §2). Refresh rows for the
+ * audience are deleted; the live access token dies within its hour anyway, and
+ * `getAdminSession` refuses a disabled `admin_user` row on every request before
+ * that, so no `token_version` bump is needed here.
+ */
+export async function revokeSessionsForAudience(
+  userId: string,
+  audience: Audience
+): Promise<number> {
+  const deleted = await db
+    .delete(refreshToken)
+    .where(and(eq(refreshToken.userId, userId), eq(refreshToken.audience, audience)))
+    .returning({ id: refreshToken.id });
+  return deleted.length;
+}
+
+/**
  * Housekeeping: drop rows past either window.
  *
  * Expired rows are already refused by `rotateSession`, so this is hygiene

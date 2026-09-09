@@ -68,7 +68,10 @@ export default async function AdminHome() {
               <li key={v.sku} className={styles.row}>
                 <span className={styles.rowName}>{v.productName}</span>
                 <span className={styles.rowMeta}>{v.sku}</span>
-                <Link className={styles.rowAction} href={`/admin/products`}>
+                <Link
+                  className={styles.rowAction}
+                  href={`/admin/products/${v.productId}/variants`}
+                >
                   Set price
                 </Link>
               </li>
@@ -96,7 +99,10 @@ export default async function AdminHome() {
                 >
                   {l.available <= 0 ? 'Out of stock' : `${l.available} left`}
                 </span>
-                <Link className={styles.rowAction} href="/admin/inventory">
+                <Link
+                  className={styles.rowAction}
+                  href={`/admin/inventory/${l.inventoryItemId}/adjust`}
+                >
                   Adjust
                 </Link>
               </li>

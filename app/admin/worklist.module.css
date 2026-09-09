@@ -3,17 +3,17 @@
 .clear {
   margin: 0;
   padding: 20px;
-  border: 1px solid var(--line-quiet);
-  border-radius: 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
   font-size: 14px;
-  color: var(--ink-quiet);
+  color: var(--text-secondary);
 }
 
 .block {
   margin: 0 0 28px;
   padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
   max-width: 760px;
 }
 
@@ -26,10 +26,10 @@
 
 .blockNote {
   margin: 0 0 16px;
-  max-width: var(--measure);
+  max-width: var(--container-text);
   font-size: 13px;
   line-height: 1.6;
-  color: var(--ink-quiet);
+  color: var(--text-secondary);
 }
 
 .list {
@@ -45,7 +45,7 @@
   align-items: center;
   gap: 14px;
   padding: 10px 0;
-  border-top: 1px solid var(--line-quiet);
+  border-top: 1px solid var(--border-subtle);
   font-size: 14px;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .rowMeta {
-  color: var(--ink-quiet);
+  color: var(--text-secondary);
   font-size: 13px;
   white-space: nowrap;
 }
@@ -63,7 +63,7 @@
 /* Out of stock is stated in words as well as colour — colour alone would fail
    the contrast-independence rule in features/accessibility.md. */
 .rowOut {
-  color: var(--gold);
+  color: var(--text-accent);
   font-size: 13px;
   white-space: nowrap;
 }
@@ -71,26 +71,20 @@
 .rowAction,
 .action {
   padding: 5px 11px;
-  border: 1px solid var(--line);
-  border-radius: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
   font-size: 13px;
-  color: var(--ink);
+  color: var(--text-primary);
   text-decoration: none;
   white-space: nowrap;
-}
-
-.action {
-  display: inline-block;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .rowAction:hover,
 .action:hover {
-  border-color: var(--ink-quiet);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.rowAction:focus-visible,
-.action:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+  color: var(--text-primary);
 }

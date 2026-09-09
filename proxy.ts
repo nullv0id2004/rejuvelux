@@ -34,6 +34,14 @@ import { verifyToken } from '@/lib/server/auth/tokens';
 
 const LOGIN_PATH = '/admin/login';
 
+/**
+ * The invitation acceptance page is the second unguarded admin route, and the
+ * only other one (features/admin.md §4). An invitee has no session by
+ * definition; the token in the URL is what admits them, and the page verifies
+ * it against `admin_invite` itself. Nothing else under /admin/invite exists.
+ */
+const INVITE_PREFIX = '/admin/invite/';
+
 export async function proxy(req: NextRequest) {
   const token = req.cookies.get(COOKIE.admin.access)?.value;
   // Audience is checked here, not merely decoded: a customer session cookie
@@ -42,8 +50,9 @@ export async function proxy(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
   const isLogin = pathname === LOGIN_PATH;
+  const isInvite = pathname.startsWith(INVITE_PREFIX);
 
-  if (!claims && !isLogin) {
+  if (!claims && !isLogin && !isInvite) {
     const url = req.nextUrl.clone();
     url.pathname = LOGIN_PATH;
     // Preserve the destination so login can return them to it.

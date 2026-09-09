@@ -43,6 +43,15 @@ const LEGAL: Record<OrderState, readonly OrderEventType[]> = {
   refunded: [],
 };
 
+/**
+ * The events legal from a state, in the table's own order. The admin offers
+ * exactly these and nothing else: features/admin.md §4, "an illegal transition
+ * is not a disabled button, it is an absent one".
+ */
+export function legalEventsFrom(state: OrderState): readonly OrderEventType[] {
+  return LEGAL[state];
+}
+
 export interface RejectedEvent {
   index: number;
   type: OrderEventType;

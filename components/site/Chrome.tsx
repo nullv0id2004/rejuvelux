@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Button, Toast, ToastStack } from '@/components/ds';
 import type { CatalogueProduct } from '@/lib/catalogue';
@@ -59,6 +60,15 @@ export function Chrome({
   catalogue: CatalogueProduct[];
   children: ReactNode;
 }) {
+  const pathname = usePathname();
+
+  // The admin is its own surface (features/admin.md §6.6, "route-group
+  // isolation"): it must not render inside the shop's nav, footer, cart drawer
+  // and popup, and it needs none of the providers — its layout carries its own
+  // chrome. The theme still applies, because the pre-paint script in the root
+  // layout sets `data-theme` on <html> before anything here runs.
+  if (pathname.startsWith('/admin')) return <>{children}</>;
+
   return (
     <CatalogueProvider catalogue={catalogue}>
       <ThemeProvider>

@@ -44,16 +44,32 @@ export async function auditedMutation<T>(
 ): Promise<T> {
   return db.transaction(async (tx) => {
     const result = await mutate(tx);
-    const entry = describe(result);
-    await tx.insert(adminAction).values({
-      adminUserId: session.adminUserId,
-      action: entry.action,
-      entityType: entry.entityType,
-      entityId: entry.entityId,
-      before: entry.before === undefined ? null : entry.before,
-      after: entry.after === undefined ? null : entry.after,
-    });
+    await recordActionIn(tx, session.adminUserId, describe(result));
     return result;
+  });
+}
+
+/**
+ * The audit write itself, inside a transaction the caller owns.
+ *
+ * Exists for the one case `auditedMutation` cannot express: a mutation whose
+ * actor is created by the mutation. Accepting an invitation inserts the
+ * `admin_user` row and must record that acceptance against the row it just
+ * made, so the actor id is only known mid-transaction. Prefer auditedMutation
+ * everywhere else; this is a primitive, not a shortcut.
+ */
+export async function recordActionIn(
+  tx: Tx,
+  adminUserId: string,
+  entry: AuditEntry
+): Promise<void> {
+  await tx.insert(adminAction).values({
+    adminUserId,
+    action: entry.action,
+    entityType: entry.entityType,
+    entityId: entry.entityId,
+    before: entry.before === undefined ? null : entry.before,
+    after: entry.after === undefined ? null : entry.after,
   });
 }
 
