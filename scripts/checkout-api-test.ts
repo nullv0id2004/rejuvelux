@@ -3,7 +3,7 @@
  * behaviour, direct DB for the assertions HTTP cannot see (reservations,
  * events, cart status), and the pure fold exercised as a unit.
  *
- * Run (dev server on 3315): npx tsx --env-file=.env.local scripts/checkout-api-test.ts
+ * Run (dev server on 3000): npx tsx --env-file=.env.local scripts/checkout-api-test.ts
  * Self-cleaning: releases reservations, deletes its orders and carts,
  * restores every price and stock count it touched.
  */
@@ -22,8 +22,8 @@ import {
 } from '../lib/server/db/schema';
 import { deriveOrderState } from '../lib/server/orders/state';
 import { releaseReservations } from '../lib/server/inventory/reserve';
+import { BASE, requireServer } from './_server';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:3315';
 
 let failures = 0;
 function check(name: string, cond: boolean, detail?: unknown) {
@@ -96,6 +96,7 @@ const GOOD_INPUT = {
 /* ---------------------------------------------------------------- main ---*/
 
 async function main() {
+  await requireServer();
   /* §2.6 — the fold, as a pure unit */
   const happy = deriveOrderState(
     ['placed', 'payment_captured', 'shipped', 'delivered'].map((type) => ({ type: type as never }))

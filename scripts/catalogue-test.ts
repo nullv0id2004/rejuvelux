@@ -7,7 +7,7 @@
  * component pulling database credentials into a browser bundle — so the
  * rendered HTML is the observation point, exactly as a visitor sees it.
  *
- * Run (dev server on 3315):
+ * Run (dev server on 3000):
  *   npm run test:catalogue
  *
  * Self-cleaning: the kit-availability section restores every stock level it
@@ -23,8 +23,8 @@ import {
   variantInventoryItem,
 } from '../lib/server/db/schema';
 import { getVariantAvailability } from '../lib/server/inventory/availability';
+import { BASE, requireServer } from './_server';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:3315';
 
 let pass = 0;
 let fail = 0;
@@ -44,6 +44,7 @@ const get = async (path: string) => {
 };
 
 async function main() {
+  await requireServer();
   /* 1. The database is the source of truth ------------------------------- */
 
   const rows = await db

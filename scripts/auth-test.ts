@@ -258,7 +258,9 @@ async function main() {
   // proves the same chain with a throwaway admin instead: session -> cookie ->
   // proxy -> session.ts -> the admin_user gate -> a rendered worklist.
 
-  const BASE = process.env.BASE_URL ?? 'http://localhost:3315';
+  // SKIPs rather than exits when nothing answers, which is right here: the
+  // other 34 checks need no server at all. Only the port was wrong.
+  const BASE = process.env.BASE_URL ?? 'http://localhost:3000';
   let serverUp = true;
   try {
     await fetch(`${BASE}/admin/login`);

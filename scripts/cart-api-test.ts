@@ -1,6 +1,6 @@
 /**
  * HTTP exit test for features/cart.md — drives the real Route Handlers over a
- * running dev server (default http://localhost:3315; override with BASE_URL).
+ * running dev server (default http://localhost:3000; override with BASE_URL).
  *
  * Covers §2 and §4 of the doc: read-never-creates, the add gates (NULL price,
  * unknown slug, the cap), atomic concurrent merge, price snapshot, PATCH/
@@ -11,7 +11,8 @@
  * Run: npx tsx scripts/cart-api-test.ts
  */
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:3315';
+import { BASE, requireServer } from './_server';
+
 
 let failures = 0;
 function check(name: string, cond: boolean, detail?: unknown) {
@@ -62,6 +63,7 @@ async function api(
 }
 
 async function main() {
+  await requireServer();
   // §2.1 — reads never create
   const empty = await api('GET', '/api/cart');
   check('GET without cookie: empty shape', empty.status === 200 && empty.json.cartId === null);

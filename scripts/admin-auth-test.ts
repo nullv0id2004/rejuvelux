@@ -13,14 +13,14 @@
  *
  * Without it, §4 is SKIPPED and reported as skipped — never as passed.
  *
- * Run with the dev server on 3315.
+ * Run with the dev server on 3000.
  */
 
 import { eq, sql } from 'drizzle-orm';
 import { db } from '../lib/server/db/client';
 import { adminUser } from '../lib/server/db/schema';
+import { BASE, requireServer } from './_server';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:3315';
 const OWNER_EMAIL = process.env.ADMIN_TEST_EMAIL ?? 'rejuveluxemarketing@gmail.com';
 const PASSWORD = process.env.ADMIN_TEST_PASSWORD;
 
@@ -50,6 +50,7 @@ const GUARDED = [
 ];
 
 async function main() {
+  await requireServer();
   /* §1 — the owner row exists and is what stage 1 requires */
   const [owner] = await db
     .select()
