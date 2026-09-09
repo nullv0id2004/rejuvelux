@@ -30,6 +30,89 @@
 > (The build tags are reserved; no application code exists yet.)
 
 ---
+## 9 September, 2026 - Supabase Auth is gone, and /admin renders for the first time [B][DB][S][DOC]
+
+**Sayon read through the authentication built for KORUM** (`Worldhire/Worldhire2.0-1-`) and
+directed the same mechanism here in place of Supabase Auth, with e-commerce session lengths and
+Google sign-in. [ADR-0012](adr/0012-self-built-auth.md) records the decision and its cost; this
+entry is stages 1-2 of `features/accounts.md` executed.
+
+**[DOC] The concern was stated once and then the work proceeded.** ADR-0008 chose Supabase Auth as
+the *named* mitigation for R-36 - no CI, no staging, no second reviewer, and a login guarding
+prices and stock - so replacing it gives that mitigation up. The ADR says so plainly rather than
+around it, and names the replacement: our tests. `scripts/auth-test.ts` is that replacement, and it
+is the reason this entry can claim anything at all.
+
+**[DB] Migration 0003 moved the credential store without locking anyone out.** `app_user` replaces
+`auth.users`; **ids are preserved**, which is what makes it safe - `customer.auth_user_id` and
+`admin_user.auth_user_id` keep their values, their names and their differing `ON DELETE` semantics,
+and simply point somewhere new. Applied transactionally, 19 statements, verified after: 1 credential
+carried, the admin link resolves, both FKs on `public.app_user` with SET NULL and CASCADE
+respectively, RLS on all three new tables.
+
+**[S] The password came across, and that was checked before it was relied on.** Supabase stores
+bcrypt; the live row was probed for **format only** - `$2a$`, 60 chars, never the value - and
+`bcryptjs` was then verified to read that format. This was not a convenience: **there is no
+password-reset email (R-78)**, so the alternative to carrying the hash was locking the only admin
+out of the only admin account.
+
+**[B] Two departures from the reference, both deliberate.** Refresh tokens are stored **hashed**, so
+a database read cannot mint a session - KORUM stores them verbatim. And tokens live in **httpOnly
+cookies from the start**, which KORUM carries as open follow-up F1 and cannot easily close because
+its frontend and backend are separate origins; we are one application on one origin.
+
+**[B] The session split is the point of the change.** Customer 90 d sliding; admin 12 h idle under a
+7 d absolute cap. One refresh path serves both because a `refresh_token` row carries a sliding
+`expires_at` **and** a fixed `absolute_expires_at`, and only the first moves.
+
+**[B] The guard is two-layer by design, not by constraint.** Next 16's own proxy documentation was
+read rather than assumed (`AGENTS.md` requires it) and is explicit: Proxy *"should not be used as a
+full session management or authorization solution"*. So `proxy.ts` verifies signature, expiry and
+audience and redirects; `session.ts` makes every real decision. Worth noting Proxy now defaults to
+the **Node.js** runtime in Next 16, so the split is a choice about correctness rather than a
+workaround for the Edge runtime.
+
+**[S] `server-only` was removed from the auth modules rather than kept, and the reasoning matters.**
+It broke the exit tests - tsx resolves CJS without the `react-server` condition. `lib/server/**` is
+already this project's boundary: cart, orders and inventory handle money and carry no marker. **A
+test that cannot run is worth less than a marker**, and the build-time bundle inspection is stronger
+than either. Re-verified: `AUTH_JWT_SECRET`, `signInWithPassword`, `hashPassword`, `bcrypt`,
+`password_hash`, `token_version` and `refresh_token` are absent from all 17 client chunks.
+
+**[B] A pre-existing bug was found, and it is the headline.** **`/admin` returned a 500 from the day
+it was written.** The worklist interpolated `${order.id}` into a correlated subquery; Drizzle emits
+that as a bare `"id"`, which binds to `order_event.id` (bigint) instead of `order.id` (uuid), and
+Postgres rejects the statement at parse time. It survived because `features/admin.md` §8's
+*"signed-in worklist renders"* check has been **SKIPPED since 2 September** for want of a password.
+The end-to-end test added here rendered that page for the first time and it failed immediately.
+**Stage 1 has been reported as substantially met since 5 September while its only page was broken.**
+
+**[DB] Two pieces of test residue were found and cleaned, one of them live.** A suite killed
+mid-run by a local DNS failure left **2 test orders holding 3 reservations**, and - worse - left
+**Assam Matcha priced at ₹1,099 instead of ₹999** on the live storefront for roughly ninety minutes.
+Both were the checkout suite's own fixtures (`checkout-test@invalid.local`, and its requote
+scenario). Orders were removed through `releaseReservations()` rather than raw deletes, so
+`reserved_quantity` decremented correctly. **A test that mutates a live price and restores it in a
+finally-less path is a hazard, not a fixture** - flagged below.
+
+Verified: `npm run typecheck` clean, `npm run build` green. **`scripts/auth-test.ts` 38/38** -
+token `type` and audience checks, `jti` uniqueness, rotation and replay refusal, `token_version`
+invalidating a still-valid access token, lockout at 8 with a timed release, the timing burn measured
+against a real bcrypt cost rather than a fixed number, CSRF bound to one user, and end-to-end: a
+real session reaches `/admin`, disabling the `admin_user` row locks the **same** cookie out, and a
+customer token in the admin cookie is refused by the proxy. Every other suite green after the
+cleanup: cart 19/19, checkout 29/29, catalogue 32/32, inventory 12/12, admin guard 15 + the same 2
+skipped.
+
+Flagged, not committed: **the checkout suite can leave a live price wrong if it dies mid-run** - it
+restores on the happy path only, and a DNS blip was enough to leave ₹1,099 on the shop. It needs its
+mutations wrapped so cleanup runs on failure. **Google sign-in is not built** and needs credentials
+that do not exist - a Cloud project, client ID and secret (`features/accounts.md` §8, ask-first).
+**Password reset, email verification and admin 2FA remain blocked on R-78.** The two long-SKIPPED
+admin checks are still skipped: the end-to-end test proves the same chain with a throwaway account
+rather than asking anyone to type the real owner's password into a test.
+
+---
 ## 7 September, 2026 - Phase 1: the storefront reads the database, and two SKUs left the shelf [F][B][DOC]
 
 **The catalogue is no longer a static array.** `lib/data.ts`'s `PRODUCTS` is gone and the
