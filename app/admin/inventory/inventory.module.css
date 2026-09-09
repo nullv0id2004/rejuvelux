@@ -1,0 +1,215 @@
+/* Inventory. A table because it is tabular — dense, scannable, no ornament.
+
+   Uses THIS repository's tokens (styles/tokens/colors.css, spacing.css). The
+   admin shell stylesheets were written against the previous frontend's names
+   — --line, --ink-quiet, --measure — none of which this repo defines, so those
+   rules silently fall back to initial values. Flagged by rejuvelux-fc, who is
+   rewriting the shell; this file was corrected at the same time so the admin
+   reads as one surface in both themes. */
+
+.empty {
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.table {
+  width: 100%;
+  max-width: 860px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th {
+  text-align: left;
+  padding: 0 12px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  display: block;
+  font-weight: 500;
+}
+
+.sku {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.usedBy,
+.usedByNone {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.usedByNone {
+  font-style: italic;
+}
+
+/* Available: the number people scan for. Three states, no other colour. */
+.ok {
+  font-weight: 500;
+}
+.low {
+  font-weight: 600;
+  color: var(--status-warning);
+}
+.out {
+  font-weight: 600;
+  color: var(--status-error);
+}
+
+.actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.adjust,
+.cancel {
+  font-size: 13px;
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.footnote {
+  margin: 24px 0 0;
+  max-width: var(--container-text);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* A refusal, per features/admin.md §5 — a sentence, never a constraint name. */
+.refusal {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  max-width: 640px;
+  border: 1px solid var(--status-error);
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.facts {
+  display: flex;
+  gap: 32px;
+  margin: 0 0 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  max-width: 480px;
+}
+
+.facts dt {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.facts dd {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.blockNote {
+  margin: 0 0 20px;
+  max-width: var(--container-text);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.form {
+  max-width: 480px;
+}
+
+.field {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hint {
+  display: block;
+  margin: 2px 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  background: var(--surface-raised);
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+}
+
+.input:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.submit {
+  padding: 11px 20px;
+  border: 1px solid var(--action-primary);
+  border-radius: 2px;
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

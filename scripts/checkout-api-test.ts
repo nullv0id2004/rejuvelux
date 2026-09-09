@@ -122,6 +122,32 @@ async function main() {
   const [matchaVariant] = await db.select().from(productVariant).where(eq(productVariant.sku, 'RJ-MATCHA-50'));
   const matchaPrice = matchaVariant.pricePaise!;
 
+  /*
+   * Guard the baseline before touching it.
+   *
+   * The requote section below raises this price and the `finally` restores it —
+   * but on 9 Sep 2026 the database became unreachable mid-run, so the restore
+   * query failed too and the storefront served ₹1,099 instead of ₹999 for about
+   * ninety minutes. A `finally` cannot help when the connection is gone.
+   *
+   * So the drift is caught on the NEXT run instead: refuse to start against a
+   * price that is not the expected one, loudly, rather than layering another
+   * mutation on top of a corrupted value and reporting a confusing failure.
+   */
+  const EXPECTED_MATCHA_PAISE = 99900;
+  if (matchaPrice !== EXPECTED_MATCHA_PAISE) {
+    console.error(
+      [
+        '',
+        `REFUSING TO RUN: RJ-MATCHA-50 is ${matchaPrice} paise, expected ${EXPECTED_MATCHA_PAISE}.`,
+        'A previous run probably died before restoring it — this test raises the price to',
+        'exercise the requote path. Check the live price before continuing:',
+        `  UPDATE product_variant SET price_paise = ${EXPECTED_MATCHA_PAISE} WHERE sku = 'RJ-MATCHA-50';`,
+      ].join('\n')
+    );
+    process.exit(1);
+  }
+
   const cleanup: { orderIds: string[]; cartIds: string[] } = { orderIds: [], cartIds: [] };
   const trackCart = (cookie: string) => {
     const id = cookie.split('=')[1];

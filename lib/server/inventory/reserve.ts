@@ -226,10 +226,14 @@ export async function releaseReservations(orderId: string, tx?: Tx): Promise<num
 export async function adjustStock(
   inventoryItemId: string,
   delta: number,
-  reason: string
+  reason: string,
+  tx?: Tx
 ): Promise<void> {
   if (!reason.trim()) throw new Error('adjustStock requires a reason.');
-  await db.transaction(async (t) => {
+  // Takes an optional transaction like its siblings above, so the admin can
+  // write the stock change and its admin_action row in ONE transaction —
+  // features/admin.md §6.2: if the audit write fails, the change fails.
+  const run = async (t: Tx) => {
     const [level] = await t
       .select()
       .from(inventoryLevel)
@@ -248,5 +252,6 @@ export async function adjustStock(
     console.info(
       `[inventory] adjust ${inventoryItemId} by ${delta}: ${reason} (was ${level.stockedQuantity})`
     );
-  });
+  };
+  await (tx ? run(tx) : db.transaction(run));
 }
