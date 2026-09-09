@@ -13,12 +13,15 @@
     "test:inventory": "tsx --env-file=.env scripts/inventory-race-test.ts",
     "test:admin": "tsx --env-file=.env scripts/admin-auth-test.ts",
     "bootstrap:owner": "tsx --env-file=.env scripts/bootstrap-owner.ts",
-    "test:catalogue": "tsx --env-file=.env scripts/catalogue-test.ts"
+    "test:catalogue": "tsx --env-file=.env scripts/catalogue-test.ts",
+    "test:auth": "tsx --env-file=.env scripts/auth-test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.114.0",
+    "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.12",
     "lucide-react": "0.460.0",
     "next": "16.3.4",
     "postgres": "^3.4.9",
@@ -27,6 +30,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "22.10.2",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",

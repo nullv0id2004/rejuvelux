@@ -23,7 +23,8 @@
 
 import { eq, sql } from 'drizzle-orm';
 import { db } from '../lib/server/db/client';
-import { adminUser } from '../lib/server/db/schema';
+import { adminUser, appUser } from '../lib/server/db/schema';
+import { hashPassword, validatePasswordStrength } from '../lib/server/auth/password';
 
 async function main() {
   const email = process.argv[2]?.trim().toLowerCase();

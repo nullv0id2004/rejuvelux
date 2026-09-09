@@ -13,7 +13,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getAdminSession } from '@/lib/server/auth/session';
-import { createServerClient } from '@/lib/server/auth/supabase';
+import { clearSessionCookies, readSessionCookies } from '@/lib/server/auth/cookies';
+import { revokeSession } from '@/lib/server/auth/sessions';
 import styles from './admin.module.css';
 
 export const metadata = { title: 'Admin' };
@@ -31,8 +32,12 @@ const NAV: { href: string; label: string; ownerOnly?: boolean }[] = [
 
 async function signOut() {
   'use server';
-  const supabase = await createServerClient();
-  await supabase.auth.signOut();
+  // Delete the row as well as the cookies. Clearing cookies alone would leave a
+  // usable refresh token behind, so a copied cookie would still renew a session
+  // the user believes they ended.
+  const { refresh } = await readSessionCookies('admin');
+  if (refresh) await revokeSession(refresh);
+  await clearSessionCookies('admin');
   redirect('/admin/login');
 }
 

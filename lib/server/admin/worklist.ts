@@ -75,9 +75,22 @@ export async function getWorklist(): Promise<Worklist> {
       orderNumber: order.orderNumber,
       id: order.id,
       placedAt: order.createdAt,
+      /*
+       * The outer column MUST be qualified. Interpolating `${order.id}` emits a
+       * bare `"id"`, which inside this subquery binds to `order_event.id`
+       * (bigint) rather than `order.id` (uuid) — the inner table shadows the
+       * outer one — and Postgres rejects the whole statement at parse time with
+       * `operator does not exist: uuid = bigint`.
+       *
+       * This made /admin a 500 from the day it was written. It went unnoticed
+       * because features/admin.md §8's "signed-in worklist renders" check had
+       * been SKIPPED since 2 Sep 2026 for want of a password; the end-to-end
+       * test added with ADR-0012 rendered the page for the first time and it
+       * failed immediately.
+       */
       latest: sql<string>`(
         SELECT e.type FROM order_event e
-        WHERE e.order_id = ${order.id}
+        WHERE e.order_id = "order"."id"
         ORDER BY e.id DESC LIMIT 1
       )`,
     })

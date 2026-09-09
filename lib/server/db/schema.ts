@@ -21,6 +21,7 @@ import {
   bigint,
   boolean,
   check,
+  index,
   integer,
   jsonb,
   pgSequence,
@@ -452,6 +453,112 @@ export const paymentEvent = pgTable(
   },
   (t) => [
     uniqueIndex('payment_event_provider_unique').on(t.providerEventId),
+  ]
+);
+
+/* Authentication — features/accounts.md §6, ADR-0012 ----------------------- */
+
+/**
+ * The credential store. Replaces Supabase's `auth.users` (ADR-0012).
+ *
+ * Deliberately a drop-in substitution rather than a merge: `customer` and
+ * `admin_user` keep their `auth_user_id` columns and their differing ON DELETE
+ * semantics, and simply point here instead. The credentials/commerce split that
+ * ADR-0008 valued — and that Medusa's own user module uses — survives intact;
+ * only the owner of the credential row changed.
+ *
+ * `passwordHash` is NULLABLE on purpose: a Google-only account has no password,
+ * and inventing an unusable one would be a lie the sign-in path has to work
+ * around forever.
+ */
+export const appUser = pgTable(
+  'app_user',
+  {
+    id: id(),
+    /** Always lowercased — enforced by a CHECK, not merely by convention. */
+    email: text('email').notNull(),
+    /** bcrypt. NULL for a Google-only account (features/accounts.md §6.1). */
+    passwordHash: text('password_hash'),
+    emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
+    /**
+     * THE credential-change kill switch. Every token carries a `tv` claim; the
+     * guard rejects a token whose `tv` is stale. Bumped on password change,
+     * reset, email change and "sign out everywhere", which kills live ACCESS
+     * tokens too — not just refresh. Without it a stolen access token survives
+     * a password reset, which is the exact moment it matters.
+     */
+    tokenVersion: integer('token_version').notNull().default(0),
+    failedLoginCount: integer('failed_login_count').notNull().default(0),
+    /** Timed, never permanent — a permanent lock is a denial-of-service on the
+     * account for anyone who knows the address (features/accounts.md §5.2). */
+    lockedUntil: timestamp('locked_until', { withTimezone: true }),
+    lastSignInAt: timestamp('last_sign_in_at', { withTimezone: true }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex('app_user_email_unique').on(t.email),
+    check('app_user_email_lower_check', sql`${t.email} = lower(${t.email})`),
+    check('app_user_token_version_check', sql`${t.tokenVersion} >= 0`),
+    check('app_user_failed_login_check', sql`${t.failedLoginCount} >= 0`),
+  ]
+);
+
+/** Federated sign-ins. One Google account cannot attach to two users. */
+export const appUserIdentity = pgTable(
+  'app_user_identity',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => appUser.id, { onDelete: 'cascade' }),
+    provider: text('provider').notNull(),
+    /** Google's stable subject claim (`sub`), never the email. */
+    providerAccountId: text('provider_account_id').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('app_user_identity_provider_unique').on(t.provider, t.providerAccountId),
+    index('app_user_identity_user_idx').on(t.userId),
+    check('app_user_identity_provider_check', sql`${t.provider} IN ('google')`),
+  ]
+);
+
+/**
+ * Live sessions. A refresh token is a row so that it can be revoked — a pure
+ * JWT refresh token cannot be.
+ *
+ * Stored HASHED, which is a deliberate departure from the KORUM reference: it
+ * stores the token verbatim, so a database read there mints a session.
+ *
+ * `audience` is what lets one refresh path serve two session policies
+ * (features/accounts.md §3): a customer window slides for 90 days, an admin
+ * window is 12 h idle under a 7 d absolute cap that does not slide.
+ */
+export const refreshToken = pgTable(
+  'refresh_token',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => appUser.id, { onDelete: 'cascade' }),
+    /** SHA-256 of the token. The plaintext exists only in the cookie. */
+    tokenHash: text('token_hash').notNull(),
+    audience: text('audience').notNull(),
+    /** The sliding window. Moves forward on each use. */
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    /** The hard ceiling. Never moves — this is what caps an admin at 7 days. */
+    absoluteExpiresAt: timestamp('absolute_expires_at', { withTimezone: true }).notNull(),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    deviceInfo: text('device_info'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('refresh_token_hash_unique').on(t.tokenHash),
+    index('refresh_token_user_idx').on(t.userId),
+    index('refresh_token_expiry_idx').on(t.absoluteExpiresAt),
+    check('refresh_token_audience_check', sql`${t.audience} IN ('customer','admin')`),
+    check('refresh_token_window_check', sql`${t.expiresAt} <= ${t.absoluteExpiresAt}`),
   ]
 );
 

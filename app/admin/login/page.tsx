@@ -1,24 +1,31 @@
 /**
  * Admin sign-in — the only unguarded admin route (features/admin.md §4).
  *
- * A server action, not a client-side Supabase call: the session cookie is set
- * server-side, so no auth token is ever handled by page JavaScript. This is
- * also why the page ships no client bundle at all, which serves §6.6 (admin
- * code never reaches a public bundle).
+ * A server action, not a client-side call: the session cookies are written
+ * server-side, so no token is ever handled by page JavaScript. This is also why
+ * the page ships no client bundle at all, which serves §6.6 (admin code never
+ * reaches a public bundle).
+ *
+ * Rebuilt on the self-built stack by ADR-0012. The failure handling below is
+ * unchanged in spirit and stricter in fact: `signInWithPassword` returns ONE
+ * message for every credential outcome and burns equal bcrypt time on the
+ * account-not-found path, so neither the wording nor the clock distinguishes a
+ * missing address from a wrong password.
  */
 
 import { redirect } from 'next/navigation';
-import { createServerClient } from '@/lib/server/auth/supabase';
+import { setSessionCookies } from '@/lib/server/auth/cookies';
+import { signInWithPassword } from '@/lib/server/auth/signin';
 import styles from './login.module.css';
 
 export const metadata = { title: 'Sign in' };
 
 /**
- * Never prerendered. A sign-in page reads searchParams and constructs an auth
- * client, so it is dynamic by nature — and without this the build tries to
- * render it at compile time, where the Supabase env vars may legitimately be
- * absent, turning a runtime requirement into a build failure. Caught by the
- * build on 4 Sep 2026, when exactly that happened.
+ * Never prerendered. A sign-in page reads searchParams and touches cookies, so
+ * it is dynamic by nature — and without this the build tries to render it at
+ * compile time, where the auth secrets may legitimately be absent, turning a
+ * runtime requirement into a build failure. Caught by the build on 4 Sep 2026,
+ * when exactly that happened with the Supabase variables.
  */
 export const dynamic = 'force-dynamic';
 
@@ -33,16 +40,20 @@ async function signIn(formData: FormData) {
     redirect(`/admin/login?error=missing&next=${encodeURIComponent(next)}`);
   }
 
-  const supabase = await createServerClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const result = await signInWithPassword(email, password, 'admin');
 
-  if (error) {
-    // Deliberately one message for every failure: wrong password, unknown
-    // address, disabled account. Distinguishing them tells an attacker which
-    // addresses exist.
-    redirect(`/admin/login?error=invalid&next=${encodeURIComponent(next)}`);
+  if (!result.ok) {
+    // One message for every credential outcome — see the file header. `locked`
+    // is the single exception, and it is only reachable by someone who has
+    // already failed eight times, so it reveals nothing they did not cause.
+    const kind = result.message.startsWith('Too many') ? 'locked' : 'invalid';
+    redirect(`/admin/login?error=${kind}&next=${encodeURIComponent(next)}`);
   }
 
+  await setSessionCookies('admin', result.session, result.userId);
+
+  // Only ever return to an /admin path: `next` comes from the query string, so
+  // treating it as a trusted redirect target would be an open redirect.
   redirect(next.startsWith('/admin') ? next : '/admin');
 }
 
@@ -63,7 +74,9 @@ export default async function LoginPage({
           <p className={styles.error} role="alert">
             {error === 'missing'
               ? 'Enter both your email address and password.'
-              : 'That email address and password do not match an account.'}
+              : error === 'locked'
+                ? 'Too many failed attempts. Try again in a few minutes.'
+                : 'That email address and password do not match an account.'}
           </p>
         ) : null}
 
