@@ -79,6 +79,7 @@ Rules:
 | [0009](0009-database-region-sydney.md) | The database lives in Sydney, not Mumbai | **`Accepted`** — amends ADR-0003's region row; closes R-73 | 2026-09-05 |
 | [0010](0010-single-flat-repository.md) | One flat repository, and `rejuvelux_old` is kept as provenance | **`Accepted`** — amends ADR-0006 and ADR-0008 path rows only | 2026-09-06 |
 | [0011](0011-superseded-visual-direction.md) | The Claude Design frontend supersedes the visual direction, and its palette was audited | **`Accepted`** — supersedes ADR-0007; raises R-75 | 2026-09-06 |
+| [0012](0012-self-built-auth.md) | Write authentication ourselves, with KORUM's mechanism as the reference | **`Accepted`** — supersedes ADR-0008's identity clause only; raises R-78 | 2026-09-09 |
 
 `Open` rows are unlinked; a link appears when the file does.
 
