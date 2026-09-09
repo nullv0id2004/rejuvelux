@@ -67,7 +67,7 @@ export const PRESENTATION: Record<string, Presentation> = {
     tagline: 'Youngest buds. Minimal intervention. Extraordinary elegance.',
     bullets: [
       'Hand-harvested buds only, no leaf',
-      'Withered, not rolled — the leaf keeps its silvery down',
+      'Withered, not rolled. The leaf keeps its silvery down',
       'Pale straw liquor, honeysuckle and melon',
     ],
     faqs: [
@@ -81,7 +81,7 @@ export const PRESENTATION: Record<string, Presentation> = {
       ],
       [
         'Is it low in caffeine?',
-        'It is naturally lower than black tea from the same garden, but not caffeine-free. Draft — final figure pending lab sheet.',
+        'It is naturally lower than black tea from the same garden, but not caffeine-free. Draft: final figure pending lab sheet.',
       ],
       [
         'How should I store it?',
@@ -97,17 +97,17 @@ export const PRESENTATION: Record<string, Presentation> = {
     image: '/assets/matcha-900.png',
     body: 4,
     brisk: 2,
-    why: 'Naturally rich in catechins and EGCG, with naturally occurring caffeine and L-theanine — a concentrated whole-leaf experience crafted for energy, alertness, and mindful focus. Grown under heavy canopy shade, it develops a distinctive chlorophyll richness alongside its natural sweetness.',
+    why: 'Naturally rich in catechins and EGCG, with naturally occurring caffeine and L-theanine. A concentrated whole-leaf experience crafted for energy, alertness, and mindful focus. Grown under heavy canopy shade, it develops a distinctive chlorophyll richness alongside its natural sweetness.',
     tagline: 'Naturally vibrant. Rich in catechins. Crafted for focus.',
     bullets: [
       'Shade-grown, steamed, stone-milled',
-      'Whole leaf, consumed — not infused',
+      'Whole leaf, consumed rather than infused',
       'Opaque green, sweet, umami',
     ],
     faqs: [
       [
         'How is Assam Matcha different from Japanese matcha?',
-        'Same process — shading, steaming, deveining, stone-milling — applied to an Assam cultivar. Expect a slightly deeper, more olive green and a rounder, less marine flavour.',
+        'Shading, steaming, deveining and stone-milling: the same process, applied to an Assam cultivar. Expect a slightly deeper, more olive green and a rounder, less marine flavour.',
       ],
       [
         'Do I need a whisk?',
@@ -206,7 +206,7 @@ export const PRESENTATION: Record<string, Presentation> = {
       ],
       [
         'Why does it show as unavailable when the matcha is in stock?',
-        'The set is only as available as its scarcest component. If the whisk stands run out, the set does too — we would rather say so than ship you five pieces of six.',
+        'The set is only as available as its scarcest component. If the whisk stands run out, the set does too. We would rather say so than ship you five pieces of six.',
       ],
     ],
   },
@@ -244,7 +244,7 @@ export const WITHHELD: Record<string, Presentation> = {
     tagline: 'Bold. Malty. Without apology.',
     bullets: [
       'Single-estate CTC, not a blend',
-      'Graded [GRADE] — even granule, fast colour',
+      'Graded [GRADE] · even granule, fast colour',
       'Deep red-brown liquor, malt, brisk',
     ],
     faqs: [
@@ -271,18 +271,18 @@ export const WITHHELD: Record<string, Presentation> = {
     why: 'Built on the same estate leaf as the rest of the range and blended rather than flavoured, Ube is naturally rich in the polyphenols of its base tea, with naturally occurring caffeine. A different register, held to the same standard.',
     tagline: 'Estate leaf. Real ube. Quietly different.',
     bullets: [
-      'Single-estate Assam base — blended, not flavoured',
+      'Single-estate Assam base, blended rather than flavoured',
       'Violet liquor that deepens with the steep',
       'Takes milk without thinning out',
     ],
     faqs: [
       [
         'What does ube taste like?',
-        'Earthy and mildly sweet — closer to chestnut or taro than to fruit. It rounds the Assam base rather than masking it.',
+        'Earthy and mildly sweet: closer to chestnut or taro than to fruit. It rounds the Assam base rather than masking it.',
       ],
       [
         'Is it sweetened?',
-        'No sugar is added. The sweetness is the ube’s own. Sweeten it yourself if you want it dessert-like. Draft — final formulation pending.',
+        'No sugar is added. The sweetness is the ube’s own. Sweeten it yourself if you want it dessert-like. Draft: final formulation pending.',
       ],
       [
         'Does it work with milk?',

@@ -79,7 +79,7 @@ export default async function HomePage() {
           className="greybox"
           style={{ position: 'absolute', inset: 0 }}
           role="img"
-          aria-label={isInterim(SITE_PHOTOS.hero) ? "The garden — interim photograph" : "RejuveLuxe hero photograph"}
+          aria-label={isInterim(SITE_PHOTOS.hero) ? "The garden, interim photograph" : "RejuveLuxe hero photograph"}
         >
           <Image
             src={SITE_PHOTOS.hero}
@@ -191,7 +191,7 @@ export default async function HomePage() {
           className="greybox"
           style={{ position: 'absolute', inset: 0 }}
           role="img"
-          aria-label={isInterim(SITE_PHOTOS.storyBand) ? "The garden — interim photograph" : "The garden"}
+          aria-label={isInterim(SITE_PHOTOS.storyBand) ? "The garden, interim photograph" : "The garden"}
         >
           <Image
             src={SITE_PHOTOS.storyBand}

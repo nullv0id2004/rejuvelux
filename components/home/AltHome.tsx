@@ -54,7 +54,7 @@ const buildSets = (count: number): [string, string, string, string][] => [
     'Sampler flight',
     'Three teas of your choice, 25 g each',
     'Save ₹[000]',
-    'Pick a register — pale, copper, or strong.',
+    'Pick a register: pale, copper, or strong.',
   ],
   [
     'Subscription',
@@ -188,7 +188,7 @@ export function AltHome() {
             ₹<Ph>[00]</Ph>
           </div>
           <div className="us">
-            ₹<Ph>[0]</Ph> — they win here
+            ₹<Ph>[0]</Ph>, they win here
           </div>
         </div>
       </section>
@@ -236,9 +236,9 @@ export function AltHome() {
                   <Swatch p={p} size={12} />
                   {p.name}
                 </div>
-                <div>{p.brewing?.water ?? '—'}</div>
-                <div>{p.brewing?.leaf ?? '—'}</div>
-                <div>{p.brewing?.time ?? '—'}</div>
+                <div>{p.brewing?.water ?? 'Not stated'}</div>
+                <div>{p.brewing?.leaf ?? 'Not stated'}</div>
+                <div>{p.brewing?.time ?? 'Not stated'}</div>
               </div>
             ))}
           </div>

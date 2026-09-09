@@ -7,7 +7,7 @@ import { rangeWordCap, SLOT, STORY } from '@/lib/data';
 export const metadata: Metadata = {
   title: 'The Garden',
   description:
-    'One garden, on purpose. A single estate in Assam — its district, elevation, flush and the people who work it.',
+    'One garden, on purpose. A single estate in Assam: its district, elevation, flush and the people who work it.',
 };
 
 /**

@@ -121,7 +121,7 @@ export function CraftView() {
                       ratio="3 / 2"
                       sizes="(max-width: 800px) 100vw, 600px"
                       src={macros[Math.floor((i + 1) / 3) - 1]}
-                      alt={`${p.name} — ${n.toLowerCase()}`}
+                      alt={`${p.name}, ${n.toLowerCase()}`}
                     />
                   </div>
                 )}

@@ -14,15 +14,22 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/server/auth/session';
 import { listInventory } from '@/lib/server/admin/inventory';
+import { readNotice, type SearchParams } from '../form';
+import { Notices } from '../notices';
 import shell from '../admin.module.css';
 import styles from './inventory.module.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Inventory' };
 
-export default async function InventoryPage() {
+export default async function InventoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   await requireAdmin();
   const rows = await listInventory();
+  const notice = readNotice(await searchParams);
 
   return (
     <>
@@ -32,6 +39,8 @@ export default async function InventoryPage() {
         have not shipped. Sorted with the scarcest first. Every change asks for
         a reason and is recorded against your name.
       </p>
+
+      <Notices notice={notice} />
 
       {rows.length === 0 ? (
         <p className={styles.empty}>No stock-tracked items exist yet.</p>
@@ -100,7 +109,7 @@ export default async function InventoryPage() {
       <p className={styles.footnote}>
         <strong>Available</strong> is what is in stock minus what is promised to
         orders that have not been sent yet. It is worked out for you and cannot
-        be edited directly — to change it, change the stock count or fulfil the
+        be edited directly: to change it, change the stock count or fulfil the
         orders holding it. A gift set is only as available as its scarcest part.
       </p>
     </>

@@ -42,27 +42,27 @@ const OG_IMAGE = {
   url: '/assets/og.jpg',
   width: 1200,
   height: 630,
-  alt: 'RejuveLuxe — Earned, not indulged. Single-origin Assam tea.',
+  alt: 'RejuveLuxe · Earned, not indulged. Single-origin Assam tea.',
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'RejuveLuxe — Earned, not indulged',
+    default: 'RejuveLuxe · Earned, not indulged',
     template: '%s · RejuveLuxe',
   },
   description:
-    "Single-origin Assam tea. One garden, one flush, one lot — printed on every tin. India doesn't need better tea; India needs better access to its best tea.",
+    "Single-origin Assam tea. One garden, one flush, one lot: printed on every tin. India doesn't need better tea; India needs better access to its best tea.",
   openGraph: {
     type: 'website',
     siteName: 'RejuveLuxe',
-    title: 'RejuveLuxe — Earned, not indulged',
+    title: 'RejuveLuxe · Earned, not indulged',
     description: 'Single-origin Assam tea. One garden, one flush, one lot.',
     images: [OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RejuveLuxe — Earned, not indulged',
+    title: 'RejuveLuxe · Earned, not indulged',
     description: 'Single-origin Assam tea. One garden, one flush, one lot.',
     images: [OG_IMAGE.url],
   },

@@ -145,7 +145,7 @@ export function ScrollShowcase() {
               className="tin-in sc-tin sc-tin-pending tin-pending"
               style={{ color: p.ink }}
               role="img"
-              aria-label={`${p.name} tin — render pending`}
+              aria-label={`${p.name} tin, render pending`}
               onClick={() => router.push(`/shop/${p.slug}`)}
             >
               Tin render pending

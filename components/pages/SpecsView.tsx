@@ -191,7 +191,7 @@ export function SpecsView() {
           </div>
           <div className="stack g3">
             <div className="between">
-              <Eyebrow muted>Active stop · {activeStop?.name ?? '—'}</Eyebrow>
+              <Eyebrow muted>Active stop · {activeStop?.name ?? 'None'}</Eyebrow>
               <Tabs
                 variant="underline"
                 items={catalogue.map((p) => ({ value: p.slug, label: p.name }))}

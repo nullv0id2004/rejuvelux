@@ -19,7 +19,7 @@ export function Footer() {
           <div className="stack g5" style={{ gap: 20 }}>
             <Logo width={148} />
             <p className="small" style={{ color: 'var(--ink-400)', maxWidth: 280 }}>
-              Single-origin Assam. One garden, one flush, one lot — printed on every tin.
+              Single-origin Assam. One garden, one flush, one lot: printed on every tin.
             </p>
           </div>
 

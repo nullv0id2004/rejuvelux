@@ -12,6 +12,12 @@
  * the count the operator typed was answering a different question, so the edit
  * is refused and re-presented rather than applied to a number they never saw.
  *
+ * **A lower count confirms** (§6.3, which lists "adjusting stock downward"
+ * among the consequential actions). Raising a count is recoverable; lowering
+ * one can take a product off sale, so the form comes back once naming the drop.
+ * Uses the same `?confirm=1` mechanism as every other admin screen, so the
+ * behaviour is learned once.
+ *
  * Three rules from §6 are load-bearing here:
  *   - §6.1 the domain layer is the only writer: this calls `adjustStock()` and
  *     never touches `inventory_level` itself.
@@ -28,45 +34,72 @@ import { requireAdmin } from '@/lib/server/auth/session';
 import { auditedMutation } from '@/lib/server/admin/audit';
 import { getInventoryRow, isOversellError } from '@/lib/server/admin/inventory';
 import { adjustStock } from '@/lib/server/inventory/reserve';
+import {
+  backTo,
+  carry,
+  checked,
+  initial,
+  integer,
+  readNotice,
+  text,
+  type SearchParams,
+} from '../../../form';
+import { ConfirmNotice, Notices } from '../../../notices';
 import shell from '../../../admin.module.css';
 import styles from '../../inventory.module.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Correct a stock count' };
 
-type Params = { params: Promise<{ id: string }> };
+/** The fields carried back on a refusal, so nothing typed is lost. */
+const FIELDS = ['count', 'reason'] as const;
 
 async function submit(formData: FormData) {
   'use server';
 
   const session = await requireAdmin();
 
-  const itemId = String(formData.get('itemId') ?? '');
-  const reason = String(formData.get('reason') ?? '').trim();
-  const rawCount = String(formData.get('count') ?? '').trim();
-  const expected = Number(formData.get('expectedStocked'));
-  const back = `/admin/inventory/${itemId}/adjust`;
+  const itemId = text(formData, 'itemId');
+  const reason = text(formData, 'reason');
+  const count = integer(formData, 'count');
+  const expected = integer(formData, 'expectedStocked');
+  const path = `/admin/inventory/${itemId}/adjust`;
+  const carried = carry(formData, FIELDS);
 
-  const fail = (code: string): never =>
-    redirect(`${back}?error=${code}&count=${encodeURIComponent(rawCount)}&reason=${encodeURIComponent(reason)}`);
+  const refuse = (sentence: string): never =>
+    redirect(backTo(path, { refused: sentence, carry: carried }));
 
-  if (!reason) fail('reason');
-
-  const count = Number(rawCount);
-  if (!Number.isInteger(count) || count < 0) fail('count');
+  if (!reason) refuse('Say why the count is changing. It is recorded with the change.');
+  if (!Number.isInteger(count) || count < 0) {
+    refuse('Enter the new count as a whole number, zero or more.');
+  }
 
   const row = await getInventoryRow(itemId);
   if (!row) notFound();
 
-  // §5 Stale — the shelf moved under the editor.
-  if (row.stocked !== expected) fail('stale');
+  // §5 Stale: the shelf moved under the editor, so the count they typed was
+  // answering a number they never saw.
+  if (row.stocked !== expected) {
+    refuse(
+      'The stock changed while this page was open, so your count was answering an older number. The current figures are below. Please check the shelf and enter it again.'
+    );
+  }
 
   const delta = count - row.stocked;
-  if (delta === 0) fail('nochange');
+  if (delta === 0) refuse('That is the same as the current count, so nothing was changed.');
 
-  // The database refuses a count below what open orders already hold. Catch it
-  // and say so in words rather than letting a constraint name reach a person.
-  if (count < row.reserved) fail('reserved');
+  // The database refuses a count below what open orders already hold. Say so in
+  // words rather than letting a constraint name reach a person.
+  if (count < row.reserved) {
+    refuse(
+      `That count is below the ${row.reserved} unit${row.reserved === 1 ? '' : 's'} already promised to orders that have not shipped. Fulfil or cancel those orders first, or enter a count of at least ${row.reserved}.`
+    );
+  }
+
+  // §6.3: lowering a count is consequential, so it confirms. Raising one is not.
+  if (delta < 0 && !checked(formData, 'confirm')) {
+    redirect(backTo(path, { confirm: true, carry: carried }));
+  }
 
   try {
     await auditedMutation(
@@ -86,37 +119,43 @@ async function submit(formData: FormData) {
     );
   } catch (e) {
     // The no-oversell CHECK is the last line and it does not bend. If it fires
-    // despite the check above, something changed concurrently — same answer.
+    // despite the check above, something changed concurrently, so: same answer.
     // Read through Drizzle's wrapper: its own message is the SQL, not the
     // constraint, so a naive string match here never fires (see isOversellError).
-    if (isOversellError(e)) fail('reserved');
+    if (isOversellError(e)) {
+      refuse(
+        `That count is below what is already promised to orders that have not shipped. Fulfil or cancel those orders first.`
+      );
+    }
     throw e;
   }
 
-  redirect('/admin/inventory?saved=1');
+  redirect(
+    backTo('/admin/inventory', {
+      done: `${row.name} is now ${count}, was ${row.stocked}.`,
+    })
+  );
 }
 
 export default async function AdjustPage({
   params,
   searchParams,
-}: Params & {
-  searchParams: Promise<{ error?: string; count?: string; reason?: string }>;
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireAdmin();
   const { id } = await params;
-  const { error, count, reason } = await searchParams;
+  const sp = await searchParams;
+  const notice = readNotice(sp);
 
   const row = await getInventoryRow(id);
   if (!row) notFound();
 
-  const messages: Record<string, string> = {
-    reason: 'Say why the count is changing — it is recorded with the change.',
-    count: 'Enter the new count as a whole number, zero or more.',
-    nochange: 'That is the same as the current count, so nothing was changed.',
-    stale:
-      'The stock changed while this page was open, so your count was answering an older number. The current figures are shown below — please check the shelf and enter it again.',
-    reserved: `That count is below the ${row.reserved} unit${row.reserved === 1 ? '' : 's'} already promised to orders that have not shipped. Fulfil or cancel those orders first, or enter a count of at least ${row.reserved}.`,
-  };
+  const typedCount = initial(sp, 'count', String(row.stocked));
+  const dropTo = Number(typedCount);
+  const confirmingDrop =
+    notice.confirm && Number.isInteger(dropTo) && dropTo < row.stocked;
 
   return (
     <>
@@ -125,10 +164,16 @@ export default async function AdjustPage({
         <strong>{row.name}</strong> · {row.sku}
       </p>
 
-      {error && messages[error] ? (
-        <p className={styles.refusal} role="alert">
-          {messages[error]}
-        </p>
+      <Notices notice={notice} />
+
+      {confirmingDrop ? (
+        <ConfirmNotice>
+          This lowers <strong>{row.name}</strong> from {row.stocked} to {dropTo}
+          {dropTo - row.reserved <= 0
+            ? ', which leaves nothing available to sell.'
+            : `, leaving ${dropTo - row.reserved} available to sell.`}{' '}
+          Submit again to confirm.
+        </ConfirmNotice>
       ) : null}
 
       <dl className={styles.facts}>
@@ -162,13 +207,14 @@ export default async function AdjustPage({
 
       <form className={styles.form} action={submit}>
         <input type="hidden" name="itemId" value={row.itemId} />
-        {/* The figure this form was rendered against — §5's staleness check. */}
+        {/* The figure this form was rendered against: §5's staleness check. */}
         <input type="hidden" name="expectedStocked" value={row.stocked} />
+        {confirmingDrop ? <input type="hidden" name="confirm" value="1" /> : null}
 
         <label className={styles.field}>
           <span className={styles.label}>New count</span>
           <span className={styles.hint}>
-            How many are actually there, counted just now — not the difference.
+            How many are actually there, counted just now. Not the difference.
           </span>
           <input
             className={styles.input}
@@ -178,7 +224,7 @@ export default async function AdjustPage({
             step={1}
             required
             autoFocus
-            defaultValue={count ?? String(row.stocked)}
+            defaultValue={typedCount}
           />
         </label>
 
@@ -193,13 +239,13 @@ export default async function AdjustPage({
             name="reason"
             required
             maxLength={200}
-            defaultValue={reason ?? ''}
+            defaultValue={initial(sp, 'reason', '')}
           />
         </label>
 
         <div className={styles.formActions}>
           <button className={styles.submit} type="submit">
-            Save the new count
+            {confirmingDrop ? 'Yes, lower the count' : 'Save the new count'}
           </button>
           <Link className={styles.cancel} href="/admin/inventory">
             Cancel

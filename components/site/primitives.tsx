@@ -105,7 +105,7 @@ export function Wordmark({
 
   if (!href) return content;
   return (
-    <Link href={href} aria-label="RejuveLuxe — home" style={{ display: 'inline-flex', color }}>
+    <Link href={href} aria-label="RejuveLuxe, home" style={{ display: 'inline-flex', color }}>
       {content}
     </Link>
   );
@@ -179,7 +179,7 @@ export function Greybox({
       className={'greybox photo ' + className}
       style={{ aspectRatio: ratio, ...style }}
       role="img"
-      aria-label={real ? (alt ?? label) : label + ' — interim photograph'}
+      aria-label={real ? (alt ?? label) : label + ', interim photograph'}
     >
       <Image
         src={src ?? SITE_PHOTOS.interim}
@@ -257,7 +257,7 @@ export function Scale({ label, value }: { label: string; value: number }) {
       </div>
       <div
         className="scale"
-        aria-label={rated ? `${label} ${value} of 5` : `${label} — not yet rated`}
+        aria-label={rated ? `${label} ${value} of 5` : `${label}, not yet rated`}
       >
         {[1, 2, 3, 4, 5].map((i) => (
           <i key={i} className={i <= value ? 'on' : ''} />
@@ -295,7 +295,7 @@ export function TinBox({
       className={'tinbox ' + className}
       style={{ background: p.tin, ...style }}
       role={p.image ? undefined : 'img'}
-      aria-label={p.image ? undefined : `${p.name} tin — render pending`}
+      aria-label={p.image ? undefined : `${p.name} tin, render pending`}
     >
       {p.image ? (
         <Image

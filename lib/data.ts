@@ -111,7 +111,7 @@ export const ANNOUNCEMENTS = [
 export const FAQS: [string, string][] = [
   [
     'Where does the tea come from?',
-    'A single estate in Assam. The garden name, district and elevation appear on every product page and are printed on every tin. Estate details are pending confirmation — the slots read [ESTATE] until then.',
+    'A single estate in Assam. The garden name, district and elevation appear on every product page and are printed on every tin. Estate details are pending confirmation, so the slots read [ESTATE] until then.',
   ],
   [
     'What does single-origin mean here?',
@@ -149,20 +149,20 @@ export const CRAFT: Record<string, CraftChapter> = {
   'assam-matcha': {
     title: 'Crafting Our Matcha',
     close:
-      'Carefully selected leaves, gently transformed into fine Matcha powder — so the whole leaf becomes part of every cup.',
+      'Carefully selected leaves, gently transformed into fine Matcha powder, so the whole leaf becomes part of every cup.',
     steps: [
       ['Leaf Selection', 'Tender, high-quality leaves are chosen for Matcha production.'],
       [
         'Shading',
-        'Before harvest, the plants are shaded, changing their chemistry — building L-theanine and chlorophyll.',
+        'Before harvest, the plants are shaded, changing their chemistry: building L-theanine and chlorophyll.',
       ],
       ['Harvesting', 'Young leaves are picked at precisely the right stage for colour and flavour.'],
       ['Steaming', 'Leaves are rapidly steamed to halt oxidation and lock in their vivid green.'],
       ['Cooling & Drying', 'Carried out under controlled conditions.'],
-      ['Deveining', 'Stems and coarse veins are removed, leaving tencha — the pure leaf.'],
+      ['Deveining', 'Stems and coarse veins are removed, leaving tencha: the pure leaf.'],
       [
         'Fine Grinding',
-        'Tencha is slowly stone-milled into an exceptionally fine powder — deliberately slow, to prevent heat from compromising the leaf.',
+        'Tencha is slowly stone-milled into an exceptionally fine powder. Deliberately slow, to prevent heat from compromising the leaf.',
       ],
       [
         'Quality Screening & Packaging',
@@ -173,7 +173,7 @@ export const CRAFT: Record<string, CraftChapter> = {
   'silver-needle-assam': {
     title: 'Crafting Our Silver Needle',
     close:
-      'Selected from tender young buds, gently withered and carefully dried — preserving natural elegance and refined character with minimal intervention.',
+      'Selected from tender young buds, gently withered and carefully dried, preserving natural elegance and refined character with minimal intervention.',
     steps: [
       [
         'Bud Selection',
@@ -182,7 +182,7 @@ export const CRAFT: Record<string, CraftChapter> = {
       ['Gentle Handling', 'Buds are handled carefully to avoid bruising or unwanted oxidation.'],
       [
         'Withering',
-        'Spread in a controlled environment to lose moisture naturally — the most critical stage of white tea.',
+        'Spread in a controlled environment to lose moisture naturally: the most critical stage of white tea.',
       ],
       ['Minimal Oxidation', 'Unlike black tea, the process stays deliberately gentle.'],
       ['Drying', 'Carefully stabilised once the desired character is achieved.'],
@@ -195,14 +195,14 @@ export const CRAFT: Record<string, CraftChapter> = {
   'assam-golden-tips': {
     title: 'Crafting Our Golden Tips',
     close:
-      'Carefully selected golden tips, transformed through precise withering, rolling, oxidation, and drying — developing their distinctive depth and character.',
+      'Carefully selected golden tips, transformed through precise withering, rolling, oxidation, and drying, developing their distinctive depth and character.',
     steps: [
       ['Selective Harvesting', 'Young leaves and golden tips are hand-picked for premium quality.'],
       ['Withering', 'Reduces moisture, making the leaf flexible for processing.'],
       ['Rolling', 'Disrupts the leaf structure, enabling natural enzymatic reactions.'],
       [
         'Oxidation',
-        "Controlled oxidation develops theaflavins and thearubigins — the compounds behind Golden Tips' colour, aroma, and body.",
+        "Controlled oxidation develops theaflavins and thearubigins: the compounds behind Golden Tips' colour, aroma, and body.",
       ],
       ['Drying / Firing', 'Stops oxidation at precisely the right point and stabilises the leaf.'],
       [
@@ -223,9 +223,9 @@ export const CRAFT_ORDER = [
 
 export const STORY = [
   'It started with a question: why does the world come to India for some of its finest teas, while India so often settles for less at home?',
-  'We have extraordinary estates. Exceptional leaves. Generations of craftsmanship. What was missing was a brand that brought the best of it together — worthy of the people who have earned the finer things in life.',
-  "So we went to the source. We searched. We tasted. We rejected. And we searched again — until we found teas that made one thing clear: India doesn't need better tea. India needs better access to its best tea.",
-  'That belief became RejuveLuxe. From rare Silver Needle and Matcha to Golden Tips, premium Green Tea and exceptional CTC, we are building a collection for people who understand quality — and expect nothing less. Not for the excess. For the earned.',
+  'We have extraordinary estates. Exceptional leaves. Generations of craftsmanship. What was missing was a brand that brought the best of it together, worthy of the people who have earned the finer things in life.',
+  "So we went to the source. We searched. We tasted. We rejected. And we searched again, until we found teas that made one thing clear: India doesn't need better tea. India needs better access to its best tea.",
+  'That belief became RejuveLuxe. From rare Silver Needle and Matcha to Golden Tips, premium Green Tea and exceptional CTC, we are building a collection for people who understand quality, and expect nothing less. Not for the excess. For the earned.',
 ];
 
 export type Review = { name: string; city: string; text: string; rating: number };

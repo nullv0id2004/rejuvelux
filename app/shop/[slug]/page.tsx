@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const summary = [p.descriptor, p.tagline].filter(Boolean).join('. ');
   return {
     title: p.name,
-    description: `${p.name}${summary ? ` — ${summary}` : ''} Single-origin Assam, ${p.netQuantity}.`,
+    description: `${p.name}${summary ? `. ${summary}` : ''} Single-origin Assam, ${p.netQuantity}.`,
     openGraph: {
       title: `${p.name} · RejuveLuxe`,
       description: p.tagline ?? p.description,
