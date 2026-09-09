@@ -59,7 +59,8 @@ Absent: `/shop` index, `/cart`, `/checkout`, any server call, any database depen
 
 - **Razorpay.** `payment` and `payment_event` exist as tables, empty and unwired.
   [features/admin.md](features/admin.md) §1 calls this "ADR-0006's marked seam".
-- **Admin stages 2–6** — inventory, products/variants, orders, users, customers/audit.
+- ~~**Admin stages 2–6** — inventory, products/variants, orders, users, customers/audit.~~
+  **Built 9 September, 2026** — see §6 and `features/admin.md` §11.
 - **Checkout UI.** `/api/checkout` exists; no page calls it.
 
 ### 1.4 The live database — assessed 6 September, 2026
@@ -192,6 +193,10 @@ Admin stage 4 → Phase 3 → Admin stages 5–6. This front-loads the two stage
 risks (R-66, R-04) at the cost of one context switch, and it defers payments — the riskiest
 work — until the paths it depends on are exercised.
 
+> **What actually happened, 9 September 2026:** Track B ran to completion in one day, stages 2–6,
+> ahead of Phase 2. Stage 4 was proved against a test order and a simulated capture rather than a
+> storefront order. Remaining: Phase 2 (cart and checkout UI) and Phase 3 (payments).
+
 ---
 
 ## 5. Track A — the storefront on the database
@@ -323,12 +328,14 @@ it.
 
 | Stage | Content | Exit criterion | Depends on |
 |---|---|---|---|
-| ~~1~~ | ~~Auth, `admin_user`, guard, audit~~ | **Substantially met 5 Sep 2026, 15/17** | — |
-| 2 | Inventory: list and adjust | **R-66 becomes closable** — real counts entered with mandatory reasons, audited | Phase 0 |
-| 3 | Products and variants, incl. price | **R-04 becomes closable by the client** rather than by a developer | Phase 0 |
-| 4 | Orders: list, detail, fulfil | An order placed through the storefront is shipped and delivered from the admin, and the fold agrees | **Phase 2** |
-| 5 | Users, invites, roles | An owner invites a staff member who can do 2–4 but not 5 | Stage 3 |
-| 6 | Customers (read) + audit viewer | — | Stage 5 |
+| ~~1~~ | ~~Auth, `admin_user`, guard, audit~~ | **Met 9 Sep 2026** on the self-built stack (ADR-0012); the worklist rendered for the first time the same day | — |
+| ~~2~~ | ~~Inventory: list and adjust~~ | **Met 9 Sep 2026, 18/18** — R-66 is closable from `/admin/inventory` | Phase 0 |
+| ~~3~~ | ~~Products and variants, incl. price~~ | **Met 9 Sep 2026** — R-04 is closable from `/admin/products/[id]/variants` | Phase 0 |
+| ~~4~~ | ~~Orders: list, detail, fulfil~~ | **Met 9 Sep 2026** — proved with a test order and a simulated capture; the fold agrees. The storefront path still waits on Phase 2 | ~~Phase 2~~ |
+| ~~5~~ | ~~Users, invites, roles~~ | **Met 9 Sep 2026** — invitation links handed over by hand (R-78) | Stage 3 |
+| ~~6~~ | ~~Customers (read) + audit viewer~~ | **Met 9 Sep 2026** | Stage 5 |
+
+**Track B is complete** as specified. `features/admin.md` §11 is the as-built record; `scripts/admin-inventory-test.ts` and `scripts/admin-stages-test.ts` are its exit tests. Stage 4 was built ahead of Phase 2 by exercising the domain directly, so it needs re-running once a storefront order exists.
 
 **Four rules that bind every stage** ([features/admin.md](features/admin.md) §6, ADR-0008):
 

@@ -39,6 +39,11 @@
 | 9 | Money stored as integer paise | Low |
 | 10 | "Silver Needle Assam", never "White tea" | Low — follows §12 |
 | 11 | Origin renders as "Assam, India" only | Low — follows R-03 |
+| 21 | The admin never appends a payment event; a placed order shows no button until capture | Medium — an offline payment (bank transfer) cannot be recorded until Phase 3 |
+| 22 | The invitation link is shown once on screen and travels in the URL that shows it | Medium — security posture of the invite flow |
+| 23 | Creating a product also creates its stock item and one link; a variant with no link cannot be made from the admin | Low — shape of the create path |
+| 24 | Guest buyers are listed by the email on their orders | Low — how "customers" reads before accounts exist |
+| 25 | The admin escapes the storefront chrome with a pathname check, not a route group | Low — the durable fix is a storefront move |
 
 ---
 
@@ -553,6 +558,69 @@ as though both came up.
 **Overturned by:** wanting real workspace tooling — shared dependencies, one lockfile, a single
 `npm install` at the root. Worth doing once the backend exists and there is code to share between
 the two. It needs one clean reinstall, so do it deliberately rather than mid-week.
+
+---
+
+## 21. The admin never records a payment by hand
+
+**What I did, 9 September 2026.** `/admin/orders/[id]` offers exactly the transitions the fold
+permits, and the admin may append only `shipped` and `delivered`. A `placed` order therefore shows
+"waiting for payment" and no button at all.
+
+**Why.** `features/admin.md` §1 puts payments out of scope because Razorpay is not integrated, and
+`features/inventory.md` §4.3 ties `payment_captured` to consuming the reservations in the same
+transaction. A "mark as paid" button would either skip that or reimplement Phase 3 in a form.
+
+**The cost.** Until Phase 3 lands, an order paid by bank transfer cannot be moved past `placed` from
+the admin. If that becomes an operational need before Razorpay, it is a deliberate "record an
+offline payment" action that also consumes reservations, and it needs a decision.
+
+## 22. The invitation link is shown once, on screen
+
+**What I did.** With no email provider (R-78), `createInvite` returns the plaintext token exactly
+once; the users page receives it through a redirect (`?invited=<id>&t=<token>`), renders the full
+link in a copy-me block, and never stores it. The row holds only the SHA-256.
+
+**Why.** `features/admin.md` §10 already said invites would be "created and the link handed over
+manually". The alternative — storing the plaintext so it can be shown again — is precisely what
+hashing exists to prevent.
+
+**Risk I am accepting:** the token passes through one URL, so it sits in the owner's browser
+history until the invite is used or expires (seven days, single use). The same-origin Referer never
+leaves the site. **Overturned by** an email provider, which replaces the block with a send.
+
+## 23. A created product always gets a stock item and one link
+
+**What I did.** `createProduct` and `createVariant` insert the variant, an `inventory_item`
+named `INV-<SKU>` with a level at zero, and a `variant_inventory_item` link with
+`required_quantity = 1`, in the same transaction.
+
+**Why.** Availability fails closed: a variant with no link is unsellable forever, silently. The
+admin should not be able to make one. Kit composition (several links, quantities above one) stays
+a migration concern (R-12).
+
+**Overturned by** a kit editor, which is out of scope until R-12's contents are decided.
+
+## 24. Guest buyers are "customers"
+
+**What I did.** `/admin/customers` lists `customer` rows *and* the distinct emails on orders with
+no customer row, with order counts, each linking to the orders filtered by that address.
+
+**Why.** Checkout creates no `customer` row, so until accounts ship the first list would be empty
+and the client team would have nowhere to look up who bought. Grouping by the typed email is
+factual and says so on the page; it verifies nothing.
+
+## 25. The admin escapes the shop's chrome by pathname
+
+**What I did.** `components/site/Chrome.tsx` returns bare children when `usePathname()` starts
+with `/admin`, so the admin renders without the nav, footer, cart drawer and popup.
+
+**Why.** The root layout wraps every route in the storefront chrome and the admin had been
+rendering inside it. The durable shape is two root layouts in route groups — `(store)` and
+`(admin)` — but that moves nine storefront routes and should be done by a session that can look at
+the rendered result. One `if` was the reviewable fix today.
+
+**Overturned by** the route-group move, after which the check is deleted.
 
 ---
 

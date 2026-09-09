@@ -335,9 +335,18 @@ six-SKU store with one developer. Recorded here so the question is settled rathe
 > - **Module map, as built.** One application. `lib/server/` is the domain layer —
 >   `db/` (schema + the single Drizzle client over the transaction pooler), `inventory/`
 >   (availability, reserve/consume/release/adjust), `cart/`, `orders/` (placement + the state
->   fold). Next.js Route Handlers (`app/api/*`) are the only HTTP surface; pages import
->   `lib/catalogue.ts`, which is the commerce boundary and the only module pages may touch.
+>   fold, and since 9 Sep 2026 `events.ts`, the appender that enforces the fold on write).
+>   Next.js Route Handlers (`app/api/*`) are the only HTTP surface for the storefront; pages
+>   import `lib/catalogue.ts`, which is the commerce boundary and the only module pages may touch.
 >   **Dependency direction: pages → catalogue/API → lib/server → db. Nothing imports upward.**
+> - **Admin, as built 2–9 Sep 2026** (ADR-0008, ADR-0012). `lib/server/auth/` is identity and
+>   sessions; `lib/server/admin/` is the admin's domain — `audit.ts` (`auditedMutation`, the
+>   structural audit rule), `refusal.ts` (domain errors as sentences, stale detection),
+>   `inventory.ts`, `products.ts`, `orders.ts`, `customers.ts`, `users.ts`, `audit-log.ts`,
+>   `worklist.ts`. Screens under `app/admin/` are server components with server-action forms
+>   and import these modules directly — no HTTP hop, no client bundle. Two guards only:
+>   `proxy.ts` (token) and `lib/server/auth/session.ts` (row, role). **Direction: admin pages →
+>   lib/server/admin → lib/server/{inventory,orders,auth} → db.**
 > - **§1 corrections.** The "admin: Medusa dashboard" row is void — there is no admin
 >   (ADR-0006). The shipping row's "rate lookups cached in Redis" is void — **no Redis exists
 >   anywhere in the system**; ADR-0002's amendment already said nothing requires it, and nothing

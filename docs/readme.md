@@ -225,7 +225,7 @@ Status: `done` · `in progress` · `blocked` · `todo`
 | 32 | `features/tea-education.md` | todo | §33/§40; ties to the Matcha Ritual Set |
 | 33 | `features/seo.md` | todo | URL scheme is decided in product.md; this documents the rest |
 | 34 | `features/analytics.md` | todo | What is measured depends on the features above |
-| 35 | `features/admin.md` | **done — `PROVISIONAL`**, 2 Sep 2026. **Now being built, out of stage order** | **This row's every claim expired.** It said the admin was last and deprioritised, that Medusa would ship one regardless, and that the doc would cover *customising* rather than building. ADR-0003/0006 removed Medusa, so **nothing ships an admin**; the storefront that justified deferring it has shipped; and [ADR-0008](adr/0008-admin-for-a-client-team.md) resolved **R-22** — a non-technical client team operates it. The doc specifies a build in six stages, and stages 2 and 3 are ordered to close **R-66** (invented stock) and **R-04** (unconfirmed price) first |
+| 35 | `features/admin.md` | **done — `PROVISIONAL`**, 2 Sep 2026. **Built, all six stages, 9 Sep 2026** — §11 of the doc is the as-built record | **This row's every claim expired.** It said the admin was last and deprioritised, that Medusa would ship one regardless, and that the doc would cover *customising* rather than building. ADR-0003/0006 removed Medusa, so **nothing ships an admin**; the storefront that justified deferring it has shipped; and [ADR-0008](adr/0008-admin-for-a-client-team.md) resolved **R-22** — a non-technical client team operates it. The doc specifies a build in six stages, and stages 2 and 3 are ordered to close **R-66** (invented stock) and **R-04** (unconfirmed price) first |
 
 ### Stage 8 — Close the loop
 

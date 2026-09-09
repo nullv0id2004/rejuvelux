@@ -30,6 +30,128 @@
 > (The build tags are reserved; no application code exists yet.)
 
 ---
+## 9 September, 2026 - Admin stages 2 to 6: every screen in features/admin.md §4 exists, and the shell had two defects nobody had seen [B][F][S][DOC]
+
+**Sayon asked for the admin to be gone through properly, what was done and what was left
+identified, and the leftover stages built.** Found: stage 1 only - login, guard, the two session
+gates, `auditedMutation`, the worklist - and nothing at all under `/admin/inventory`, `/products`,
+`/orders`, `/customers`, `/users` or `/audit`, although the nav had pointed at all six since 2 Sep.
+**Two sessions turned out to be working in the same tree at once**, and the split was agreed by
+message rather than discovered by conflict: the other session (`rejuvelux-1f`) built and committed
+stage 2 (`e8383c2`, inventory list and adjust, 18/18); this one built stages 3 to 6, the shared
+shell fixes, and this entry for both.
+
+**[F] The admin had never rendered as designed, and two things were wrong with it.** The three
+admin stylesheets referenced the *old* frontend's tokens (`--ground`, `--ink`, `--line`,
+`--ink-quiet`, `--measure`), which this repository's `styles/tokens/colors.css` never defined, so
+every border, colour and measure had been falling back to initial values since the port on 6 Sep.
+And the root layout wraps every route in the storefront `Chrome`, so `/admin` had been rendering
+inside the shop's announcement bar, nav, footer, cart drawer and popup. Both fixed: the stylesheets
+use the semantic aliases (which is also what makes the admin follow the light/dark theme for free),
+and `Chrome` returns bare children under `/admin`. The route-group shape ADR-0008 named is the
+durable fix; it moves nine storefront routes and is recorded as open call #25, not done in passing.
+
+**[B] The domain layer stays the only writer, and it grew the functions the plan named.**
+`lib/server/admin/` gained `refusal.ts` (`RefusedError`, `StaleError`, `explainRefusal`),
+`products.ts`, `orders.ts`, `customers.ts`, `users.ts` and `audit-log.ts`; `lib/server/orders/
+events.ts` is the order-event appender the docs kept referring to, enforcing the fold's transition
+table on write; `audit.ts` gained `recordActionIn`, the primitive beneath `auditedMutation`, for
+the one write whose actor is created by the write itself. Every mutation locks its row, compares
+the form's `updated_at` (or the latest event id) under the lock, and refuses a stale edit before
+anything is written. No raw SQL in any page. **No migration**: 0002's three tables and 0003's
+`app_user` were enough.
+
+**[B] Refusals are sentences, and Drizzle nearly hid them.** `explainRefusal` walks the `cause`
+chain to the driver error because a `DrizzleQueryError`'s own message is the failed SQL rather
+than the constraint - the parallel session hit that first and passed it on, and the test now
+proves a constraint two levels down becomes a sentence. The correlated-subquery trap from the
+worklist bug (`${table.col}` rendering as a bare `"id"` that binds to the inner table) was avoided
+by writing the outer column out in full in `customers.ts` and `audit-log.ts`, with the reason inline.
+
+**[F] No client JavaScript, so form state lives in the query string, named in one place.**
+`app/admin/form.ts`: `?done=` and `?refused=` carry a sentence, `?confirm=1` marks the second
+submit of a consequential action, `?f.<name>=` carries the typed fields back so a refused or
+unconfirmed form re-renders with what the person typed. Confirmations as built: setting, changing
+or removing a price; retiring a product; promoting, demoting or disabling an admin; and both
+fulfilment events, whose page *is* the confirmation. **Not built: a downward stock count** - §6.3
+lists it, stage 2 saves on first submit. Recorded in `features/admin.md` §10 and flagged below.
+
+**[B] Products: three visible steps stand between "created" and "on sale".** A product is created
+as a draft with its first variant, a stock item `INV-<SKU>` at zero and one link, because a
+variant with no link is unsellable forever and silently; it then needs a price, a count and
+`active`. Slug editable only while draft; `active` never returns to `draft` (its page would vanish
+for anyone holding the link); retiring confirms. A price change is audited as `variant.price.set`
+with before and after, so the most consequential edit in the admin is findable on its own. Catalogue
+mutations call `revalidatePath('/', 'layout')`, so a price edit reaches the shop at once rather
+than within the ISR hour.
+
+**[B] Orders: exactly the transitions the fold permits, and never a payment by hand.** A `placed`
+order offers nothing and says why in a sentence; after `payment_captured` exactly `shipped` is
+offered (courier and tracking optional), then exactly `delivered`, then nothing. The admin never
+appends a payment event (open call #21): capture belongs to Phase 3, together with the reservation
+consume it must travel with. Stage 4's exit criterion was met against a test order with a simulated
+capture, ahead of Phase 2; it needs re-running once a storefront order exists.
+
+**[S] Users and invitations on the self-built stack, without an email provider.** The invite token
+is stored as its SHA-256 and shown once, as a full link, on `/admin/users` straight after creation
+(open call #22); it works once, for seven days. Accepting creates `app_user` and `admin_user`
+together, or links an existing account only after its own password is proved, so a link can never
+overwrite a credential. Owner-only through `assertRole()` in `session.ts`, so the role model still
+lives in exactly two files. Nobody disables themselves; the last active owner is neither demoted
+nor disabled, a pure rule (`assertAnOwnerRemains`) tested without arranging a database with one
+owner. Disabling ends the person's admin-audience sessions and leaves their customer sessions alone
+(`revokeSessionsForAudience`). `/admin/invite/[token]` is the second and last unguarded route;
+`proxy.ts` exempts exactly that prefix.
+
+**[F] Customers and audit.** Guest buyers, who have no `customer` row, are listed by the email on
+their orders (open call #24), because that is the whole customer base until accounts ship; each
+links to the orders filtered by that address. The audit viewer pages by keyset on the identity id
+and offers filters drawn from the values that actually exist; records link to their screens.
+
+**[DOC] Documents corrected in the same pass** so none asserts the admin is unbuilt:
+`features/admin.md` (route table, §7's FK, §8's six stages met with their tests, §9, §10, and a
+new §11 "As built"), `roadmap.md` §1.3, §4 and §6 (Track B complete), `risks.md` R-66 (closable)
+and R-78 (invites worked around), `open-calls.md` #21 to #25, `architecture.md` §10's module map,
+`tech-stack.md`'s admin row, `readme.md` item 35, `README.md`.
+
+Verified: `npx tsc --noEmit` clean; **`npm run build` exit 0**, sixteen `/admin` routes all
+dynamic, `ƒ Proxy` registered; **client bundles inspected, not assumed** - 15 chunks, and
+`auditedMutation`, `createInvite`, `acceptInvite`, `fulfilOrder`, `updateVariant`, `admin_action`,
+`admin_invite`, `AUTH_JWT_SECRET`, `password_hash`, `DATABASE_URL`, `explainRefusal` and
+`listAdminOrders` appear in none of them. **New `scripts/admin-stages-test.ts`, 111/111** against
+the live database and the dev server on :3000: 92 through the domain (refusals and staleness;
+create-as-draft, slug lock, status rules, price audit, duplicate slug and SKU refused with
+sentences; fulfilment offered exactly when legal, stale form refused, the fold agrees, list filters
+by derived state; invitations hashed and single-use, staff refused, existing account linked by its
+own password, last-owner and self-disable guards, audience-scoped session revocation; customers;
+audit paging) and 19 over HTTP (every admin screen renders for an owner with the expected content,
+staff see the reason on `/admin/users` and no controls, a valid invite link renders signed out and
+a bogus one says so, `/admin/users` still redirects signed out, and the admin HTML carries none of
+the storefront chrome), self-cleaning and proven so. The parallel session's
+`scripts/admin-inventory-test.ts` 18/18. The em/en-dash grep over the new screens finds them only
+in code comments.
+
+Flagged, not committed: **two stage 2 gaps were passed to the owning session and closed by it the
+same evening** - a downward stock count now confirms on the shared `?confirm=1` mechanism (§6.3),
+and the four em dashes in that page's copy are recast; its exit test was extended to cover the
+confirm. **That extended test then found a defect outside the admin:** its whole-page dash check
+failed on the storefront catalogue that the root layout serialises into every admin page's payload,
+whose editorial copy carried em dashes that render to customers on the shop. Raised as **R-79**,
+and **the parallel session fixed it site-wide the same evening** (`f28b1f8`): 22 in storefront
+copy, 5 in the root layout's metadata (site title, OG and Twitter titles, OG image alt,
+description), 11 in `aria-label`s, all recast per `content-style.md` §7.1's own table; verified from
+this session with a Unicode-aware search over the rendered HTML of `/admin/login` and
+`/shop/assam-matcha`, zero remaining, and its suite now 24/24. R-79 is `resolved`. **Its stage 2
+edits and that fix are committed**; this session's files are not. **`/admin` still resolves the storefront catalogue on every
+request**, because the root layout does so before `Chrome` skips itself - one cross-region query
+per admin page (ADR-0009) that the route-group move (open call #25) removes. **The order list
+folds every order per page load**, fine into the hundreds and noted in code. **Port 3315 holds a
+dead listener** that accepts connections and never answers, so the HTTP checks were run against
+:3000; the two admin suites now default to :3000, the four older suites still default to 3315 and
+need `BASE_URL`; all SKIP rather than fail when nothing answers. **This session's work is uncommitted** -
+40 files, left in the tree for review; the parallel session committed its stage 2 and the copy fix separately.
+
+---
 ## 9 September, 2026 - Supabase Auth is gone, and /admin renders for the first time [B][DB][S][DOC]
 
 **Sayon read through the authentication built for KORUM** (`Worldhire/Worldhire2.0-1-`) and

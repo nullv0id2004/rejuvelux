@@ -25,13 +25,33 @@ npm run typecheck
 | `/wholesale`, `/contact` | Nav destinations the brief specifies; content pending, slots visibly empty |
 | `/og-preview` | Source for the link-preview card. `noindex`, unlinked — see below |
 
+## Admin
+
+`/admin` is the client team's console: a worklist, then inventory, products and prices, orders and
+fulfilment, customers, admin users and invitations, and the audit log. Server components with
+server-action forms and no client JavaScript; `proxy.ts` guards everything under `/admin` except
+`/admin/login` and `/admin/invite/[token]`. The first owner is created with
+`npm run bootstrap:owner`; every later admin is invited from `/admin/users`. Specification and
+as-built notes: `docs/features/admin.md`.
+
+Exit tests, all against the live database (`.env`), with a dev server on `BASE_URL` for the
+HTTP checks (the two admin suites default to `http://localhost:3000`, `next dev`'s own port; the
+older suites still default to 3315 and need `BASE_URL` set):
+
+```bash
+npm run test:admin              # stage 1: the guard
+npm run test:auth               # the session stack
+npm run test:admin-inventory    # stage 2
+npm run test:admin-stages       # stages 3 to 6, and the shell
+```
+
 ## Layout
 
 ```
-app/            routes; globals.css carries the ported stylesheet
+app/            routes; globals.css carries the ported stylesheet; app/admin/ is the console
 components/ds/  the design system's components as typed React modules
 components/site/ chrome and shared primitives (evidence rows, ladder, greybox, showcase)
-lib/            product data, cart / toast / theme state
+lib/            catalogue resolver, cart / toast / theme state; lib/server/ is the commerce domain
 styles/tokens/  design tokens, copied unchanged from the handoff bundle
 ```
 
