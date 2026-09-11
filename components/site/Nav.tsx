@@ -12,7 +12,7 @@ type Item = { href: string; label: string };
 type Menu = { id: 'shop' | 'gifts'; label: string; items: Item[]; match: string[] };
 type NavLink = Item & { match: string[] };
 
-/** Main navigation from the content handover: two menus, then three direct links. */
+/** Main navigation from the content handover (two menus, three direct links), plus Contact. */
 const SHOP: Menu = {
   id: 'shop',
   label: 'Shop Tea',
@@ -49,6 +49,7 @@ const RITUALS: NavLink = {
 const RIGHT: NavLink[] = [
   { href: '/our-story', label: 'Our Story', match: ['/our-story', '/assam-origin', '/craft'] },
   { href: '/journal', label: 'Journal', match: ['/journal'] },
+  { href: '/contact', label: 'Contact', match: ['/contact'] },
 ];
 
 const matches = (match: string[], path: string) => match.some((m) => path === m || path.startsWith(m + '/'));
