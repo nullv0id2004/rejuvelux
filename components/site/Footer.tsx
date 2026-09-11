@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Input } from '@/components/ds';
-import { PRODUCTS } from '@/lib/data';
+import { CONTACT, PRODUCTS } from '@/lib/data';
 import { useToast } from '@/lib/toast';
-import { Ph, Wordmark } from './primitives';
+import { Wordmark } from './primitives';
 
 export function Footer() {
   const [email, setEmail] = useState('');
@@ -35,8 +35,14 @@ export function Footer() {
             <div className="eyebrow">House</div>
             <Link href="/garden">The Garden</Link>
             <Link href="/craft">The Craft</Link>
-            <Link href="/wholesale">Wholesale</Link>
+            <Link href="/blog">Blog</Link>
             <Link href="/contact">Contact</Link>
+          </div>
+
+          <div className="stack g2">
+            <div className="eyebrow">Contact</div>
+            <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+            <a href={`tel:${CONTACT.phoneHref}`}>{CONTACT.phone}</a>
           </div>
 
           <div className="stack g2">
@@ -81,7 +87,8 @@ export function Footer() {
 
         <div className="between wrapm" style={{ gap: 12 }}>
           <p className="cap" style={{ color: 'var(--ink-500)' }}>
-            © 2026 RejuveLuxe · Assam, India · FSSAI Lic. No. <Ph>[00000000000000]</Ph>
+            © 2026 RejuveLuxe · Packed &amp; marketed by {CONTACT.entity}, {CONTACT.address} · FSSAI
+            Lic. No. {CONTACT.fssai}
           </p>
           <div className="row g6">
             <Link href="/contact">Instagram</Link>

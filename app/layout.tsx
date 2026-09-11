@@ -25,8 +25,15 @@ const figtree = Figtree({
   display: 'swap',
 });
 
+/**
+ * Absolute origin for canonical, Open Graph and Twitter URLs. Read once at build
+ * — `NEXT_PUBLIC_` values are inlined, so set it before `next build`. An invalid
+ * value throws here and fails the build rather than shipping broken share links.
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://rejuveluxe.in';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://rejuveluxe.example'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'RejuveLuxe — Earned, not indulged',
     template: '%s · RejuveLuxe',

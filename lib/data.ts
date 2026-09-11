@@ -322,6 +322,17 @@ export const PRODUCTS: Product[] = [
 
 export const byId = (id: string) => PRODUCTS.find((p) => p.id === id);
 
+/** Verified business and support details. Single source for footer, contact and pack copy. */
+export const CONTACT = {
+  email: 'support@rejuveluxe.in',
+  /** E.164, for `tel:` hrefs. */
+  phoneHref: '+918853920222',
+  phone: '+91 88539 20222',
+  fssai: '12726066000468',
+  entity: 'Green Life Global Pvt. Ltd.',
+  address: 'E4/1609, SEC-O, LDA Colony, Lucknow, Uttar Pradesh',
+} as const;
+
 const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
 
 /** Spelled-out size of the range, so headline copy tracks the SKU list. */

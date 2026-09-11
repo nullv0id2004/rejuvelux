@@ -12,6 +12,9 @@ npm run build   # static prerender of every route
 npm run typecheck
 ```
 
+No environment variables are required to run locally. See
+[`ENVIRONMENT.md`](ENVIRONMENT.md) for the ones production needs.
+
 ## Routes
 
 | Route | What it is |
@@ -22,7 +25,9 @@ npm run typecheck
 | `/garden` | Long-form editorial, single 720px column with full-bleed photography breaking it |
 | `/alt-home` | The homepage in the brief's fixed section order (deliverable 1). `noindex` |
 | `/specs` | Component sheet and colour/type specimen, both themes (deliverables 4, 5, 8, 9, 10). `noindex` |
-| `/wholesale`, `/contact` | Nav destinations the brief specifies; content pending, slots visibly empty |
+| `/blog` | Index — lead story plus a card grid, newest first |
+| `/blog/[slug]` | Editorial post, one per entry in `lib/blog.ts` |
+| `/contact` | Business and support details, plus a customer-service form |
 
 ## Layout
 
@@ -87,6 +92,7 @@ showcase, the footer and the range-size copy all derive from that list.
 
 ## What is not built
 
-Checkout, wholesale and contact content, the full brew-guide page, and set and
-gift configuration. The cart is client-side only — quantities persist in
-`localStorage`; the Checkout button is a stub.
+Checkout, the full brew-guide page, and set and gift configuration. The cart is
+client-side only — quantities persist in `localStorage`; the Checkout button is
+a stub. The contact form has no backend: it validates in the browser and hands
+off to the visitor's mail client via `mailto:`.

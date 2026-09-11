@@ -12,12 +12,14 @@ const NAV: { href: string; label: string }[] = [
   { href: '/#collection', label: 'Shop' },
   { href: '/garden', label: 'The Garden' },
   { href: '/craft', label: 'The Craft' },
-  { href: '/wholesale', label: 'Wholesale' },
+  { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },
 ];
 
 function isActive(href: string, pathname: string) {
   if (href === '/#collection') return pathname === '/' || pathname.startsWith('/shop');
+  // Blog posts keep the Blog link lit.
+  if (href === '/blog') return pathname === '/blog' || pathname.startsWith('/blog/');
   return pathname === href;
 }
 

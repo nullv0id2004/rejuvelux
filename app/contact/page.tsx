@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
-import { Placeholder } from '@/components/site/Placeholder';
+import { Button } from '@/components/ds';
+import { ContactForm } from '@/components/site/ContactForm';
+import { Evidence, Eyebrow } from '@/components/site/primitives';
+import { CONTACT } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -8,16 +11,43 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <Placeholder
-      eyebrow="Contact"
-      title="Reach the people who packed it."
-      body="Contact details are pending. The nav carries this page because the brief specifies it; the slots below are sized and visibly empty until the real values arrive."
-      rows={[
-        ['Email', '[HELLO@DOMAIN]'],
-        ['Phone', '[+91 00000 00000]'],
-        ['Registered office', '[ADDRESS], Assam'],
-        ['FSSAI Lic. No.', '[00000000000000]'],
-      ]}
-    />
+    <main>
+      <section className="wrap sec">
+        <div className="editorial" style={{ alignItems: 'flex-start', gap: 32 }}>
+          <Eyebrow>Contact</Eyebrow>
+          <h1 className="display" style={{ fontSize: 'clamp(40px,4.6cqw,64px)' }}>
+            Reach the people who packed it.
+          </h1>
+          <p className="lead">
+            Order queries, returns, and anything about the leaf in the tin. One inbox, one number,
+            answered during business hours, India time.
+          </p>
+
+          <div className="row g6" style={{ flexWrap: 'wrap' }}>
+            <Button href={`mailto:${CONTACT.email}`}>Email us</Button>
+            <Button variant="outline" href={`tel:${CONTACT.phoneHref}`}>
+              {CONTACT.phone}
+            </Button>
+          </div>
+
+          <ContactForm />
+
+          <Evidence
+            rows={[
+              ['Consumer support', CONTACT.email],
+              ['Phone', CONTACT.phone],
+              ['FSSAI Lic. No.', CONTACT.fssai],
+              ['Packed & marketed by', CONTACT.entity],
+              ['Address', CONTACT.address],
+            ]}
+            style={{ width: '100%' }}
+          />
+
+          <Button variant="outline" href="/">
+            Back to the collection
+          </Button>
+        </div>
+      </section>
+    </main>
   );
 }

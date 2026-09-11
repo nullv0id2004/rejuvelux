@@ -18,7 +18,7 @@ import {
   TinBox,
   withSlots,
 } from '@/components/site/primitives';
-import { PRICE, PRODUCTS, REVIEWS, SLOT, fmt, type Product } from '@/lib/data';
+import { CONTACT, PRICE, PRODUCTS, REVIEWS, SLOT, fmt, type Product } from '@/lib/data';
 import { useCart } from '@/lib/cart';
 
 /** Subscription discount is a placeholder alongside the placeholder price. */
@@ -255,7 +255,7 @@ export function ProductView({ p }: { p: Product }) {
                 ],
                 [
                   'Specification',
-                  `Net weight ${p.weight}. Grade [GRADE]. Lot [LOT-0000], plucked [MONTH 0000]. Packed at source in a lined steel tin. Ingredients: tea (Camellia sinensis). FSSAI Lic. No. [00000000000000].`,
+                  `Net weight ${p.weight}. Grade [GRADE]. Lot [LOT-0000], plucked [MONTH 0000]. Packed at source in a lined steel tin. Ingredients: tea (Camellia sinensis). FSSAI Lic. No. ${CONTACT.fssai}. Packed and marketed by ${CONTACT.entity}, ${CONTACT.address}.`,
                 ],
                 [
                   'Shipping and returns',
