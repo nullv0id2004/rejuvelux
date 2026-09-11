@@ -4,7 +4,16 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Icon } from '@/components/ds';
-import { PRICE, PRODUCTS, SLOT, fmt } from '@/lib/data';
+import { useCatalogue } from '@/lib/catalogue-context';
+import { SLOT } from '@/lib/data';
+
+/** ₹ with Indian grouping, no decimals. */
+const inr = (paise: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
 import { useCart } from '@/lib/cart';
 import { Evidence, Scale, withSlots } from './primitives';
 
@@ -20,7 +29,8 @@ const WIPE_CYCLE_MS = 960;
  * `prefers-reduced-motion` swaps products instantly with no wipe.
  */
 export function ScrollShowcase() {
-  const N = PRODUCTS.length;
+  const catalogue = useCatalogue();
+  const N = catalogue.length;
   const wrapRef = useRef<HTMLElement>(null);
   const router = useRouter();
   const { add } = useCart();
@@ -102,9 +112,9 @@ export function ScrollShowcase() {
     window.scrollTo({ top: window.scrollY + r.top + span * ((i + 0.5) / N), behavior: 'smooth' });
   };
 
-  const p = PRODUCTS[shown];
+  const p = catalogue[shown];
   // Silver Needle's tin is white, so its pagination dots need the gold instead.
-  const dotColor = p.id === 'silver' ? 'var(--gold-500)' : 'var(--bone-100)';
+  const dotColor = p.slug === 'silver-needle-assam' ? 'var(--gold-500)' : 'var(--bone-100)';
 
   return (
     <section
@@ -119,7 +129,7 @@ export function ScrollShowcase() {
           <div className="sc-block-dark" />
           {p.image ? (
             <Image
-              key={p.id}
+              key={p.slug}
               className="tin-in sc-tin"
               src={p.image}
               alt={`${p.name} tin`}
@@ -127,24 +137,24 @@ export function ScrollShowcase() {
               height={900}
               sizes="(max-width: 800px) 70vw, 480px"
               priority={shown === 0}
-              onClick={() => router.push(`/shop/${p.id}`)}
+              onClick={() => router.push(`/shop/${p.slug}`)}
             />
           ) : (
             <span
-              key={p.id}
+              key={p.slug}
               className="tin-in sc-tin sc-tin-pending tin-pending"
               style={{ color: p.ink }}
               role="img"
-              aria-label={`${p.name} tin — render pending`}
-              onClick={() => router.push(`/shop/${p.id}`)}
+              aria-label={`${p.name} tin, render pending`}
+              onClick={() => router.push(`/shop/${p.slug}`)}
             >
               Tin render pending
             </span>
           )}
           <div className="sc-dots">
-            {PRODUCTS.map((q, i) => (
+            {catalogue.map((q, i) => (
               <button
-                key={q.id}
+                key={q.slug}
                 aria-label={q.name}
                 aria-current={i === idx}
                 onClick={() => jump(i)}
@@ -155,8 +165,8 @@ export function ScrollShowcase() {
         </div>
 
         <div className="sc-right">
-          <div key={p.id} className="copy-in sc-copy">
-            <div className="sc-frame sc-tag">{withSlots(`${p.category} · ${p.descriptor}`)}</div>
+          <div key={p.slug} className="copy-in sc-copy">
+            <div className="sc-frame sc-tag">{withSlots(`${p.teaType} · ${p.descriptor}`)}</div>
             <div className="sc-frame sc-title">
               <h2 className="h1 it" style={{ textAlign: 'center', fontSize: 'clamp(34px,4.2cqw,60px)' }}>
                 {p.name}
@@ -168,19 +178,23 @@ export function ScrollShowcase() {
               </div>
               <div className="sc-frame sc-notes">
                 <div style={{ color: p.ink }}>
-                  <Scale label="Body" value={p.body} />
+                  <Scale label="Body" value={p.body ?? 0} />
                 </div>
-                <div style={{ color: p.ink }}>
-                  <Scale label="Briskness" value={p.brisk} />
-                </div>
-                <div className="stack g2">
-                  <span className="eyebrow muted">Brew</span>
-                  <span className="cap num" style={{ color: 'var(--text-primary)' }}>
-                    {p.brew.temp} · {p.brew.g}
-                    <br />
-                    {p.brew.min}
-                  </span>
-                </div>
+                {p.brisk !== undefined && (
+                  <div style={{ color: p.ink }}>
+                    <Scale label="Briskness" value={p.brisk} />
+                  </div>
+                )}
+                {p.brewing && (
+                  <div className="stack g2">
+                    <span className="eyebrow muted">Brew</span>
+                    <span className="cap num" style={{ color: 'var(--text-primary)' }}>
+                      {p.brewing.water} · {p.brewing.leaf}
+                      <br />
+                      {p.brewing.time}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <Evidence
@@ -188,18 +202,23 @@ export function ScrollShowcase() {
               rows={[
                 ['Grade', SLOT.grade],
                 ['Lot', SLOT.lot],
-                ['Net weight', p.weight],
+                ['Net quantity', p.netQuantity],
               ]}
             />
           </div>
 
           <div className="sc-foot">
-            <div key={'pr' + p.id} className="copy-in row g2" style={{ alignItems: 'baseline' }}>
-              <span className="price" style={{ fontSize: 26 }}>
-                {fmt(PRICE)}
-                <span className="cap">*</span>
-              </span>
-              <span className="cap">/ {p.weight}</span>
+            <div key={'pr' + p.slug} className="copy-in row g2" style={{ alignItems: 'baseline' }}>
+              {p.pricePaise === null ? (
+                <span className="cap" style={{ color: 'var(--text-accent)' }}>
+                  Price to be confirmed
+                </span>
+              ) : (
+                <span className="price" style={{ fontSize: 26 }}>
+                  {inr(p.pricePaise)}
+                </span>
+              )}
+              <span className="cap">/ {p.netQuantity}</span>
             </div>
             <div className="row g2">
               <Button

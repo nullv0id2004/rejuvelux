@@ -5,7 +5,7 @@ import { Button } from '@/components/ds';
 import { PostBody } from '@/components/site/PostBody';
 import { Eyebrow, Greybox, Swatch } from '@/components/site/primitives';
 import { POSTS, POSTS_BY_DATE, formatDate, postById, relatedPosts } from '@/lib/blog';
-import { byId } from '@/lib/data';
+import { getProduct } from '@/lib/catalogue';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -14,6 +14,9 @@ export function generateStaticParams() {
 }
 
 export const dynamicParams = false;
+
+/** The tea cross-links read the catalogue, so revalidate on the same hour as the shop. */
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
@@ -36,7 +39,9 @@ export default async function PostPage({ params }: Params) {
   const post = postById(slug);
   if (!post) notFound();
 
-  const mentioned = post.products.map(byId).filter((p) => p !== undefined);
+  const mentioned = (await Promise.all(post.products.map((slug) => getProduct(slug)))).filter(
+    (p) => p !== null,
+  );
   const related = relatedPosts(post.id);
 
   return (
@@ -80,7 +85,7 @@ export default async function PostPage({ params }: Params) {
             <Eyebrow muted>Teas in this piece</Eyebrow>
             <div className="row g6" style={{ flexWrap: 'wrap' }}>
               {mentioned.map((p) => (
-                <Link key={p.id} href={`/shop/${p.id}`} className="row g3" style={{ gap: 10 }}>
+                <Link key={p.slug} href={`/shop/${p.slug}`} className="row g3" style={{ gap: 10 }}>
                   <Swatch p={p} size={28} />
                   <span>{p.name}</span>
                 </Link>

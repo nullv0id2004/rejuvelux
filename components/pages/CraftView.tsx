@@ -3,7 +3,8 @@
 import { Fragment, useState } from 'react';
 import { Button, Tabs } from '@/components/ds';
 import { Evidence, Eyebrow, Greybox, Ph, Swatch, TinBox } from '@/components/site/primitives';
-import { CRAFT, CRAFT_ORDER, SLOT, byId } from '@/lib/data';
+import { useProduct } from '@/lib/catalogue-context';
+import { CRAFT, CRAFT_ORDER, SLOT } from '@/lib/data';
 import { useCart } from '@/lib/cart';
 
 /**
@@ -12,12 +13,16 @@ import { useCart } from '@/lib/cart';
  * photograph every three steps.
  */
 export function CraftView() {
-  const [tea, setTea] = useState<string>('golden');
+  const [tea, setTea] = useState<string>('assam-golden-tips');
   const { add } = useCart();
 
   const c = CRAFT[tea];
-  const p = byId(tea)!;
+  const p = useProduct(tea);
   const chapter = CRAFT_ORDER.indexOf(tea as (typeof CRAFT_ORDER)[number]) + 1;
+  // The chapter's tea may be absent from the catalogue — a product can be
+  // retired in the admin without this page being edited. Render nothing rather
+  // than crash on a missing row.
+  if (!p) return null;
   // The chapter's macro slots take this tea's own photography in order, and
   // fall back to the labelled stand-in once it runs out.
   const macros = [p.photos?.dryLeaf, p.photos?.wetLeaf, p.photos?.liquor].filter(Boolean) as string[];
@@ -116,7 +121,7 @@ export function CraftView() {
                       ratio="3 / 2"
                       sizes="(max-width: 800px) 100vw, 600px"
                       src={macros[Math.floor((i + 1) / 3) - 1]}
-                      alt={`${p.name} — ${n.toLowerCase()}`}
+                      alt={`${p.name}, ${n.toLowerCase()}`}
                     />
                   </div>
                 )}

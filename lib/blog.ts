@@ -27,7 +27,7 @@ export type Post = {
   author: string;
   /** Label for the hero stand-in until the real photograph lands. */
   hero: string;
-  /** Product ids this post is about, for the cross-link row at the foot. */
+  /** Catalogue slugs this post is about, for the cross-link row at the foot. */
   products: string[];
   body: Block[];
 };
@@ -42,7 +42,7 @@ export const POSTS: Post[] = [
     minutes: 6,
     author: 'RejuveLuxe',
     hero: 'Sorting table · sacks marked by lot',
-    products: ['golden', 'silver'],
+    products: ['assam-golden-tips', 'silver-needle-assam'],
     body: [
       {
         t: 'p',
@@ -110,7 +110,7 @@ export const POSTS: Post[] = [
     minutes: 5,
     author: 'RejuveLuxe',
     hero: 'Silver Needle · dry buds in a warmed vessel',
-    products: ['silver'],
+    products: ['silver-needle-assam'],
     body: [
       {
         t: 'p',
@@ -175,7 +175,7 @@ export const POSTS: Post[] = [
     minutes: 7,
     author: 'RejuveLuxe',
     hero: 'Shade canopy over the matcha rows',
-    products: ['matcha', 'green'],
+    products: ['assam-matcha', 'green-tea'],
     body: [
       {
         t: 'p',
@@ -237,7 +237,7 @@ export const POSTS: Post[] = [
     minutes: 6,
     author: 'RejuveLuxe',
     hero: 'Second flush · new growth on the bush',
-    products: ['golden', 'ctc'],
+    products: ['assam-golden-tips'],
     body: [
       {
         t: 'p',
@@ -293,7 +293,7 @@ export const POSTS: Post[] = [
     minutes: 4,
     author: 'RejuveLuxe',
     hero: 'Lined steel tin · lid off, on a work surface',
-    products: ['green', 'ube'],
+    products: ['green-tea'],
     body: [
       {
         t: 'p',

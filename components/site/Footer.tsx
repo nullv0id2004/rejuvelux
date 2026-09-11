@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Input } from '@/components/ds';
-import { CONTACT, PRODUCTS } from '@/lib/data';
+import { useCatalogue } from '@/lib/catalogue-context';
+import { CONTACT } from '@/lib/data';
 import { useToast } from '@/lib/toast';
-import { Wordmark } from './primitives';
+import { Logo } from './primitives';
 
 export function Footer() {
+  const catalogue = useCatalogue();
   const [email, setEmail] = useState('');
   const { toast } = useToast();
 
@@ -16,16 +18,16 @@ export function Footer() {
       <div className="wrap stack g8">
         <div className="fgrid">
           <div className="stack g5" style={{ gap: 20 }}>
-            <Wordmark inverse stacked size={26} />
+            <Logo width={148} />
             <p className="small" style={{ color: 'var(--ink-400)', maxWidth: 280 }}>
-              Single-origin Assam. One garden, one flush, one lot — printed on every tin.
+              Single-origin Assam. One garden, one flush, one lot: printed on every tin.
             </p>
           </div>
 
           <div className="stack g2">
             <div className="eyebrow">Shop</div>
-            {PRODUCTS.map((p) => (
-              <Link key={p.id} href={`/shop/${p.id}`}>
+            {catalogue.map((p) => (
+              <Link key={p.slug} href={`/shop/${p.slug}`}>
                 {p.name}
               </Link>
             ))}

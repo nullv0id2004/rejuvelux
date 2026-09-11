@@ -1,0 +1,143 @@
+/*
+ * Admin shell. Dense and functional, on the brand's tokens (features/admin.md
+ * §9). Deliberately unlike the storefront: this is a tool, and it should read
+ * as one rather than borrowing the editorial spacing of the shop.
+ *
+ * Token names are the semantic aliases in styles/tokens/colors.css, which is
+ * what makes the admin follow the light/dark theme for free. The first draft
+ * of this file used the OLD frontend's names (--ground, --ink, --line) which
+ * this repository never defined, so the shell rendered unstyled until 9 Sep
+ * 2026. Focus rings are the global :focus-visible rule in globals.css.
+ */
+
+.shell {
+  min-height: 100dvh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 20px;
+  height: 56px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-page-alt);
+}
+
+.brand {
+  font-family: var(--font-wordmark);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.navLink {
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navLink:hover {
+  color: var(--text-primary);
+  background: var(--surface-raised);
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.email {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role {
+  padding: 2px 7px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.signOut {
+  padding: 5px 9px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: none;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.signOut:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.main {
+  padding: 28px 20px 64px;
+}
+
+/* Shared page furniture, used by every admin screen from stage 2 on. */
+.pageTitle {
+  margin: 0 0 4px;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.pageIntro {
+  margin: 0 0 28px;
+  max-width: var(--container-text);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .bar {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 10px 16px;
+  }
+  .nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .who {
+    margin-left: auto;
+  }
+  .main {
+    padding: 20px 16px 48px;
+  }
+}

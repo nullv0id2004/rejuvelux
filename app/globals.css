@@ -193,6 +193,8 @@ button {
 
 .wordmark {
   font: var(--type-wordmark);
+  /* after the shorthand, so the per-instance size wins */
+  font-size: var(--wm-size, 22px);
   letter-spacing: var(--tracking-wordmark);
   text-transform: uppercase;
 }
@@ -208,6 +210,7 @@ button {
 }
 .strap {
   font: var(--type-eyebrow);
+  font-size: var(--strap-size, 8px);
   letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase;
   color: var(--text-accent);
@@ -649,7 +652,7 @@ button {
 
 .brew {
   display: grid;
-  grid-template-columns: 1.4fr repeat(5, 1fr);
+  grid-template-columns: 1.4fr repeat(3, 1fr);
 }
 .brew > div {
   padding: 12px 12px;
@@ -659,7 +662,7 @@ button {
   text-align: right;
   color: var(--text-primary);
 }
-.brew > div:nth-child(6n + 1) {
+.brew > div:nth-child(4n + 1) {
   text-align: left;
 }
 .brew .hd {
@@ -1315,8 +1318,8 @@ button {
     min-width: 0 !important;
   }
   .brew {
-    grid-template-columns: 1.4fr repeat(5, 1fr);
-    min-width: 560px;
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+    min-width: 420px;
   }
   .brew-wrap {
     overflow-x: auto;
@@ -1340,6 +1343,17 @@ button {
   }
   .nav-c .strap {
     display: none;
+  }
+  .nav-mark {
+    gap: 8px;
+  }
+  .nav-mark img {
+    width: 34px;
+    height: auto;
+  }
+  .nav-c .wordmark {
+    --wm-size: 16px;
+    letter-spacing: 0.08em;
   }
   .menu-btn {
     display: inline-flex;
@@ -1488,4 +1502,16 @@ button {
 }
 .editorial ul li::marker {
   color: var(--accent);
+}
+
+/* Nav mark: crest beside the type wordmark. The type carries the name — the
+   crest is too detailed to be read at this size on its own. */
+.nav-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.nav-mark img {
+  flex: none;
 }

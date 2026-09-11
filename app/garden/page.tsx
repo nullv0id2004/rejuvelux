@@ -1,19 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Evidence, Eyebrow, Greybox, Ph, Swatch } from '@/components/site/primitives';
-import { PRODUCTS, RANGE_WORD_CAP, SLOT, STORY } from '@/lib/data';
+import { listProducts } from '@/lib/catalogue';
+import { rangeWordCap, SLOT, STORY } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: 'The Garden',
   description:
-    'One garden, on purpose. A single estate in Assam — its district, elevation, flush and the people who work it.',
+    'One garden, on purpose. A single estate in Assam: its district, elevation, flush and the people who work it.',
 };
 
 /**
  * Long-form editorial: a single 720px column with full-bleed photography
  * breaking it at intervals, and the evidence rows at the head of the page.
  */
-export default function GardenPage() {
+export default async function GardenPage() {
+  const products = await listProducts();
+  const rangeCap = rangeWordCap(products.length);
   return (
     <main>
       <section className="wrap" style={{ padding: '96px 0 48px' }}>
@@ -108,12 +111,12 @@ export default function GardenPage() {
       <section className="wrap sec">
         <div className="editorial" style={{ alignItems: 'flex-start' }}>
           <Eyebrow>From this garden</Eyebrow>
-          <h2 className="h1">{RANGE_WORD_CAP} expressions of one leaf.</h2>
+          <h2 className="h1">{rangeCap} expressions of one leaf.</h2>
           <div className="row g3" style={{ flexWrap: 'wrap' }}>
-            {PRODUCTS.map((p) => (
+            {products.map((p) => (
               <Link
-                key={p.id}
-                href={`/shop/${p.id}`}
+                key={p.slug}
+                href={`/shop/${p.slug}`}
                 className="row g2 hair"
                 style={{
                   padding: '10px 14px',

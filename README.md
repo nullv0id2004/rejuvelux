@@ -12,8 +12,8 @@ npm run build   # static prerender of every route
 npm run typecheck
 ```
 
-No environment variables are required to run locally. See
-[`ENVIRONMENT.md`](ENVIRONMENT.md) for the ones production needs.
+Copy `.env.example` to `.env` and fill in `DATABASE_URL` and `AUTH_JWT_SECRET`
+before running. See [`ENVIRONMENT.md`](ENVIRONMENT.md).
 
 ## Routes
 
@@ -28,14 +28,35 @@ No environment variables are required to run locally. See
 | `/blog` | Index — lead story plus a card grid, newest first |
 | `/blog/[slug]` | Editorial post, one per entry in `lib/blog.ts` |
 | `/contact` | Business and support details, plus a customer-service form |
+| `/og-preview` | Source for the link-preview card. `noindex`, unlinked — see below |
+
+## Admin
+
+`/admin` is the client team's console: a worklist, then inventory, products and prices, orders and
+fulfilment, customers, admin users and invitations, and the audit log. Server components with
+server-action forms and no client JavaScript; `proxy.ts` guards everything under `/admin` except
+`/admin/login` and `/admin/invite/[token]`. The first owner is created with
+`npm run bootstrap:owner`; every later admin is invited from `/admin/users`. Specification and
+as-built notes: `docs/features/admin.md`.
+
+Exit tests, all against the live database (`.env`), with a dev server on `BASE_URL` for the
+HTTP checks (the two admin suites default to `http://localhost:3000`, `next dev`'s own port; the
+older suites still default to 3315 and need `BASE_URL` set):
+
+```bash
+npm run test:admin              # stage 1: the guard
+npm run test:auth               # the session stack
+npm run test:admin-inventory    # stage 2
+npm run test:admin-stages       # stages 3 to 6, and the shell
+```
 
 ## Layout
 
 ```
-app/            routes; globals.css carries the ported stylesheet
+app/            routes; globals.css carries the ported stylesheet; app/admin/ is the console
 components/ds/  the design system's components as typed React modules
 components/site/ chrome and shared primitives (evidence rows, ladder, greybox, showcase)
-lib/            product data, cart / toast / theme state
+lib/            catalogue resolver, cart / toast / theme state; lib/server/ is the commerce domain
 styles/tokens/  design tokens, copied unchanged from the handoff bundle
 ```
 
@@ -69,6 +90,20 @@ stylesheet had to drive a 390px device frame. Wide content (the collection
 ladder, the brew table) scrolls inside its own container; the page body never
 scrolls sideways.
 
+## Link previews
+
+`public/assets/og.jpg` is a static 1200×630 card, rendered once by screenshotting
+`/og-preview` so it is built from the site's own tokens and self-hosted faces.
+To regenerate it after a brand change, screenshot the `#og-card` element on that
+route at scale 1 and re-encode to JPEG.
+
+`metadataBase` resolves from `NEXT_PUBLIC_SITE_URL`, falling back to Vercel's
+`VERCEL_PROJECT_PRODUCTION_URL`, then localhost. Social scrapers will not follow
+a relative image path, so set `NEXT_PUBLIC_SITE_URL` once a custom domain exists.
+
+The favicon stays a plain gold `R` rather than the crest: at 32px every crop of
+the crest is illegible, and a favicon has to read as a silhouette.
+
 ## Placeholders
 
 Everything the brief marks as a known gap is a visible slot, not an invented
@@ -76,16 +111,22 @@ value. Bracketed text (`[ESTATE]`, `[LOT-0000]`, `[000 m]`) renders in the accen
 colour so an unfilled slot reads as empty rather than as fact.
 
 - **Prices** — one dummy value (₹1,250) on every SKU, marked with `*`.
-- **Photography** — none exists. Every image slot shows the interim tea-field
-  photograph at the correct aspect ratio, captioned with the shot it stands in
-  for. It is a golden-hour image, which the brief's photography direction rules
-  out; replace it when the flat-daylight garden shots arrive.
+- **Photography** — partial. All six tin renders are in, plus a hero and Silver
+  Needle's dry-leaf and liquor shots. Every other slot still shows the interim
+  field photograph at the correct ratio, captioned with the shot it stands in
+  for. Both the hero and that stand-in are golden-hour images, which the brief's
+  photography direction rules out — replace them when flat-daylight shots exist.
+  Per-SKU shots go in `photos` on the product (`dryLeaf`, `liquor`, `wetLeaf`,
+  `lot`); shared editorial photography goes in `SITE_PHOTOS`. A slot with no
+  file keeps its caption; giving it one removes the caption automatically.
 - **Reviews, awards, stockists** — modules are built, content is marked "example".
-- **Ube** — the sixth expression. Its tin colourway is confirmed
-  (`--tea-ube-tin` / `--tea-ube-ink`) but no copy and no tin render were
-  supplied, so its `image` is `null` and the tin frame draws a labelled
-  placeholder. Drop the render at `public/assets/ube-900.png` and set `image` in
-  `lib/data.ts` to wire it in.
+- **Ube copy** — the sixth expression's tin and colourway are confirmed, but the
+  design system supplied no copy, so its description, tagline, weight, cups,
+  intensity scores and brew figures are drafted and need sign-off. Flagged in a
+  comment above the entry in `lib/data.ts`.
+- **Hero contrast** — the hero overlay is sized so the eyebrow, headline and
+  subhead all clear 4.5:1 against the current photograph. Swap the hero and
+  re-measure; a lighter image will fail.
 
 Adding or removing a SKU in `lib/data.ts` is enough: routes, the ladder, the
 showcase, the footer and the range-size copy all derive from that list.

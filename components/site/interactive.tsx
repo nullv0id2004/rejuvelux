@@ -3,7 +3,17 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ds';
-import { PRICE, PRODUCTS, SLOT, fmt, type Product } from '@/lib/data';
+import type { CatalogueProduct } from '@/lib/catalogue';
+import { useCatalogue } from '@/lib/catalogue-context';
+import { SLOT } from '@/lib/data';
+
+/** ₹ with Indian grouping, no decimals. */
+const inr = (paise: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
 import { useCart } from '@/lib/cart';
 import { Evidence, Scale, Swatch, TinBox, withSlots } from './primitives';
 
@@ -65,9 +75,9 @@ export function Accordion({ items }: { items: [string, string][] }) {
 /* ----------------------------------------------------------------- tile -- */
 
 /** The only card on the site — the one object that genuinely lifts off the page. */
-export function Tile({ p }: { p: Product }) {
+export function Tile({ p }: { p: CatalogueProduct }) {
   const { add } = useCart();
-  const href = `/shop/${p.id}`;
+  const href = `/shop/${p.slug}`;
 
   return (
     <article className="tile" style={{ borderTopColor: p.ink, borderTopWidth: 3 }}>
@@ -89,21 +99,26 @@ export function Tile({ p }: { p: Product }) {
         <Evidence
           rows={[
             ['Grade', SLOT.grade],
-            ['Net weight', p.weight],
+            ['Net quantity', p.netQuantity],
           ]}
         />
         <div className="between">
-          <span className="price">
-            {fmt(PRICE)}
-            <span className="cap" title="Placeholder price">
-              *
+          {p.pricePaise === null ? (
+            <span className="cap" style={{ color: 'var(--text-accent)' }}>
+              Price to be confirmed
             </span>
-          </span>
-          <span className="cap">{p.category}</span>
+          ) : (
+            <span className="price">{inr(p.pricePaise)}</span>
+          )}
+          <span className="cap">{p.teaType}</span>
         </div>
         <div className="row g2" style={{ flexWrap: 'wrap' }}>
-          <Button size="sm" onClick={() => add(p)}>
-            Add to cart
+          <Button size="sm" disabled={p.unavailable} onClick={() => add(p)}>
+            {p.priceUnconfirmed
+              ? 'Not yet on sale'
+              : p.availability <= 0
+                ? 'Out of stock'
+                : 'Add to cart'}
           </Button>
           <Button size="sm" variant="outline" href={href}>
             Details
@@ -132,7 +147,8 @@ export function Ladder({
   compact?: boolean;
   linkToProduct?: boolean;
 }) {
-  const count = PRODUCTS.length;
+  const catalogue = useCatalogue();
+  const count = catalogue.length;
   return (
     <div className="ladder">
       <div style={{ minWidth: compact ? 0 : count * 224 }} className="ladder-inner">
@@ -145,7 +161,7 @@ export function Ladder({
           className="ladder-track"
           style={{ gridTemplateColumns: `repeat(${count}, minmax(224px, 1fr))`, minWidth: count * 224 }}
         >
-          {PRODUCTS.map((p, i) => {
+          {catalogue.map((p, i) => {
             const inner = (
               <>
                 <div className="between">
@@ -157,36 +173,41 @@ export function Ladder({
                   <h3 className="h3">{p.name}</h3>
                   <p className="small it">{p.descriptor}</p>
                 </div>
-                <div className="stack g3" style={{ color: p.ink }}>
-                  <Scale label="Body" value={p.body} />
-                  <Scale label="Briskness" value={p.brisk} />
-                </div>
+                {p.body !== undefined && p.brisk !== undefined && (
+                  <div className="stack g3" style={{ color: p.ink }}>
+                    <Scale label="Body" value={p.body} />
+                    <Scale label="Briskness" value={p.brisk} />
+                  </div>
+                )}
                 <div className="between">
-                  <span className="price">
-                    {fmt(PRICE)}
-                    <span className="cap">*</span>
-                  </span>
-                  <span className="cap">{p.weight}</span>
+                  {p.pricePaise === null ? (
+                    <span className="cap" style={{ color: 'var(--text-accent)' }}>
+                      To be confirmed
+                    </span>
+                  ) : (
+                    <span className="price">{inr(p.pricePaise)}</span>
+                  )}
+                  <span className="cap">{p.netQuantity}</span>
                 </div>
               </>
             );
 
-            const className = 'stop' + (active === p.id ? ' on' : '');
+            const className = 'stop' + (active === p.slug ? ' on' : '');
             const handlers = {
-              onMouseEnter: () => onSelect?.(p.id),
-              onFocus: () => onSelect?.(p.id),
+              onMouseEnter: () => onSelect?.(p.slug),
+              onFocus: () => onSelect?.(p.slug),
             };
 
             return linkToProduct ? (
-              <Link key={p.id} href={`/shop/${p.id}`} className={className} {...handlers}>
+              <Link key={p.slug} href={`/shop/${p.slug}`} className={className} {...handlers}>
                 {inner}
               </Link>
             ) : (
               <button
-                key={p.id}
+                key={p.slug}
                 type="button"
                 className={className}
-                aria-pressed={active === p.id}
+                aria-pressed={active === p.slug}
                 {...handlers}
               >
                 {inner}

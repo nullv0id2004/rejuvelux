@@ -3,19 +3,36 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { Button, Dialog, Icon } from '@/components/ds';
-import { FREE_SHIPPING_AT, PRICE, PRODUCTS, RANGE_WORD_CAP, SLOT, byId, fmt } from '@/lib/data';
+import { useCatalogue } from '@/lib/catalogue-context';
+import { FREE_SHIPPING_AT, rangeWordCap, SLOT } from '@/lib/data';
+
+/** ₹ with Indian grouping, no decimals. */
+const inr = (paise: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
 import { useCart } from '@/lib/cart';
 import { useToast } from '@/lib/toast';
 import { Ph, TinBox } from './primitives';
 
 export function CartDrawer() {
-  const { items, count, total, open, setOpen, add, setQty } = useCart();
+  const { items, count, totalPaise, open, setOpen, add, setQty } = useCart();
   const { toast } = useToast();
   const router = useRouter();
+  const catalogue = useCatalogue();
   const restoreFocus = useRef<HTMLElement | null>(null);
 
+  const total = totalPaise / 100;
   const left = Math.max(0, FREE_SHIPPING_AT - total);
-  const addon = PRODUCTS.find((p) => !items.some((it) => it.id === p.id)) || PRODUCTS[0];
+  const rangeCap = rangeWordCap(catalogue.length);
+  // Suggest something buyable that is not already in the cart. A product with
+  // no confirmed price (R-04) is never suggested — the cart would refuse it.
+  const addon =
+    catalogue.find(
+      (p) => !p.unavailable && !items.some((it) => it.slug === p.slug),
+    ) ?? null;
 
   // Focus moves into the drawer on open, is trapped while it is open, and
   // returns to the trigger on close.
@@ -76,8 +93,7 @@ export function CartDrawer() {
             <div className="between">
               <span className="eyebrow muted">Total</span>
               <span className="price" style={{ fontSize: 26 }}>
-                {fmt(total)}
-                <span className="cap">*</span>
+                {inr(totalPaise)}
               </span>
             </div>
             <Button
@@ -94,7 +110,7 @@ export function CartDrawer() {
               Checkout
             </Button>
             <p className="cap">
-              Dispatch in <Ph>[00]</Ph> h · <Ph>[00]</Ph>-day return · *placeholder prices
+              Dispatch in <Ph>[00]</Ph> h · <Ph>[00]</Ph>-day return
             </p>
           </div>
         ) : null
@@ -105,7 +121,7 @@ export function CartDrawer() {
           <span className="eyebrow muted">
             {left === 0 ? 'Free shipping unlocked' : 'Free shipping'}
           </span>
-          <span className="cap num">{left === 0 ? '✓' : `${fmt(left)} to go`}</span>
+          <span className="cap num">{left === 0 ? '✓' : `${inr(left * 100)} to go`}</span>
         </div>
         <div className="progress">
           <i style={{ width: `${Math.min(100, (total / FREE_SHIPPING_AT) * 100)}%` }} />
@@ -118,7 +134,7 @@ export function CartDrawer() {
             Nothing in it yet.
           </p>
           <p className="small">
-            {RANGE_WORD_CAP} teas, one garden. Start with the one you already drink and work outward from
+            {rangeCap} teas, one garden. Start with the one you already drink and work outward from
             there.
           </p>
           <Button
@@ -134,12 +150,12 @@ export function CartDrawer() {
       )}
 
       <div className="stack">
-        {items.map(({ id, qty }) => {
-          const p = byId(id);
+        {items.map(({ slug, qty }) => {
+          const p = catalogue.find((c) => c.slug === slug);
           if (!p) return null;
           return (
             <div
-              key={id}
+              key={slug}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '72px 1fr auto',
@@ -162,15 +178,15 @@ export function CartDrawer() {
                     {p.name}
                   </div>
                   <div className="cap num">
-                    {p.weight} · Lot <Ph>{SLOT.lot}</Ph>
+                    {p.netQuantity} · Lot <Ph>{SLOT.lot}</Ph>
                   </div>
                 </div>
                 <div className="qty">
-                  <button aria-label={`Decrease ${p.name}`} onClick={() => setQty(id, qty - 1)}>
+                  <button aria-label={`Decrease ${p.name}`} onClick={() => setQty(slug, qty - 1)}>
                     <Icon name="minus" size={12} />
                   </button>
                   <span className="small num">{qty}</span>
-                  <button aria-label={`Increase ${p.name}`} onClick={() => setQty(id, qty + 1)}>
+                  <button aria-label={`Increase ${p.name}`} onClick={() => setQty(slug, qty + 1)}>
                     <Icon name="plus" size={12} />
                   </button>
                 </div>
@@ -178,11 +194,11 @@ export function CartDrawer() {
 
               <div className="stack g2" style={{ alignItems: 'flex-end' }}>
                 <span className="price" style={{ color: 'var(--text-primary)' }}>
-                  {fmt(PRICE * qty)}
+                  {inr((p.pricePaise ?? 0) * qty)}
                 </span>
                 <button
                   aria-label={`Remove ${p.name}`}
-                  onClick={() => setQty(id, 0)}
+                  onClick={() => setQty(slug, 0)}
                   style={{
                     border: 0,
                     background: 'none',
@@ -200,7 +216,7 @@ export function CartDrawer() {
         })}
       </div>
 
-      {items.length > 0 && (
+      {items.length > 0 && addon && (
         <div className="stack g3" style={{ paddingTop: 24 }}>
           <div className="eyebrow muted">Add to the order</div>
           <div
@@ -224,7 +240,8 @@ export function CartDrawer() {
                 {addon.name}
               </div>
               <div className="cap num">
-                {addon.weight} · {fmt(PRICE)}*
+                {addon.netQuantity}
+                {addon.pricePaise !== null && <> · {inr(addon.pricePaise)}</>}
               </div>
             </div>
             <Button size="sm" variant="outline" onClick={() => add(addon)}>

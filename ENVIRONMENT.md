@@ -1,91 +1,83 @@
 # Environment
 
-RejuveLuxe runs with **no environment variables set**. Every value below has a
-default, so `npm install && npm run dev` works on a clean checkout.
-
-Set them to point the site at a real domain, or once a feature that needs a
-secret is built.
+The site needs a database and one auth secret to run. Everything else has a
+default.
 
 ## Setup
 
 ```bash
-cp .env.example .env.local   # then edit
-npm run dev                  # restart after every env change
+cp .env.example .env   # then fill in the two required values
+npm run dev            # restart after every env change
 ```
 
-`.env.local` is gitignored. `.env.example` is committed and must never hold a
-real secret.
+`.env` is gitignored. `.env.example` is committed and must only ever hold fake
+values. The test and bootstrap scripts load `.env` directly
+(`tsx --env-file=.env`), which is why it is `.env` and not `.env.local`.
 
 ## Variables
 
-### In use
-
-| Variable | Scope | Default | Required |
+| Variable | Required | Scope | When unset |
 |---|---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Build time, public | `https://rejuveluxe.in` | Production |
+| `DATABASE_URL` | Yes | Server, secret | Throws on import; no page renders, `next build` fails |
+| `AUTH_JWT_SECRET` | Yes | Server, secret | Throws the first time auth runs; must be 32+ characters |
+| `AUTH_JWT_REFRESH_SECRET` | No | Server, secret | Falls back to `AUTH_JWT_SECRET` |
+| `AUTH_CSRF_SECRET` | No | Server, secret | Falls back to `AUTH_JWT_SECRET` |
+| `NEXT_PUBLIC_SITE_URL` | No | Build time, public | `https://$VERCEL_PROJECT_PRODUCTION_URL`, else `http://localhost:3000` |
+| `VERCEL_PROJECT_PRODUCTION_URL` | Set by Vercel | Build time | Do not set by hand |
+| `BASE_URL` | No | Test scripts only | `http://localhost:3000` |
 
-**`NEXT_PUBLIC_SITE_URL`** — public origin of the site, no trailing slash.
-Read in [`app/layout.tsx`](app/layout.tsx) as `metadataBase`, which Next.js
-uses to turn relative canonical, Open Graph and Twitter image paths into
-absolute URLs. Without the right value, links shared to WhatsApp, Instagram or
-Slack preview against the wrong domain.
+### `DATABASE_URL`
 
-| Environment | Value |
-|---|---|
-| Local | `http://localhost:3000` |
-| Preview | The preview deployment's URL |
-| Production | `https://rejuveluxe.in` |
+Supabase Postgres through the **transaction pooler** (Supabase → Connect →
+Transaction pooler URI). Read in `lib/server/db/client.ts`, which throws at
+import if it is missing. The catalogue is loaded from the database by the root
+layout, so a missing value breaks every route and the build, not just admin.
 
-An invalid URL throws during `next build` — intentional, so a typo fails the
-build instead of shipping broken share previews.
+### `AUTH_JWT_SECRET`, `AUTH_JWT_REFRESH_SECRET`, `AUTH_CSRF_SECRET`
 
-### Planned, not read yet
+Read in `lib/server/auth/config.ts`. The access secret is validated loudly:
+missing or under 32 characters throws rather than falling back, because a
+default signing secret is an authentication bypass. Generate each with:
 
-These are reserved for a server-side contact form. The current form validates in
-the browser and opens the visitor's mail client via `mailto:`, so it needs none
-of them. **Setting them today does nothing.**
+```bash
+openssl rand -base64 48
+```
 
-| Variable | Scope | Purpose |
-|---|---|---|
-| `RESEND_API_KEY` | Server, secret | Sends contact form mail |
-| `CONTACT_TO_EMAIL` | Server | Inbox that receives submissions — `support@rejuveluxe.in` |
-| `CONTACT_FROM_EMAIL` | Server | Verified sender address on the sending domain |
+Setting distinct refresh and CSRF secrets is recommended: with a single secret,
+a leak of the access secret also mints 90-day refresh sessions.
 
-When that feature lands, move each row up to **In use** in the same change.
+### `NEXT_PUBLIC_SITE_URL`
+
+Absolute origin for Open Graph and canonical URLs, read in `app/layout.tsx`.
+Leave unset on Vercel until a custom domain exists; the project's production
+URL is used automatically. Inlined at build time, so changing it needs a
+rebuild, not a restart.
 
 ## How Next.js handles these
 
-- **Server only by default.** A variable without the `NEXT_PUBLIC_` prefix
-  never reaches the browser.
-- **`NEXT_PUBLIC_` is inlined at build.** The value is copied into the
-  JavaScript bundle during `next build` and frozen there. Changing it on the
-  host needs a rebuild, not a restart. Never put a secret behind this prefix —
-  anyone can read it in the page source.
-- **Inlining needs a literal lookup.** `process.env.NEXT_PUBLIC_SITE_URL` is
-  replaced; `process.env[name]` or a destructured `env.X` is not.
-- **Load order**, first match wins:
-  1. `process.env` (the host's settings, e.g. Vercel project variables)
-  2. `.env.$(NODE_ENV).local`
-  3. `.env.local` — skipped when `NODE_ENV=test`
-  4. `.env.$(NODE_ENV)`
-  5. `.env`
-
-Reference: `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md`.
+- Variables without `NEXT_PUBLIC_` never reach the browser.
+- `NEXT_PUBLIC_` values are copied into the bundle at `next build` and frozen.
+  Never put a secret behind that prefix.
+- Load order, first match wins: `process.env` (the host) →
+  `.env.$(NODE_ENV).local` → `.env.local` → `.env.$(NODE_ENV)` → `.env`.
 
 ## Deploying
 
-Set production values in the host's dashboard, not in a committed file. On
-Vercel:
+Set values in the Vercel project (Settings → Environment Variables), never in
+a committed file. `DATABASE_URL` and `AUTH_JWT_SECRET` must exist for
+**Production and Preview** or those deployments fail to build. Redeploy after
+adding them.
+
+When adding a value from a terminal, pipe it without a trailing newline. A
+stored carriage return turns a valid URL into `Invalid URL` at build time:
 
 ```bash
-vercel env add NEXT_PUBLIC_SITE_URL production
-vercel env pull .env.local      # sync hosted values down for local work
+printf '%s' "$VALUE" | vercel env add DATABASE_URL production
 ```
 
 ## Adding a variable
 
-1. Read it with a literal `process.env.NAME`, with a sensible default or a
-   clear failure.
-2. Add it to `.env.example`, commented, with no real value.
-3. Add a row to **In use** above: scope, default, where it is read.
-4. Prefix with `NEXT_PUBLIC_` only if the browser genuinely needs it.
+1. Read it with a literal `process.env.NAME`, with a default or a loud failure.
+2. Add it to `.env.example` with a fake value and a comment.
+3. Add a row to the table above.
+4. Use `NEXT_PUBLIC_` only if the browser genuinely needs it.

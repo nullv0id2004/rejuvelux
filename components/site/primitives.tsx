@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import type { Product } from '@/lib/data';
+import type { CatalogueProduct } from '@/lib/catalogue';
+import { SITE_PHOTOS } from '@/lib/data';
 
 /* --------------------------------------------------------------- labels -- */
 
@@ -45,16 +46,21 @@ export function Wordmark({
   size = 22,
   href,
   inverse,
+  crest,
+  crestWidth = 46,
 }: {
   stacked?: boolean;
   size?: number;
   href?: string;
   inverse?: boolean;
+  /** Sets the crest beside the type. The type carries the name; the crest is the mark. */
+  crest?: boolean;
+  crestWidth?: number;
 }) {
   const color = inverse ? 'var(--bone-100)' : 'var(--text-primary)';
   const strap = inverse ? 'var(--gold-300)' : 'var(--text-accent)';
 
-  const content = stacked ? (
+  const type = stacked ? (
     <span
       style={{
         display: 'inline-flex',
@@ -64,29 +70,75 @@ export function Wordmark({
         color,
       }}
     >
-      <span className="wordmark" style={{ fontSize: size }}>
+      <span className="wordmark" style={{ '--wm-size': `${size}px` } as CSSProperties}>
         Rejuveluxe
       </span>
-      <span className="strap" style={{ color: strap, fontSize: Math.max(8, size * 0.36) }}>
+      <span
+        className="strap"
+        style={{ color: strap, '--strap-size': `${Math.max(8, size * 0.36)}px` } as CSSProperties}
+      >
         ◆ Earned not indulged ◆
       </span>
     </span>
   ) : (
     <span className="wm" style={{ color }}>
-      <span className="wordmark" style={{ fontSize: size }}>
+      <span className="wordmark" style={{ '--wm-size': `${size}px` } as CSSProperties}>
         Rejuveluxe
       </span>
-      <span className="strap hide-m" style={{ color: strap, fontSize: 8 }}>
+      <span
+        className="strap hide-m"
+        style={{ color: strap, '--strap-size': '8px' } as CSSProperties}
+      >
         ◆ Earned not indulged ◆
       </span>
     </span>
   );
 
+  const content = crest ? (
+    <span className="nav-mark">
+      <Logo width={crestWidth} priority />
+      {type}
+    </span>
+  ) : (
+    type
+  );
+
   if (!href) return content;
   return (
-    <Link href={href} aria-label="RejuveLuxe — home" style={{ display: 'inline-flex', color }}>
+    <Link href={href} aria-label="RejuveLuxe, home" style={{ display: 'inline-flex', color }}>
       {content}
     </Link>
+  );
+}
+
+/**
+ * The brand crest — the full lockup from the tins: Mughal arch, crown, cup,
+ * leaves, wordmark and strapline.
+ *
+ * It carries its own detail and its own colour (gold gradients on a cream
+ * ground), so it does not take the page's ink colour and it needs room. Below
+ * roughly 120px tall the wordmark inside it turns to mush; use `Wordmark` in
+ * type for anything smaller, which is what the nav does.
+ */
+export function Logo({
+  width = 150,
+  priority,
+  style,
+}: {
+  width?: number;
+  priority?: boolean;
+  style?: CSSProperties;
+}) {
+  const RATIO = 1345.1 / 1253.7; // the SVG's own viewBox
+  return (
+    <Image
+      src="/assets/logo.svg"
+      alt="RejuveLuxe"
+      width={width}
+      height={Math.round(width * RATIO)}
+      priority={priority}
+      style={{ height: 'auto', ...style }}
+    />
   );
 }
 
@@ -127,10 +179,10 @@ export function Greybox({
       className={'greybox photo ' + className}
       style={{ aspectRatio: ratio, ...style }}
       role="img"
-      aria-label={real ? (alt ?? label) : label + ' — interim photograph'}
+      aria-label={real ? (alt ?? label) : label + ', interim photograph'}
     >
       <Image
-        src={src ?? '/assets/tea-field.jpeg'}
+        src={src ?? SITE_PHOTOS.interim}
         alt=""
         fill
         sizes={sizes}
@@ -174,7 +226,7 @@ export function Evidence({
 
 /* --------------------------------------------------- swatch and scales --- */
 
-export function Swatch({ p, size = 24, style }: { p: Product; size?: number; style?: CSSProperties }) {
+export function Swatch({ p, size = 24, style }: { p: CatalogueProduct; size?: number; style?: CSSProperties }) {
   return (
     <span
       className="swatch"
@@ -205,7 +257,7 @@ export function Scale({ label, value }: { label: string; value: number }) {
       </div>
       <div
         className="scale"
-        aria-label={rated ? `${label} ${value} of 5` : `${label} — not yet rated`}
+        aria-label={rated ? `${label} ${value} of 5` : `${label}, not yet rated`}
       >
         {[1, 2, 3, 4, 5].map((i) => (
           <i key={i} className={i <= value ? 'on' : ''} />
@@ -230,7 +282,7 @@ export function TinBox({
   priority,
   alt,
 }: {
-  p: Product;
+  p: CatalogueProduct;
   className?: string;
   style?: CSSProperties;
   imgStyle?: CSSProperties;
@@ -243,7 +295,7 @@ export function TinBox({
       className={'tinbox ' + className}
       style={{ background: p.tin, ...style }}
       role={p.image ? undefined : 'img'}
-      aria-label={p.image ? undefined : `${p.name} tin — render pending`}
+      aria-label={p.image ? undefined : `${p.name} tin, render pending`}
     >
       {p.image ? (
         <Image

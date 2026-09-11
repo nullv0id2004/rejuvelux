@@ -15,7 +15,8 @@ import {
 } from '@/components/ds';
 import { Accordion, Ladder, Tile } from '@/components/site/interactive';
 import { Evidence, Eyebrow, Greybox, Scale, Swatch, Wordmark } from '@/components/site/primitives';
-import { FAQS, PRODUCTS, RANGE_WORD_CAP, SLOT, byId } from '@/lib/data';
+import { useCatalogue, useProduct } from '@/lib/catalogue-context';
+import { FAQS, rangeWordCap, SLOT } from '@/lib/data';
 import { useCart } from '@/lib/cart';
 
 function Block({ label, note, children }: { label: string; note?: string; children: ReactNode }) {
@@ -43,6 +44,8 @@ const TOKEN_SWATCHES: [string, string][] = [
 ];
 
 function Specimen({ theme }: { theme: 'light' | 'dark' }) {
+  const catalogue = useCatalogue();
+  const rangeCap = rangeWordCap(catalogue.length);
   return (
     <div className="theme-pane" data-theme={theme}>
       <div className="between">
@@ -70,8 +73,8 @@ function Specimen({ theme }: { theme: 'light' | 'dark' }) {
         className="grid"
         style={{ gridTemplateColumns: 'repeat(auto-fill,minmax(88px,1fr))', gap: 12 }}
       >
-        {PRODUCTS.map((p) => (
-          <div key={p.id} className="sw">
+        {catalogue.map((p) => (
+          <div key={p.slug} className="sw">
             <i style={{ background: p.tin, boxShadow: `inset 0 -16px 0 ${p.ink}` }} />
             <span>
               {p.name}
@@ -88,7 +91,7 @@ function Specimen({ theme }: { theme: 'light' | 'dark' }) {
         </p>
         <span className="cap">Display · Playfair Display 400 · italic for emphasis</span>
 
-        <h2 className="h1">{RANGE_WORD_CAP} expressions. One garden.</h2>
+        <h2 className="h1">{rangeCap} expressions. One garden.</h2>
         <span className="cap">H1 · Playfair Display 400 · balanced</span>
 
         <h3 className="h3 it">Golden Tips</h3>
@@ -127,9 +130,11 @@ function Specimen({ theme }: { theme: 'light' | 'dark' }) {
  * component the pages use, not a drawing of it.
  */
 export function SpecsView() {
-  const [state, setState] = useState('golden');
+  const catalogue = useCatalogue();
+  const [state, setState] = useState('assam-golden-tips');
   const [sw, setSw] = useState(false);
   const { replace, setOpen } = useCart();
+  const activeStop = useProduct(state);
 
   return (
     <main>
@@ -186,10 +191,10 @@ export function SpecsView() {
           </div>
           <div className="stack g3">
             <div className="between">
-              <Eyebrow muted>Active stop · {byId(state)!.name}</Eyebrow>
+              <Eyebrow muted>Active stop · {activeStop?.name ?? 'None'}</Eyebrow>
               <Tabs
                 variant="underline"
-                items={PRODUCTS.map((p) => ({ value: p.id, label: p.name }))}
+                items={catalogue.map((p) => ({ value: p.slug, label: p.name }))}
                 value={state}
                 onChange={setState}
               />
@@ -231,10 +236,14 @@ export function SpecsView() {
             </Button>
             <Button
               onClick={() => {
-                replace([
-                  { id: 'golden', qty: 1 },
-                  { id: 'ctc', qty: 2 },
-                ]);
+                // Fills from whatever the catalogue actually holds, so the
+                // demo cannot reference a slug the database has retired.
+                replace(
+                  catalogue
+                    .filter((p) => !p.unavailable)
+                    .slice(0, 2)
+                    .map((p, i) => ({ slug: p.slug, qty: i + 1 })),
+                );
                 setOpen(true);
               }}
             >
@@ -323,8 +332,8 @@ export function SpecsView() {
             className="grid"
             style={{ gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))' }}
           >
-            {PRODUCTS.map((p) => (
-              <div key={p.id} className="stack g3">
+            {catalogue.map((p) => (
+              <div key={p.slug} className="stack g3">
                 <div className="row g3">
                   <Swatch p={p} />
                   <span className="small" style={{ color: 'var(--text-primary)' }}>
@@ -332,8 +341,8 @@ export function SpecsView() {
                   </span>
                 </div>
                 <div className="stack g3" style={{ color: p.ink }}>
-                  <Scale label="Body" value={p.body} />
-                  <Scale label="Briskness" value={p.brisk} />
+                  <Scale label="Body" value={p.body ?? 0} />
+                  <Scale label="Briskness" value={p.brisk ?? 0} />
                 </div>
               </div>
             ))}
@@ -345,8 +354,8 @@ export function SpecsView() {
           note="The only card on the site. Tin on its colour, name, italic descriptor, evidence rows, price, both CTAs. Ink colour as a 3 px top rule."
         >
           <div className="grid cols-3">
-            {PRODUCTS.slice(0, 3).map((p) => (
-              <Tile key={p.id} p={p} />
+            {catalogue.slice(0, 3).map((p) => (
+              <Tile key={p.slug} p={p} />
             ))}
           </div>
         </Block>
