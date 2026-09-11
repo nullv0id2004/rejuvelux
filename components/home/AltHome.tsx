@@ -328,7 +328,7 @@ export function AltHome() {
                 </div>
               </div>
               <div>
-                <Button variant="outline" href="/garden">
+                <Button variant="outline" href="/assam-origin">
                   Read about the garden
                 </Button>
               </div>

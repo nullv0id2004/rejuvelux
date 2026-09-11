@@ -2,26 +2,56 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Icon, IconButton } from '@/components/ds';
 import { useCart } from '@/lib/cart';
 import { useTheme } from '@/lib/theme';
 import { Wordmark } from './primitives';
 
-const NAV: { href: string; label: string }[] = [
-  { href: '/#collection', label: 'Shop' },
-  { href: '/garden', label: 'The Garden' },
-  { href: '/craft', label: 'The Craft' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Contact' },
+type Item = { href: string; label: string };
+type Menu = { id: 'shop' | 'gifts'; label: string; items: Item[]; match: string[] };
+type NavLink = Item & { match: string[] };
+
+/** Main navigation from the content handover: two menus, then three direct links. */
+const SHOP: Menu = {
+  id: 'shop',
+  label: 'Shop Tea',
+  items: [
+    { href: '/shop', label: 'All Tea' },
+    { href: '/collections/assam-collection', label: 'The Assam Collection' },
+    { href: '/shop/assam-matcha', label: 'Assam Matcha' },
+    { href: '/shop/silver-needle-assam', label: 'Silver Needle Assam' },
+    { href: '/shop/assam-golden-tips', label: 'Assam Golden Tips' },
+    { href: '/shop/green-tea', label: 'Green Tea' },
+  ],
+  match: ['/shop', '/collections'],
+};
+
+const GIFTS: Menu = {
+  id: 'gifts',
+  label: 'Gifts',
+  items: [
+    { href: '/gifting', label: 'Gifting' },
+    { href: '/collections/gift-sets', label: 'Tea Gift Sets' },
+    { href: '/shop/matcha-ritual-set', label: 'Matcha Ritual Set' },
+    { href: '/corporate-gifting', label: 'Corporate Gifting' },
+    { href: '/festive-gifting', label: 'Festive Gifting' },
+  ],
+  match: ['/gifting', '/corporate-gifting', '/festive-gifting', '/collections/gift-sets'],
+};
+
+const RITUALS: NavLink = {
+  href: '/tea-rituals',
+  label: 'Tea Rituals',
+  match: ['/tea-rituals', '/how-to-make-matcha', '/choose-your-tea'],
+};
+
+const RIGHT: NavLink[] = [
+  { href: '/our-story', label: 'Our Story', match: ['/our-story', '/assam-origin', '/craft'] },
+  { href: '/journal', label: 'Journal', match: ['/journal'] },
 ];
 
-function isActive(href: string, pathname: string) {
-  if (href === '/#collection') return pathname === '/' || pathname.startsWith('/shop');
-  // Blog posts keep the Blog link lit.
-  if (href === '/blog') return pathname === '/blog' || pathname.startsWith('/blog/');
-  return pathname === href;
-}
+const matches = (match: string[], path: string) => match.some((m) => path === m || path.startsWith(m + '/'));
 
 function ThemeToggle() {
   const { theme, toggle } = useTheme();
@@ -31,7 +61,7 @@ function ThemeToggle() {
       variant="ghost"
       onClick={toggle}
     >
-      {/* Two overlapping discs — a light/dark mark that needs no extra icon set. */}
+      {/* Two overlapping discs: a light/dark mark that needs no extra icon set. */}
       <span
         aria-hidden="true"
         style={{
@@ -47,32 +77,75 @@ function ThemeToggle() {
 }
 
 /**
- * Sticky nav, 64–72px, hairline bottom border. The wordmark is centred with the
- * links split either side (the flow the design landed on); below the shell
- * breakpoint the links collapse into a disclosure menu.
+ * Sticky nav with the wordmark centred and links split either side. Shop Tea and
+ * Gifts open a panel under the bar; Escape, a click outside or a navigation
+ * closes it. Below the shell breakpoint everything collapses into one menu.
  */
 export function Nav() {
   const pathname = usePathname();
   const [menu, setMenu] = useState(false);
-  const { count, setOpen } = useCart();
+  const [open, setOpen] = useState<Menu['id'] | null>(null);
+  const header = useRef<HTMLElement>(null);
+  const { count, setOpen: setCartOpen } = useCart();
 
-  // Close the mobile menu whenever navigation completes.
   useEffect(() => {
     setMenu(false);
+    setOpen(null);
   }, [pathname]);
 
-  const link = ({ href, label }: { href: string; label: string }) => (
-    <Link key={href} href={href} className={isActive(href, pathname) ? 'on' : ''}>
-      {label}
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpen(null);
+      header.current?.querySelector<HTMLButtonElement>(`[data-menu="${open}"]`)?.focus();
+    };
+    const onDown = (e: MouseEvent) => {
+      if (!header.current?.contains(e.target as Node)) setOpen(null);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [open]);
+
+  const trigger = (m: Menu) => {
+    const expanded = open === m.id;
+    return (
+      <button
+        key={m.id}
+        type="button"
+        data-menu={m.id}
+        className={'nav-dd' + (matches(m.match, pathname) ? ' on' : '')}
+        aria-expanded={expanded}
+        aria-controls={`nav-panel-${m.id}`}
+        aria-label={`${expanded ? 'Close' : 'Open'} ${m.label} menu`}
+        onClick={() => setOpen(expanded ? null : m.id)}
+      >
+        {m.label}
+        <span className="caret" aria-hidden="true" />
+      </button>
+    );
+  };
+
+  const link = (l: NavLink) => (
+    <Link key={l.href} href={l.href} className={matches(l.match, pathname) ? 'on' : ''}>
+      {l.label}
     </Link>
   );
 
+  const panel = open === 'shop' ? SHOP : open === 'gifts' ? GIFTS : null;
+
   return (
     <>
-      <header className="nav">
+      <header className="nav" ref={header}>
         <div className="wrap nav-c">
           <nav className="nav-links" aria-label="Primary">
-            {NAV.slice(0, 3).map(link)}
+            {trigger(SHOP)}
+            {trigger(GIFTS)}
+            {link(RITUALS)}
           </nav>
           <span className="menu-btn">
             <IconButton
@@ -89,26 +162,52 @@ export function Nav() {
 
           <div className="row g6" style={{ justifyContent: 'flex-end' }}>
             <nav className="nav-links" aria-label="Secondary">
-              {NAV.slice(3).map(link)}
+              {RIGHT.map(link)}
             </nav>
             <ThemeToggle />
             <IconButton
-              label={count ? `Cart, ${count} item${count === 1 ? '' : 's'}` : 'Cart'}
+              label={count ? `Shopping bag, ${count} item${count === 1 ? '' : 's'}` : 'Shopping bag'}
               variant="ghost"
               badge={count || undefined}
-              onClick={() => setOpen(true)}
+              onClick={() => setCartOpen(true)}
             >
               <Icon name="shopping-bag" size={20} />
             </IconButton>
           </div>
         </div>
+
+        {panel && (
+          <div className="nav-panel" id={`nav-panel-${panel.id}`}>
+            <div className="wrap">
+              <ul>
+                {panel.items.map((i) => (
+                  <li key={i.href}>
+                    <Link href={i.href} className={pathname === i.href ? 'on' : ''}>
+                      {i.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </header>
 
       {menu && (
         <div className="mobile-menu">
-          {NAV.map(({ href, label }) => (
-            <Link key={href} href={href} onClick={() => setMenu(false)}>
-              {label}
+          {[SHOP, GIFTS].map((m) => (
+            <div key={m.id} className="mm-group">
+              <div className="mm-h">{m.label}</div>
+              {m.items.map((i) => (
+                <Link key={i.href} href={i.href} className="mm-sub" onClick={() => setMenu(false)}>
+                  {i.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+          {[RITUALS, ...RIGHT].map((l) => (
+            <Link key={l.href} href={l.href} onClick={() => setMenu(false)}>
+              {l.label}
             </Link>
           ))}
         </div>

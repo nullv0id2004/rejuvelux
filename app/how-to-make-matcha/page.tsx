@@ -1,7 +1,7 @@
 import { ContentView, contentMetadata } from '@/components/site/ContentView';
 import { page } from '@/lib/content/pages';
 
-const content = page('contact');
+const content = page('how-to-make-matcha');
 
 export const metadata = contentMetadata(content);
 

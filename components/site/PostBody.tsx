@@ -1,5 +1,5 @@
 import { Evidence, Greybox, withSlots } from './primitives';
-import type { Block } from '@/lib/blog';
+import type { Block } from '@/lib/content/journal';
 
 /**
  * Renders a post's blocks into the editorial column. Paragraphs run through

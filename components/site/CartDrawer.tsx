@@ -141,7 +141,7 @@ export function CartDrawer() {
             variant="outline"
             onClick={() => {
               setOpen(false);
-              router.push('/#collection');
+              router.push('/shop');
             }}
           >
             Browse the collection

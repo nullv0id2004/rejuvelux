@@ -19,16 +19,25 @@ before running. See [`ENVIRONMENT.md`](ENVIRONMENT.md).
 
 | Route | What it is |
 |---|---|
-| `/` | Homepage — full-bleed hero, three cards, dark story band, scroll-driven collection showcase, "why" row, newsletter band |
-| `/shop/[slug]` | Product page, one per SKU. Gallery, evidence panel, brew parameters, accordions, reviews, cross-sells, FAQs |
-| `/craft` | Three chapters, one per tea, as a vertical process timeline |
-| `/garden` | Long-form editorial, single 720px column with full-bleed photography breaking it |
-| `/alt-home` | The homepage in the brief's fixed section order (deliverable 1). `noindex` |
-| `/specs` | Component sheet and colour/type specimen, both themes (deliverables 4, 5, 8, 9, 10). `noindex` |
-| `/blog` | Index — lead story plus a card grid, newest first |
-| `/blog/[slug]` | Editorial post, one per entry in `lib/blog.ts` |
-| `/contact` | Business and support details, plus a customer-service form |
-| `/og-preview` | Source for the link-preview card. `noindex`, unlinked — see below |
+| `/` | Homepage: hero, the three expressions, story band, collection showcase, rituals and gifting, journal, sign-up |
+| `/shop` | All Tea, the database catalogue |
+| `/shop/[slug]` | Product page per database row; enquiry page for the handover's unlisted items (gift set, Matcha box, cup, CTC, Ube) |
+| `/collections`, `/collections/[slug]` | Collection directory; the Assam Collection, Gift Sets and Teaware |
+| `/our-story`, `/assam-origin`, `/craft` | Brand and origin |
+| `/choose-your-tea`, `/tea-rituals`, `/how-to-make-matcha` | Education and preparation |
+| `/gifting`, `/corporate-gifting`, `/festive-gifting` | Gifting, with the corporate enquiry form |
+| `/contact`, `/faq`, `/where-to-find-us`, `/track-order` | Support |
+| `/journal`, `/journal/[slug]` | The Journal and its six articles |
+| `/policies/[slug]` | Shipping, returns, privacy and terms: proposed drafts pending legal review |
+| `/alt-home`, `/specs` | Design deliverables. `noindex` |
+| `/og-preview` | Source for the link-preview card. `noindex`, unlinked, see below |
+
+Page copy comes from the RejuveLuxe website content handover and lives as data in
+`lib/content/`, rendered by `components/site/ContentView.tsx`. Product editorial
+lives in `lib/presentation.ts`. `[SLOT]` fields in copy are business facts not yet
+approved and render as visible placeholders. `/blog`, `/garden`, `/wholesale` and
+the handover's platform-style paths (`/pages/*`, `/products/*`, `/blogs/journal/*`)
+redirect to their routes here.
 
 ## Admin
 

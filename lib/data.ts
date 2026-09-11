@@ -113,124 +113,38 @@ export const rangeWordCap = (count: number) => {
   return w.charAt(0).toUpperCase() + w.slice(1);
 };
 
-export const ANNOUNCEMENTS = [
-  'Free shipping above ₹[0,000] · India-wide',
-  'Current flush · [FLUSH] [0000]',
-  'Dispatch within [00] hours · Lot number on every tin',
+/** Announcement bar. The brand promise only: no shipping, dispatch or offer claim until approved. */
+export const ANNOUNCEMENTS: { text: string; href: string }[] = [
+  { text: 'Exceptional Tea. Uncompromising Quality.', href: '/collections/assam-collection' },
 ];
 
+/** Short FAQ set for the design deliverables (alt-home, specs). The full set lives on /faq. */
 export const FAQS: [string, string][] = [
   [
-    'Where does the tea come from?',
-    'A single estate in Assam. The garden name, district and elevation appear on every product page and are printed on every tin. Estate details are pending confirmation, so the slots read [ESTATE] until then.',
+    'What is the Assam Collection?',
+    'It is our hero collection of Assam Matcha, Silver Needle Assam and Assam Golden Tips, expressed through Focus, Elegance and Legacy.',
   ],
   [
-    'What does single-origin mean here?',
-    'One garden, one flush, one lot. Not blended across gardens or seasons. The lot number on the tin traces to a pluck month.',
+    'Which tea should I try first?',
+    'Choose Matcha for a whisked green-tea ritual, Silver Needle for a delicate cup or Golden Tips for richer black-tea character. Our tea guide helps you compare them.',
   ],
   [
-    'How fresh is it?',
-    'Each tin carries its pluck month and lot number. Current flush is shown in the announcement bar. Dispatch timings are being finalised.',
+    'Is Silver Needle Assam a white tea?',
+    'Yes. Silver Needle Assam is the product expression; white tea is the category.',
+  ],
+  [
+    'Are all products caffeine-free?',
+    'No. The hero teas contain naturally occurring caffeine. Check the specific product details if caffeine content is important to your choice.',
   ],
   [
     'How should I store tea?',
-    'Sealed in the tin, away from light, heat and anything with a smell. Do not refrigerate leaf tea; do refrigerate Matcha.',
+    'Keep it tightly closed in a cool, dry place away from moisture and direct sunlight. Follow any additional storage guidance on the pack.',
   ],
   [
-    'What is the difference between Matcha and Green Tea?',
-    'Both start as green leaf. Green Tea is steamed, rolled and infused. Matcha is shaded, steamed, deveined and stone-milled, and you consume the leaf itself.',
-  ],
-  [
-    'How much caffeine is in each tea?',
-    'All five contain naturally occurring caffeine. Lab figures per cup will be published on each product page once available. Draft.',
-  ],
-  [
-    'Do you ship outside India?',
-    'Not yet. India-wide shipping only. Thresholds and dispatch times are placeholders until logistics are confirmed.',
+    'Can I make an iced Matcha latte?',
+    'Yes. Whisk Matcha with water first, then combine with cold milk and ice. See our Matcha guide for a starting recipe.',
   ],
 ];
-
-export type CraftChapter = {
-  title: string;
-  close: string;
-  steps: [string, string][];
-};
-
-export const CRAFT: Record<string, CraftChapter> = {
-  'assam-matcha': {
-    title: 'Crafting Our Matcha',
-    close:
-      'Carefully selected leaves, gently transformed into fine Matcha powder, so the whole leaf becomes part of every cup.',
-    steps: [
-      ['Leaf Selection', 'Tender, high-quality leaves are chosen for Matcha production.'],
-      [
-        'Shading',
-        'Before harvest, the plants are shaded, changing their chemistry: building L-theanine and chlorophyll.',
-      ],
-      ['Harvesting', 'Young leaves are picked at precisely the right stage for colour and flavour.'],
-      ['Steaming', 'Leaves are rapidly steamed to halt oxidation and lock in their vivid green.'],
-      ['Cooling & Drying', 'Carried out under controlled conditions.'],
-      ['Deveining', 'Stems and coarse veins are removed, leaving tencha: the pure leaf.'],
-      [
-        'Fine Grinding',
-        'Tencha is slowly stone-milled into an exceptionally fine powder. Deliberately slow, to prevent heat from compromising the leaf.',
-      ],
-      [
-        'Quality Screening & Packaging',
-        'Assessed for colour, aroma, and fineness, then sealed against oxygen, light, and moisture.',
-      ],
-    ],
-  },
-  'silver-needle-assam': {
-    title: 'Crafting Our Silver Needle',
-    close:
-      'Selected from tender young buds, gently withered and carefully dried, preserving natural elegance and refined character with minimal intervention.',
-    steps: [
-      [
-        'Bud Selection',
-        'Only young, tender buds are hand-harvested, their fine silvery hairs giving Silver Needle its signature look.',
-      ],
-      ['Gentle Handling', 'Buds are handled carefully to avoid bruising or unwanted oxidation.'],
-      [
-        'Withering',
-        'Spread in a controlled environment to lose moisture naturally: the most critical stage of white tea.',
-      ],
-      ['Minimal Oxidation', 'Unlike black tea, the process stays deliberately gentle.'],
-      ['Drying', 'Carefully stabilised once the desired character is achieved.'],
-      [
-        'Sorting & Grading, then Packaging',
-        'Graded for bud quality and appearance, then sealed against moisture and light.',
-      ],
-    ],
-  },
-  'assam-golden-tips': {
-    title: 'Crafting Our Golden Tips',
-    close:
-      'Carefully selected golden tips, transformed through precise withering, rolling, oxidation, and drying, developing their distinctive depth and character.',
-    steps: [
-      ['Selective Harvesting', 'Young leaves and golden tips are hand-picked for premium quality.'],
-      ['Withering', 'Reduces moisture, making the leaf flexible for processing.'],
-      ['Rolling', 'Disrupts the leaf structure, enabling natural enzymatic reactions.'],
-      [
-        'Oxidation',
-        "Controlled oxidation develops theaflavins and thearubigins: the compounds behind Golden Tips' colour, aroma, and body.",
-      ],
-      ['Drying / Firing', 'Stops oxidation at precisely the right point and stabilises the leaf.'],
-      [
-        'Sorting, Grading & Sensory Evaluation',
-        'Assessed for appearance, liquor, flavour, and finish before packaging.',
-      ],
-    ],
-  },
-};
-
-/** Order the Craft page presents its chapters in. */
-/** Chapter order, by database slug (Phase 1 — roadmap.md §5.1 step 2). */
-export const CRAFT_ORDER = [
-  'assam-matcha',
-  'silver-needle-assam',
-  'assam-golden-tips',
-] as const;
 
 export const STORY = [
   'It started with a question: why does the world come to India for some of its finest teas, while India so often settles for less at home?',

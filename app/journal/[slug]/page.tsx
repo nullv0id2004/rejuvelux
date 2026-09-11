@@ -4,18 +4,18 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ds';
 import { PostBody } from '@/components/site/PostBody';
 import { Eyebrow, Greybox, Swatch } from '@/components/site/primitives';
-import { POSTS, POSTS_BY_DATE, formatDate, postById, relatedPosts } from '@/lib/blog';
 import { getProduct } from '@/lib/catalogue';
+import { POSTS, postById, readingMinutes, relatedPosts } from '@/lib/content/journal';
 
 type Params = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
-  return POSTS.map((p) => ({ slug: p.id }));
+  return POSTS.map((post) => ({ slug: post.id }));
 }
 
 export const dynamicParams = false;
 
-/** The tea cross-links read the catalogue, so revalidate on the same hour as the shop. */
+/** The tea links read the catalogue, so revalidate on the same hour as the shop. */
 export const revalidate = 3600;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -23,25 +23,18 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const post = postById(slug);
   if (!post) return {};
   return {
-    title: post.title,
-    description: post.dek,
-    openGraph: {
-      type: 'article',
-      title: `${post.title} · RejuveLuxe`,
-      description: post.dek,
-      publishedTime: post.date,
-    },
+    title: { absolute: post.seoTitle },
+    description: post.description,
+    openGraph: { type: 'article', title: post.seoTitle, description: post.description },
   };
 }
 
-export default async function PostPage({ params }: Params) {
+export default async function JournalPostPage({ params }: Params) {
   const { slug } = await params;
   const post = postById(slug);
   if (!post) notFound();
 
-  const mentioned = (await Promise.all(post.products.map((slug) => getProduct(slug)))).filter(
-    (p) => p !== null,
-  );
+  const mentioned = (await Promise.all(post.products.map((s) => getProduct(s)))).filter((p) => p !== null);
   const related = relatedPosts(post.id);
 
   return (
@@ -53,36 +46,32 @@ export default async function PostPage({ params }: Params) {
             {post.title}
           </h1>
           <p className="lead">{post.dek}</p>
-          <div
-            className="row g4 cap rule-t"
-            style={{ color: 'var(--text-tertiary)', paddingTop: 20, flexWrap: 'wrap' }}
-          >
+          <div className="row g4 cap rule-t" style={{ color: 'var(--text-tertiary)', paddingTop: 20, flexWrap: 'wrap' }}>
             <span>{post.author}</span>
-            <time dateTime={post.date}>{formatDate(post.date)}</time>
-            <span>{post.minutes} min read</span>
+            <span>{readingMinutes(post)} min read</span>
           </div>
         </div>
       </section>
 
-      <Greybox
-        label={post.hero}
-        ratio="21 / 9"
-        className="bleed"
-        style={{ maxHeight: 620 }}
-        sizes="100vw"
-        priority
-      />
+      <Greybox label={post.hero} ratio="21 / 9" className="bleed" style={{ maxHeight: 620 }} sizes="100vw" priority />
 
       <section className="wrap sec">
         <div className="editorial">
           <PostBody blocks={post.body} />
+          <div className="row g3" style={{ flexWrap: 'wrap', paddingTop: 16 }}>
+            {post.cta.map((c, i) => (
+              <Button key={c.href} href={c.href} variant={i === 0 ? undefined : 'outline'}>
+                {c.label}
+              </Button>
+            ))}
+          </div>
         </div>
       </section>
 
       {mentioned.length > 0 && (
         <section className="wrap sec rule-t">
           <div className="editorial" style={{ gap: 20 }}>
-            <Eyebrow muted>Teas in this piece</Eyebrow>
+            <Eyebrow muted>Teas in this story</Eyebrow>
             <div className="row g6" style={{ flexWrap: 'wrap' }}>
               {mentioned.map((p) => (
                 <Link key={p.slug} href={`/shop/${p.slug}`} className="row g3" style={{ gap: 10 }}>
@@ -99,20 +88,20 @@ export default async function PostPage({ params }: Params) {
         <div className="stack g6">
           <Eyebrow muted>Keep reading</Eyebrow>
           <div className="grid cols-2">
-            {related.map((p) => (
-              <Link key={p.id} href={`/blog/${p.id}`} className="post-card stack g3">
-                <Greybox label={p.hero} ratio="3 / 2" sizes="(max-width: 800px) 100vw, 50vw" />
+            {related.map((r) => (
+              <Link key={r.id} href={`/journal/${r.id}`} className="post-card stack g3">
+                <Greybox label={r.hero} ratio="3 / 2" sizes="(max-width: 800px) 100vw, 50vw" />
                 <div className="row g4 cap" style={{ color: 'var(--text-tertiary)' }}>
-                  <span style={{ color: 'var(--accent)' }}>{p.category}</span>
-                  <time dateTime={p.date}>{formatDate(p.date)}</time>
+                  <span style={{ color: 'var(--accent)' }}>{r.category}</span>
+                  <span>{readingMinutes(r)} min read</span>
                 </div>
-                <h3 className="h3">{p.title}</h3>
+                <h3 className="h3">{r.title}</h3>
               </Link>
             ))}
           </div>
           <div>
-            <Button variant="outline" href="/blog">
-              All {POSTS_BY_DATE.length} pieces
+            <Button variant="outline" href="/journal">
+              Read the Journal
             </Button>
           </div>
         </div>

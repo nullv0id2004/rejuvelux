@@ -57,13 +57,13 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'RejuveLuxe',
     title: 'RejuveLuxe · Earned, not indulged',
-    description: 'Single-origin Assam tea. One garden, one flush, one lot.',
+    description: 'Discover Assam Matcha, Silver Needle Assam and Assam Golden Tips. Explore refined tea rituals and thoughtful gifting with RejuveLuxe.',
     images: [OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RejuveLuxe · Earned, not indulged',
-    description: 'Single-origin Assam tea. One garden, one flush, one lot.',
+    description: 'Discover Assam Matcha, Silver Needle Assam and Assam Golden Tips. Explore refined tea rituals and thoughtful gifting with RejuveLuxe.',
     images: [OG_IMAGE.url],
   },
 };

@@ -1,12 +1,10 @@
-import type { Metadata } from 'next';
-import { CraftView } from '@/components/pages/CraftView';
+import { ContentView, contentMetadata } from '@/components/site/ContentView';
+import { page } from '@/lib/content/pages';
 
-export const metadata: Metadata = {
-  title: 'The Craft',
-  description:
-    'Three teas, three distinct journeys. The process for Matcha, Silver Needle and Golden Tips, step by step, as it is run at the estate.',
-};
+const content = page('craft');
 
-export default function CraftPage() {
-  return <CraftView />;
+export const metadata = contentMetadata(content);
+
+export default function Page() {
+  return <ContentView page={content} />;
 }

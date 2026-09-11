@@ -1,43 +1,52 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductView } from '@/components/product/ProductView';
+import { ContentView, contentMetadata } from '@/components/site/ContentView';
 import { getProduct, listProducts } from '@/lib/catalogue';
+import { ENQUIRY } from '@/lib/content/enquiry';
 
 type Params = { params: Promise<{ slug: string }> };
 
 /**
  * Slugs come from the database, which Phase 1 made the source of truth
- * (`docs/roadmap.md` §5.1). Products not in the database — `ctc` (R-52) and
- * `ube` (undocumented) — have no row, so no page is generated and
- * `dynamicParams: false` turns a request for one into a 404.
+ * (`docs/roadmap.md` §5.1), plus the enquiry-only items from the content
+ * handover that have no database row. A database row always wins, so an item
+ * that later gains a row, a price and stock becomes a real product page.
  */
 export async function generateStaticParams() {
   const products = await listProducts();
-  return products.map((p) => ({ slug: p.slug }));
+  const inDb = new Set(products.map((p) => p.slug));
+  return [
+    ...products.map((p) => ({ slug: p.slug })),
+    ...ENQUIRY.filter((e) => !inDb.has(e.slug)).map((e) => ({ slug: e.slug })),
+  ];
 }
 
 export const dynamicParams = false;
 
 /**
  * ADR-0009 puts the database in Sydney and the application in Mumbai, so every
- * query crosses the Indian Ocean. `architecture.md` §4's answer for the read
- * path is to cache rendered output rather than query per request: these pages
- * are prerendered and revalidated, so a client price edit appears within the
- * hour without a deploy, and no visitor pays the round trip.
+ * query crosses the Indian Ocean. These pages are prerendered and revalidated,
+ * so a client price edit appears within the hour without a deploy.
  */
 export const revalidate = 3600;
+
+const enquiry = (slug: string) => ENQUIRY.find((e) => e.slug === slug);
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const p = await getProduct(slug);
-  if (!p) return {};
-  const summary = [p.descriptor, p.tagline].filter(Boolean).join('. ');
+  if (!p) {
+    const e = enquiry(slug);
+    return e ? contentMetadata(e) : {};
+  }
+  const summary = p.tagline ?? p.description;
   return {
     title: p.name,
-    description: `${p.name}${summary ? `. ${summary}` : ''} Single-origin Assam, ${p.netQuantity}.`,
+    description: `${p.name}. ${summary} ${p.netQuantity}.`,
     openGraph: {
       title: `${p.name} · RejuveLuxe`,
-      description: p.tagline ?? p.description,
+      description: summary,
       ...(p.image ? { images: [{ url: p.image }] } : {}),
     },
   };
@@ -46,6 +55,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function ProductPage({ params }: Params) {
   const { slug } = await params;
   const p = await getProduct(slug);
-  if (!p) notFound();
-  return <ProductView p={p} />;
+  if (p) return <ProductView p={p} />;
+  const e = enquiry(slug);
+  if (e) return <ContentView page={e} />;
+  notFound();
 }

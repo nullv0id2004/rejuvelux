@@ -26,30 +26,44 @@ import type { ProductPhotos } from './data';
 export type Presentation = {
   /** One-word register: Focus / Elegance / Legacy / Clarity … */
   descriptor: string;
-  /** Tin body colour — the full-bleed panel behind the product. */
+  /** Tin body colour: the full-bleed panel behind the product. */
   tin: string;
-  /** Tin ink colour — rules, scales and accents scoped to this product. */
+  /** Tin ink colour: rules, scales and accents scoped to this product. */
   ink: string;
   /**
-   * Transparent tin render. `null` where none has been supplied — the tin
+   * Transparent tin render. `null` where none has been supplied; the tin
    * frame then draws a labelled placeholder rather than a broken image.
    */
   image: string | null;
   /** Real photography, filled in per shot as it arrives. */
   photos?: ProductPhotos;
-  /** Intensity scales, 1–5. PROVISIONAL — see the header, R-29. */
+  /** Intensity scales, 1 to 5. PROVISIONAL, see the header, R-29. */
   body?: number;
   brisk?: number;
   why?: string;
+  /** Short card line. Used in listings, metadata and the showcase. */
   tagline?: string;
   bullets?: string[];
   faqs?: [string, string][];
+  /** Eyebrow above the product name, e.g. "FOCUS · THE ASSAM COLLECTION". */
+  eyebrow?: string;
+  /** Standfirst under the product name. */
+  intro?: string;
+  /** Editorial sections as [heading, body], rendered as the product page accordions. */
+  sections?: [string, string][];
+  /** Preparation guidance as customer copy. May carry [SLOT] fields. */
+  preparation?: string;
+  /** Product details rows. Net quantity is appended from the database. */
+  details?: [string, string][];
+  storage?: string;
+  /** The onward action the content handover gives this product. */
+  related?: { label: string; href: string };
 };
 
 /**
- * The rendered range. Keys are database slugs, not the old frontend ids —
- * `silver` became `silver-needle-assam`, `matcha` became `assam-matcha`,
- * `golden` became `assam-golden-tips`, `green` became `green-tea`.
+ * The rendered range. Keys are database slugs. Editorial copy is transcribed
+ * from the RejuveLuxe website content handover (P11 to P14, P19); it carries
+ * no processing, grade or wellness claim the handover does not approve.
  */
 export const PRESENTATION: Record<string, Presentation> = {
   'silver-needle-assam': {
@@ -61,33 +75,42 @@ export const PRESENTATION: Record<string, Presentation> = {
       dryLeaf: '/assets/silver-needle-dry-leaf.webp',
       liquor: '/assets/silver-needle-liquor.jpg',
     },
-    body: 1,
-    brisk: 1,
-    why: 'Crafted from tender young buds and gently processed, Silver Needle is naturally rich in tea polyphenols and catechins, offering a refined cup with a naturally elegant character.',
-    tagline: 'Youngest buds. Minimal intervention. Extraordinary elegance.',
-    bullets: [
-      'Hand-harvested buds only, no leaf',
-      'Withered, not rolled. The leaf keeps its silvery down',
-      'Pale straw liquor, honeysuckle and melon',
+    eyebrow: 'ELEGANCE · THE ASSAM COLLECTION',
+    tagline: 'Tender buds and a delicate cup.',
+    intro: 'Tender buds. Delicate character. A white tea for the moments when you have time to notice the cup.',
+    sections: [
+      [
+        'Quiet distinction',
+        'Silver Needle Assam is our expression of Elegance. Its appeal lies in careful selection and gentle handling, preserving the subtle qualities of the buds. Pour it without hurry and let its lighter character unfold.',
+      ],
+      [
+        'Character in the cup',
+        'A light infusion, delicate aroma and refined presence. Enjoy it on its own to explore the tea’s subtleties.',
+      ],
+      [
+        'Care that preserves character',
+        'Silver Needle begins with young buds. The aim of its craft is to handle them carefully through withering and drying, allowing delicacy to remain at the centre of the experience.',
+      ],
     ],
+    preparation:
+      'Place 2 g of tea in a roomy infuser. Add 200 ml water at 80-85°C. Steep for 3-4 minutes, then strain. Taste before adjusting your next infusion; small changes in time can help you find the balance you enjoy.',
+    details: [
+      ['Tea type', 'White tea'],
+      ['Ingredient', 'White tea'],
+      ['Origin', 'Assam, India'],
+      ['Caffeine', 'Naturally contains caffeine'],
+    ],
+    storage: 'Keep tightly closed in a cool, dry place away from direct sunlight and moisture.',
     faqs: [
+      ['Is this a white tea?', 'Yes. Silver Needle Assam is the specific product name; white tea is its tea category.'],
+      ['Is it best with milk?', 'Begin by tasting it on its own so its delicate character can be appreciated.'],
       [
-        'Why is Silver Needle pale?',
-        'It is made from buds that are withered and dried with almost no oxidation. Colour in the cup comes from oxidation, so there is very little of it here.',
+        'Can I steep the buds again?',
+        'You can try another infusion and adjust the time to taste. The result depends on your preparation and the tea in your pack.',
       ],
-      [
-        'Can I re-steep it?',
-        'Yes. Three steeps is the usual range; the second is often the best.',
-      ],
-      [
-        'Is it low in caffeine?',
-        'It is naturally lower than black tea from the same garden, but not caffeine-free. Draft: final figure pending lab sheet.',
-      ],
-      [
-        'How should I store it?',
-        'Sealed, away from light, heat and anything aromatic. The tin is designed for this.',
-      ],
+      ['Is white tea caffeine-free?', 'No. It naturally contains caffeine.'],
     ],
+    related: { label: 'Compare with Assam Golden Tips', href: '/shop/assam-golden-tips' },
   },
 
   'assam-matcha': {
@@ -95,33 +118,47 @@ export const PRESENTATION: Record<string, Presentation> = {
     tin: 'var(--tea-matcha-tin)',
     ink: 'var(--tea-matcha-ink)',
     image: '/assets/matcha-900.png',
-    body: 4,
-    brisk: 2,
-    why: 'Naturally rich in catechins and EGCG, with naturally occurring caffeine and L-theanine. A concentrated whole-leaf experience crafted for energy, alertness, and mindful focus. Grown under heavy canopy shade, it develops a distinctive chlorophyll richness alongside its natural sweetness.',
-    tagline: 'Naturally vibrant. Rich in catechins. Crafted for focus.',
-    bullets: [
-      'Shade-grown, steamed, stone-milled',
-      'Whole leaf, consumed rather than infused',
-      'Opaque green, sweet, umami',
+    eyebrow: 'FOCUS · THE ASSAM COLLECTION',
+    tagline: 'Vibrant green character. A deliberate whole-leaf ritual.',
+    intro:
+      'A finely milled whole-leaf green tea with a vibrant green character. Made for the pleasure of slowing down to sift, whisk and enjoy.',
+    sections: [
+      [
+        'A ritual of intention',
+        'Assam Matcha brings preparation into the experience. The powder is whisked into the cup, creating a different texture from an infused leaf tea. Enjoy it with water to explore its character, or with milk as a latte.',
+      ],
+      [
+        'Character in the cup',
+        'Fresh. Green. Vibrant. Begin with a simple preparation and adjust the balance of tea, water and milk to your preference.',
+      ],
+      [
+        'The leaf, in another form',
+        'Matcha is finely milled green tea. Because the powder remains in the drink, sifting and whisking help create a smooth, even mixture. A little care at the beginning makes the preparation more enjoyable.',
+      ],
     ],
+    preparation:
+      'Sift 2 g into a bowl. Add 70 ml water at around 80°C. Whisk briskly until evenly mixed, then enjoy or add more water or milk to taste. For an iced latte, pour the prepared Matcha over cold milk and ice, then stir before drinking.',
+    details: [
+      ['Tea type', 'Green tea powder'],
+      ['Ingredient', 'Green tea powder (Matcha)'],
+      ['Origin', 'Assam, India'],
+      ['Caffeine', 'Naturally contains caffeine'],
+    ],
+    storage:
+      'Keep tightly closed in a cool, dry place away from direct sunlight and moisture. Follow any additional instructions on your pack.',
     faqs: [
       [
-        'How is Assam Matcha different from Japanese matcha?',
-        'Shading, steaming, deveining and stone-milling: the same process, applied to an Assam cultivar. Expect a slightly deeper, more olive green and a rounder, less marine flavour.',
+        'Is Assam Matcha a loose-leaf tea?',
+        'It is a fine powder whisked into water, rather than leaves that are steeped and removed.',
       ],
+      ['Can I make a latte?', 'Yes. Prepare the Matcha with water first, then combine with your choice of milk.'],
       [
-        'Do I need a whisk?',
-        'A bamboo whisk gives the best texture. A small electric frother works. A spoon does not.',
+        'Do I need a bamboo whisk?',
+        'A bamboo whisk is part of the traditional preparation experience. A suitable handheld frother can also help mix a latte.',
       ],
-      [
-        'Does it contain caffeine?',
-        'Yes, naturally occurring caffeine alongside L-theanine. Because you consume the leaf, the effect is steadier than infused tea.',
-      ],
-      [
-        'How long does it keep?',
-        'Sealed and cold, several months. Once opened, use within eight weeks for colour and freshness. Draft.',
-      ],
+      ['Is it caffeine-free?', 'No. Matcha contains naturally occurring caffeine.'],
     ],
+    related: { label: 'Complete the Ritual', href: '/shop/matcha-ritual-set' },
   },
 
   'assam-golden-tips': {
@@ -129,26 +166,48 @@ export const PRESENTATION: Record<string, Presentation> = {
     tin: 'var(--tea-golden-tin)',
     ink: 'var(--tea-golden-ink)',
     image: '/assets/golden-tips-900.png',
-    body: 4,
-    brisk: 3,
-    why: "Naturally rich in tea polyphenols and theaflavins, with naturally occurring caffeine, Golden Tips carries Assam's heritage into a sophisticated daily ritual.",
-    tagline: 'Rare golden tips. Deep character. Assam heritage.',
-    bullets: [
-      'Hand-picked tips, orthodox rolled',
-      'Controlled oxidation for depth without harshness',
-      'Copper liquor, malt, honey, dried fruit',
+    eyebrow: 'LEGACY · THE ASSAM COLLECTION',
+    tagline: 'Selected golden tips. Rich black-tea character.',
+    intro: 'Selected golden tips. Rich black-tea character. A distinguished expression of Assam, made to be savoured.',
+    sections: [
+      [
+        'A cup with presence',
+        'Assam Golden Tips brings depth to the collection. Its character develops through the decisions of black-tea craft: withering, rolling, controlled oxidation and drying. The result is a tea that invites you to slow down and notice its richness.',
+      ],
+      [
+        'Character in the cup',
+        'Rich, smooth and aromatic, with the fuller presence of black tea. Begin without additions, then explore the way you prefer to drink it.',
+      ],
+      [
+        'Transformation, carefully guided',
+        'Each stage changes the leaf. Withering prepares it, rolling shapes its path and oxidation develops character before drying. The craft is in guiding that change with care.',
+      ],
     ],
+    preparation:
+      'Use 2 g of tea for 200 ml water at 90-95°C. Steep for 3 minutes and taste; allow up to 5 minutes if you prefer a stronger cup. Strain fully when the tea reaches your preferred strength.',
+    details: [
+      ['Tea type', 'Black tea'],
+      ['Ingredient', 'Black tea leaves'],
+      ['Origin', 'Assam, India'],
+      ['Caffeine', 'Naturally contains caffeine'],
+    ],
+    storage: 'Keep tightly closed in a cool, dry place away from direct sunlight and moisture.',
     faqs: [
-      ['Milk or no milk?', 'It stands on its own. If you take milk, steep a minute longer.'],
       [
-        'What does "tips" mean?',
-        'The unopened bud at the end of each shoot. Golden after oxidation because of its fine down. More tips, finer grade.',
+        'What are golden tips?',
+        'The name refers to the selected golden tips that distinguish this black tea expression.',
+      ],
+      ['Can I add milk?', 'You can. Taste it on its own first, then add a little milk if that is how you enjoy black tea.'],
+      [
+        'How can I make it stronger?',
+        'Adjust the leaf quantity or steeping time gradually. Strain the leaves once the tea is ready.',
       ],
       [
-        'How does this differ from CTC?',
-        'Golden Tips is whole leaf and orthodox-rolled; CTC is cut and curled for strength. Different jobs.',
+        'How does it differ from Silver Needle?',
+        'Golden Tips is a black tea with a richer character. Silver Needle Assam is a white tea centred on delicacy.',
       ],
     ],
+    related: { label: 'Discover the Assam Collection', href: '/collections/assam-collection' },
   },
 
   'green-tea': {
@@ -156,59 +215,78 @@ export const PRESENTATION: Record<string, Presentation> = {
     tin: 'var(--tea-green-tin)',
     ink: 'var(--tea-green-ink)',
     image: '/assets/green-tea-900.png',
-    body: 2,
-    brisk: 3,
-    why: 'Naturally rich in catechins with naturally occurring caffeine, our Green Tea is the everyday expression of the Assam leaf, done properly.',
-    tagline: 'Clean. Grassy. Unadorned.',
-    bullets: [
-      'Whole leaf, steamed to hold the green',
-      'Made for a daily cup, priced for one',
-      'Pale yellow-green liquor, clean finish',
+    tagline: 'A simple leaf infusion, made your way.',
+    intro: 'A simple leaf-brewing ritual, with room to make the cup your own.',
+    sections: [
+      [
+        'Return to the leaf',
+        'Measure the tea. Pour the water. Give the leaves a little time to infuse, then strain. RejuveLuxe Green Tea is for those who enjoy the straightforward pleasure of preparing a fresh cup.',
+      ],
+      [
+        'Find your balance',
+        'Start with a shorter infusion and taste. Adjust the next cup gradually until you find the strength you enjoy. A timer helps you repeat a preparation that works for you.',
+      ],
     ],
+    preparation:
+      'Use 1 teaspoon of tea with [APPROVED_GREEN_TEA_WATER_VOLUME] water at around 80°C. Steep for 1.5-2 minutes, then remove the leaves. Adjust within the guidance on your pack to suit your taste.',
+    details: [
+      ['Tea type', 'Green tea'],
+      ['Ingredients', '[APPROVED_GREEN_TEA_INGREDIENTS]'],
+      ['Origin', '[APPROVED_GREEN_TEA_ORIGIN]'],
+    ],
+    storage: 'Keep tightly closed in a cool, dry place away from direct sunlight and moisture.',
     faqs: [
-      [
-        'Why does my green tea taste bitter?',
-        'Water too hot or steeped too long. 80 °C and under three minutes.',
-      ],
-      [
-        'Is this the same leaf as the Matcha?',
-        'Same garden, different plucking and processing. This is infused; Matcha is milled and consumed.',
-      ],
-      ['Can I cold-brew it?', 'Yes. 5 g per 500 ml, six hours in the fridge.'],
-      ['Loose leaf only?', 'Yes. No bags, no sachets.'],
+      ['How is it different from Matcha?', 'These leaves are infused and removed. Matcha is a powder that remains in the drink.'],
+      ['Can I use a tea infuser?', 'Yes. Choose an infuser that gives the leaves room to move in the water.'],
+      ['Can I sweeten it?', 'Prepare and taste the tea first, then add a little sweetener if you prefer.'],
     ],
+    related: { label: 'Explore Assam Matcha', href: '/shop/assam-matcha' },
   },
 
   /**
    * The six-component kit (§32). It has **no tin render** in this repository,
-   * so `image` is null and the tin frame draws its labelled placeholder — the
-   * honest state, not a broken image. Its contents come from the database's
-   * `components` column, which is display copy, distinct from the inventory
-   * linkage in `variant_inventory_item` that computes its availability.
-   *
-   * No `body`/`brisk`: intensity scales describe a tea, and this is a set.
+   * so `image` is null and the tin frame draws its labelled placeholder. Its
+   * contents come from the database's `components` column.
    */
   'matcha-ritual-set': {
     descriptor: 'Ritual',
     tin: 'var(--tea-matcha-tin)',
     ink: 'var(--tea-matcha-ink)',
     image: null,
-    tagline: 'Everything the ritual asks for, and the tea it was made for.',
-    bullets: [
-      'Six pieces, each stock-tracked on its own',
-      'Unavailable the moment any one component is',
-      'Built around the Assam Matcha, not around a box',
+    tagline: 'Preparation is part of the product.',
+    intro:
+      'Preparation is part of the product. Bring the tea and its tools together, and give the ritual your full attention.',
+    sections: [
+      [
+        'From powder to pause',
+        'Measure the tea. Sift it into the bowl. Add water and whisk. The sequence is simple, but the attention it asks for is part of its pleasure. This set brings the elements of that preparation together.',
+      ],
+      [
+        'Learn as you prepare',
+        'Our Matcha guide takes you through measuring, sifting and whisking, with a latte variation for a different way to enjoy the tea.',
+      ],
+      [
+        'A gift for someone who enjoys the details',
+        'For the curious first bowl or a familiar personal ritual, choose a set that makes preparation part of the experience.',
+      ],
+    ],
+    details: [
+      ['Set type', 'Matcha tea and preparation tools'],
+      ['Matcha quantity', '[APPROVED_MATCHA_QUANTITY]'],
+      ['Care', 'Follow the care instructions supplied with the set'],
     ],
     faqs: [
+      ['Does the set include tea?', 'Ask us to confirm the current Matcha quantity and full set contents before ordering.'],
       [
-        'What is in the set?',
-        'Six pieces: the Assam Matcha itself, a bamboo whisk, a bamboo spoon, a strainer, a ceramic bowl and a whisk stand.',
+        'Is it suitable for a beginner?',
+        'The preparation guide offers a clear place to start. No prior tea knowledge is needed to follow the steps.',
       ],
       [
-        'Why does it show as unavailable when the matcha is in stock?',
-        'The set is only as available as its scarcest component. If the whisk stands run out, the set does too. We would rather say so than ship you five pieces of six.',
+        'How should I care for the tools?',
+        'Follow the care instructions supplied with the set. Contact us if you need guidance for a particular piece.',
       ],
     ],
+    related: { label: 'Enquire About the Set', href: '/contact?topic=matcha-ritual-set' },
   },
 };
 

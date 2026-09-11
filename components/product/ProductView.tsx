@@ -9,8 +9,6 @@ import {
   Evidence,
   Eyebrow,
   Greybox,
-  Ph,
-  Rating,
   SectionHead,
   Scale,
   Slot,
@@ -20,7 +18,7 @@ import {
 } from '@/components/site/primitives';
 import type { CatalogueProduct } from '@/lib/catalogue';
 import { useCatalogue } from '@/lib/catalogue-context';
-import { CONTACT, REVIEWS, SLOT } from '@/lib/data';
+import { CONTACT, SLOT } from '@/lib/data';
 import { useCart } from '@/lib/cart';
 
 /** ₹ with Indian grouping, no decimals. Mirrors formatPrice in lib/catalogue. */
@@ -88,8 +86,8 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
     <main>
       <div className="wrap" style={{ paddingTop: 24 }}>
         <nav className="row g2 cap" aria-label="Breadcrumb">
-          <Link href="/#collection" style={{ color: 'var(--text-tertiary)' }}>
-            Shop
+          <Link href="/shop" style={{ color: 'var(--text-tertiary)' }}>
+            Shop Tea
           </Link>
           <span>/</span>
           <span>{p.teaType}</span>
@@ -145,7 +143,7 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
             <div className="stack g3">
               <div className="between">
                 <Eyebrow>
-                  {p.teaType} · <Ph>{SLOT.grade}</Ph>
+                  {p.eyebrow ?? p.teaType}
                 </Eyebrow>
                 <Swatch p={p} />
               </div>
@@ -153,16 +151,8 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
                 {p.name}
               </h1>
               <p className="lead it">
-                {withSlots(
-                  [p.descriptor, p.tagline].filter(Boolean).join('. '),
-                )}
+                {withSlots(p.intro ?? [p.descriptor, p.tagline].filter(Boolean).join('. '))}
               </p>
-              <div className="row g3 cap">
-                <Rating value={4} />
-                <span className="num">
-                  4.8 · <Ph>[000]</Ph> reviews · example
-                </span>
-              </div>
             </div>
 
             <div className="stack g4">
@@ -221,8 +211,9 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
               )}
 
               <p className="cap">
-                Free shipping above ₹<Ph>[0,000]</Ph> · dispatch in <Ph>[00]</Ph> h ·{' '}
-                <Ph>[00]</Ph>-day return
+                Delivery options and charges are shown before payment ·{' '}
+                <Link href="/policies/shipping-policy">Shipping</Link> ·{' '}
+                <Link href="/policies/refund-policy">Returns and Cancellations</Link>
               </p>
             </div>
 
@@ -251,9 +242,13 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
             {/* The evidence panel — what makes this page unlike a competitor's.
                 It sits above the accordions, never inside them (brief §11.2). */}
             <div className="stack g3">
-              <Eyebrow>Evidence</Eyebrow>
+              <Eyebrow>{p.details ? 'Product details' : 'Evidence'}</Eyebrow>
               <Evidence
-                rows={[
+                rows={p.details ? ([
+                  ...p.details,
+                  ['Net quantity', p.netQuantity],
+                  ...(p.cups ? [['Cups per tin', p.cups]] : []),
+                ] as [string, string][]) : [
                   ['Garden', SLOT.estate],
                   ['District', SLOT.district],
                   ['Elevation', SLOT.elevation],
@@ -273,7 +268,12 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
             {/* Brewing is the database's, and the database holds three
                 parameters. Vessel volume and steep count have no column, so
                 they are absent rather than invented (product.md §4.2). */}
-            {p.brewing && (
+            {p.preparation ? (
+              <div className="stack g3">
+                <Eyebrow>Prepare your cup</Eyebrow>
+                <p className="body">{withSlots(p.preparation)}</p>
+              </div>
+            ) : p.brewing && (
               <div className="stack g3">
                 <Eyebrow>Brew · draft values</Eyebrow>
                 <Evidence
@@ -294,8 +294,8 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
 
             <Accordion
               items={[
-                ['Description', [p.description, p.why].filter(Boolean).join(' ')],
-                ...(p.brewing
+                ...(p.sections ?? [['Description', [p.description, p.why].filter(Boolean).join(' ')]]),
+                ...(!p.preparation && p.brewing
                   ? ([
                       [
                         'How to brew',
@@ -303,13 +303,14 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
                       ],
                     ] as [string, string][])
                   : []),
+                ...(p.storage ? ([['Storage', p.storage]] as [string, string][]) : []),
                 [
                   'Specification',
-                  `Net quantity ${p.netQuantity}. SKU ${p.sku}. Grade [GRADE]. Lot [LOT-0000], plucked [MONTH 0000]. Packed at source in a lined steel tin. Ingredients: ${p.ingredients}. FSSAI Lic. No. ${CONTACT.fssai}. Packed and marketed by ${CONTACT.entity}, ${CONTACT.address}.`,
+                  `Net quantity ${p.netQuantity}. SKU ${p.sku}. Ingredients: ${p.ingredients}. FSSAI Lic. No. ${CONTACT.fssai}. Packed and marketed by ${CONTACT.entity}, ${CONTACT.address}. Consumer support: ${CONTACT.email} · ${CONTACT.phone}.`,
                 ],
                 [
                   'Shipping and returns',
-                  'India-wide shipping. Free above ₹[0,000]; ₹[000] below. Dispatch within [00] hours. Unopened tins returnable within [00] days. All values are placeholders.',
+                  'Delivery options and charges are shown before payment. See our Shipping Policy and Returns and Cancellations pages for details.',
                 ],
               ]}
             />
@@ -318,27 +319,7 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
       </section>
 
       <section className="wrap sec rule-t">
-        <SectionHead
-          eyebrow="Reviews · example content"
-          title={`What people said about ${p.name}.`}
-        >
-          <span className="price num">4.8 / 5</span>
-        </SectionHead>
-        <div className="grid cols-3">
-          {REVIEWS.map((r) => (
-            <div key={r.name} className="stack g3 rule-t" style={{ paddingTop: 20 }}>
-              <Rating value={r.rating} />
-              <p className="body it">{r.text}</p>
-              <span className="cap">
-                {r.name}, {r.city}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="wrap sec rule-t">
-        <SectionHead eyebrow="Elsewhere on the ladder" title="Three to try next." />
+        <SectionHead eyebrow="Continue exploring" title="More from RejuveLuxe." />
         <div className="grid cols-3">
           {others.map((q) => (
             <Tile key={q.slug} p={q} />
@@ -351,6 +332,13 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
           <div className="stack g3">
             <Eyebrow>{p.name}</Eyebrow>
             <h2 className="h1">Questions.</h2>
+            {p.related && (
+              <div style={{ paddingTop: 8 }}>
+                <Button variant="outline" href={p.related.href}>
+                  {p.related.label}
+                </Button>
+              </div>
+            )}
           </div>
           <Accordion items={p.faqs ?? []} />
         </div>
