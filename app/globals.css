@@ -1647,3 +1647,352 @@ button {
   text-underline-offset: 3px;
 }
 
+/* ---------------------------------------------------- home: spotlight -- */
+
+.spot {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.spot-side {
+  display: grid;
+  gap: 20px;
+}
+.spot-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.spot-card:hover {
+  border-color: var(--border-strong);
+}
+.spot-card:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 4px;
+}
+.spot-feature {
+  background: var(--ink-900);
+  border-color: var(--ink-700);
+}
+.spot-feature:hover {
+  border-color: var(--gold-400);
+}
+.spot-tins {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  align-content: center;
+  padding: 32px 8px 0;
+  min-height: 280px;
+}
+.spot-tins .tinbox {
+  aspect-ratio: 1 / 1;
+}
+/* The tin renders carry transparent padding, so they are drawn wider than
+   their cell and allowed to overlap it; the neighbours' padding absorbs it. */
+.spot-tins .tinbox img {
+  width: 150%;
+  max-width: none;
+}
+.spot-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 26px 26px;
+}
+
+/* ------------------------------------------------- home: product row -- */
+
+/* Four to a row; the grid wraps to further rows rather than scrolling. */
+.prow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+.prow-item {
+  min-width: 0;
+}
+.prow-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+}
+.prow-card .tinbox {
+  aspect-ratio: 1 / 1;
+}
+.prow-card .tinbox img {
+  width: 82%;
+}
+.prow-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 18px 20px;
+}
+.prow-card .qty button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (max-width: 900px) {
+  .spot {
+    grid-template-columns: 1fr;
+  }
+  .prow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Phones: two compact columns rather than one very tall one. */
+@media (max-width: 520px) {
+  .prow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .prow-body {
+    padding: 12px 12px 14px;
+    gap: 6px;
+  }
+  .prow-body .h3 {
+    font-size: 17px;
+    line-height: 1.25;
+  }
+  .prow-body > p.small {
+    display: none;
+  }
+  .prow-body > .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .prow-body .qty {
+    width: 100%;
+    justify-content: space-between;
+  }
+  /* Button styles are inline in the design system, so the override needs weight. */
+  .prow-body > .row > button,
+  .prow-body > a {
+    width: 100% !important;
+    padding: 0 8px !important;
+    letter-spacing: 0.08em !important;
+  }
+}
+
+/* --------------------------------------------------------- home: hero -- */
+
+/* Sized to the banner's own shape so the tins are never cropped away. The
+   ground is the banner's wall colour, sampled, so any letterboxing is invisible. */
+.hero-banner {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  aspect-ratio: 1672 / 941;
+  min-height: 560px;
+  max-height: 880px;
+  background: #eedfcc;
+  color: var(--ink-900);
+}
+.hero-banner-media {
+  display: block;
+}
+.hero-banner-media,
+.hero-banner-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* When the height clamps, crop from the empty wall on the left, never the tins. */
+.hero-banner-media img {
+  object-fit: cover;
+  object-position: 80% 55%;
+}
+/* A soft wash of the wall colour behind the copy, calming the leaf shadows. */
+.hero-banner-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(238, 223, 204, 0.9) 0%,
+    rgba(238, 223, 204, 0.6) 26%,
+    rgba(238, 223, 204, 0) 44%
+  );
+}
+.hero-banner-copy {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  padding-block: 64px;
+}
+/* Narrow enough to stay on the empty wall, clear of the tins. */
+.hero-banner-copy > .stack {
+  max-width: min(420px, 32vw);
+}
+
+/* Below the nav breakpoint the portrait banner's open wall is too short for the
+   copy, so the copy sits above it and the banner's empty top slides up beneath. */
+@media (max-width: 800px) {
+  .hero-banner {
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .hero-banner-copy {
+    align-self: stretch;
+    padding-block: 36px 0;
+  }
+  .hero-banner-copy > .stack {
+    max-width: none;
+  }
+  .hero-banner-media {
+    position: relative;
+    inset: auto;
+    height: auto;
+    aspect-ratio: 941 / 1672;
+    margin-top: -38vw;
+  }
+  .hero-banner-media img {
+    object-position: 50% 100%;
+  }
+  /* Blends the photograph's top edge into the ground behind the copy. */
+  .hero-banner-media::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 30%;
+    background: linear-gradient(180deg, #eedfcc 0%, rgba(238, 223, 204, 0) 100%);
+    pointer-events: none;
+  }
+  .hero-banner-shade {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------ mobile: layout -- */
+
+@media (max-width: 800px) {
+  /* Hero actions stack full width; long labels wrap instead of running off screen. */
+  .hero-banner-copy .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-banner-copy .row > a {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 48px;
+    padding: 12px 16px !important;
+    white-space: normal !important;
+    text-align: center;
+    letter-spacing: 0.12em !important;
+    font-size: var(--text-xs) !important;
+  }
+  .spot-tins {
+    min-height: 0;
+    padding: 24px 8px 0;
+  }
+  /* The scroll-pinned showcase costs a screen of scrolling per tea; on phones
+     the products grid above already lists every tea. */
+  .home-showcase {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------ mobile: menu -- */
+
+.mobile-menu {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: var(--rule);
+  padding-bottom: 32px;
+}
+.mobile-menu nav {
+  display: flex;
+  flex-direction: column;
+}
+.mobile-menu .mm-group {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.mobile-menu .mm-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.mobile-menu .mm-toggle .caret {
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.mobile-menu .mm-toggle[aria-expanded='true'] .caret {
+  transform: translateY(2px) rotate(-135deg);
+}
+.mobile-menu .mm-list {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0 14px;
+  border-bottom: var(--rule);
+}
+.mobile-menu a.mm-sub {
+  padding-left: calc(var(--gutter) + 12px);
+}
+.mobile-menu a.on,
+.mobile-menu .mm-toggle.on {
+  color: var(--text-accent);
+}
+
+/* Placeholder tokens like [APPROVED_SHIPPING_RATE] are one unbroken word;
+   let them break so they never push a narrow page sideways. */
+.ph {
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------- content: photos -- */
+
+.card-media,
+.content-photo {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bone-300);
+}
+
+/* ------------------------------------------------------ product cards -- */
+
+/* Each product is an outlined box on the page's own ground: the tin sits on
+   the page rather than a coloured panel, and the outline holds the image,
+   text, quantity and Add to cart together. */
+.prow-card,
+.tile {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+}
+/* TinBox paints its tin colour inline, so the override needs the weight. */
+.prow-card .tinbox,
+.tile .tinbox {
+  background: transparent !important;
+}
+.prow-card .tinbox {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.card-media {
+  flex-shrink: 0;
+}
+

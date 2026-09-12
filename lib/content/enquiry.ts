@@ -1,3 +1,4 @@
+import { CONTACT } from '../data';
 import type { ContentPage } from './types';
 
 /**
@@ -10,57 +11,47 @@ import type { ContentPage } from './types';
  * grid, as the handover directs.
  */
 export const ENQUIRY: ContentPage[] = [
-  {
-    slug: 'tea-gift-set',
-    seoTitle: 'RejuveLuxe Tea Gift Set | A Considered Selection',
-    description:
-      'Explore a RejuveLuxe tea gift set with different tea expressions and thoughtful accessories. Discover the selection and enquire about gifting.',
-    eyebrow: 'Tea Gift Sets',
-    title: 'RejuveLuxe Tea Gift Set',
-    lead: [
-      'Different teas. A shared moment of discovery. A considered selection for someone who appreciates the pleasure of a well-made cup.',
-      'Price: [APPROVED_TEA_GIFT_SET_PRICE]',
-    ],
-    cta: [{ label: 'Enquire About This Gift', href: '/contact?topic=tea-gift-set' }],
-    sections: [
-      {
-        t: 'text',
-        title: 'A gift that invites exploration',
-        body: [
-          'Let the recipient move between lighter and richer tea expressions, discover a new preparation and make time for a cup of their own. The set brings tea and simple accessories together in one presentation.',
-        ],
-      },
-      {
-        t: 'steps',
-        title: 'Inside the set',
-        items: ['White Tea · 10 g', 'Golden Tips Tea · 10 g', 'Matcha Tea · 15 g', 'Ube Tea · 15 g', 'One spoon, one infuser and one cup'],
-      },
-      {
-        t: 'text',
-        title: 'Give the ritual room',
-        body: [
-          'Each tea has its own preparation. Use the individual brewing guidance to explore the selection, rather than treating every tea in the box the same way.',
-        ],
-      },
-      {
-        t: 'text',
-        title: 'For the occasion you have in mind',
-        body: [
-          'A thank-you, a milestone or a festive visit. Choose a tea gift when you want the gesture to continue beyond the moment it is opened.',
-        ],
-      },
-      {
-        t: 'faq',
-        title: 'Gift set questions',
-        items: [
-          ['Can I choose the cup colour?', 'Ask us which options are available for the current set.'],
-          ['Can I change the teas?', 'Contact us to discuss the available selection; customization is subject to confirmation.'],
-          ['Can I order several sets?', 'Tell us the quantity, delivery locations and date you have in mind through our gifting enquiry form.'],
-        ],
-        cta: [{ label: 'Discuss a Gifting Order', href: '/corporate-gifting' }],
-      },
-    ],
-  },
+  ...[
+    {
+      slug: 'complete-tasting-gift-set',
+      name: 'Complete Tasting Gift Set',
+      key: 'complete-tasting',
+      colour: 'Maroon',
+      ratio: '4 / 3',
+      mrp: '₹3,499',
+      description:
+        'Four RejuveLuxe teas in one gift box: Assam Golden Tips, Silver Needle Assam, Assam Matcha and Ube, with a tea infuser, a wooden spoon and a premium cup.',
+      lead: 'Four teas. One considered box. Move from the depth of Golden Tips to the delicacy of Silver Needle, the whisked ritual of Matcha and the distinctive character of Ube.',
+      tubes: 'four tea tubes',
+      contents: ['Assam Golden Tips · 10 g', 'Silver Needle Assam · 10 g', 'Assam Matcha · 15 g', 'Ube · 25 g'],
+    },
+    {
+      slug: 'heritage-duo-gift-set',
+      name: 'Heritage Duo Gift Set',
+      key: 'heritage-duo',
+      colour: 'Black',
+      ratio: '1 / 1',
+      mrp: '₹2,999',
+      description:
+        'Assam Golden Tips and Silver Needle Assam in one gift box, with a tea infuser, a wooden spoon and a premium cup.',
+      lead: 'Two expressions of Assam, side by side. The depth of Golden Tips and the quiet refinement of Silver Needle, presented with the tools for an unhurried cup.',
+      tubes: 'two tea tubes',
+      contents: ['Assam Golden Tips · 10 g', 'Silver Needle Assam · 10 g'],
+    },
+    {
+      slug: 'vibrant-duo-gift-set',
+      name: 'Vibrant Duo Gift Set',
+      key: 'vibrant-duo',
+      colour: 'Green',
+      ratio: '1 / 1',
+      mrp: '₹2,199',
+      description:
+        'Assam Matcha and Ube in one gift box, with a tea infuser, a wooden spoon and a premium cup.',
+      lead: 'Two colourful expressions for a hands-on ritual. The fresh green character of Assam Matcha beside the distinctive violet of Ube, with the tools to prepare them.',
+      tubes: 'two tea tubes',
+      contents: ['Assam Matcha · 15 g', 'Ube · 25 g'],
+    },
+  ].map(giftSet),
 
   {
     slug: 'matcha-tea-box',
@@ -149,6 +140,11 @@ export const ENQUIRY: ContentPage[] = [
   {
     slug: 'ctc-tea',
     seoTitle: 'CTC Tea | RejuveLuxe',
+    image: {
+      src: '/assets/ctc-tea-900.png',
+      alt: 'Brown RejuveLuxe CTC Tea tin with a gold lid.',
+      tin: 'var(--tea-ctc-tin)',
+    },
     description: 'Discover RejuveLuxe CTC Tea and enquire about its available format, preparation and product details.',
     eyebrow: 'Tea',
     title: 'CTC Tea',
@@ -180,6 +176,11 @@ export const ENQUIRY: ContentPage[] = [
   {
     slug: 'ube',
     seoTitle: 'Ube Tea and Gifting Enquiries | RejuveLuxe',
+    image: {
+      src: '/assets/ube-900.png',
+      alt: 'Lilac RejuveLuxe Ube tin with a purple cafe illustration.',
+      tin: 'var(--tea-ube-tin)',
+    },
     description:
       'Enquire about RejuveLuxe Ube, its current formulation and gifting availability. Find the right preparation for the product you choose.',
     eyebrow: 'Enquiry',
@@ -211,3 +212,93 @@ export const ENQUIRY: ContentPage[] = [
     ],
   },
 ];
+
+/**
+ * The three boxed gift sets. Contents, MRP, shelf life and storage are as
+ * printed on the back of each box (supplied pack photography, 12 Sep 2026).
+ * The printed "bio-degradable" cup claim is left off until it is substantiated.
+ * No database row yet, so each is an enquiry page with its price shown.
+ */
+function giftSet(g: {
+  slug: string;
+  name: string;
+  key: string;
+  colour: string;
+  ratio: string;
+  mrp: string;
+  description: string;
+  lead: string;
+  tubes: string;
+  contents: string[];
+}): ContentPage {
+  const dir = `/assets/gift-sets/${g.key}`;
+  return {
+    slug: g.slug,
+    seoTitle: `${g.name} | RejuveLuxe`,
+    description: g.description,
+    eyebrow: 'Tea Gift Sets',
+    title: g.name,
+    image: { src: `${dir}-front.jpg`, alt: `${g.colour} RejuveLuxe ${g.name} box, closed.`, photo: true, ratio: g.ratio },
+    lead: [g.lead, `MRP ${g.mrp} · inclusive of all taxes`],
+    cta: [
+      { label: 'Enquire About This Gift', href: `/contact?topic=${g.key}` },
+      { label: 'Discuss a Gifting Order', href: '/corporate-gifting' },
+    ],
+    sections: [
+      {
+        t: 'gallery',
+        images: [
+          {
+            src: `${dir}-open.jpg`,
+            alt: `${g.name} open, showing ${g.tubes}, a cup, a tea infuser and a wooden spoon.`,
+            caption: 'Inside the box',
+            ratio: g.ratio,
+          },
+          {
+            src: `${dir}-back.jpg`,
+            alt: `Back of the ${g.name} box, printed with its contents, nutrition and packing details.`,
+            caption: 'Contents and details, as printed on the box',
+            ratio: g.ratio,
+          },
+        ],
+      },
+      {
+        t: 'steps',
+        title: 'Inside the set',
+        items: [...g.contents, 'Tea infuser', 'Wooden spoon', 'Premium cup'],
+      },
+      {
+        t: 'details',
+        title: 'Set details',
+        rows: [
+          ['Net quantity', '1 gift set'],
+          ['MRP', `${g.mrp} (inclusive of all taxes)`],
+          ['Best before', '12 months from date of packaging'],
+          ['Storage', 'Store in a cool, dry place, away from direct sunlight'],
+          ['Country of origin', 'India'],
+          ['Packed and marketed by', `${CONTACT.entity}, ${CONTACT.address}`],
+          ['FSSAI Lic. No.', CONTACT.fssai],
+          ['Note', 'Combination package, not to be sold loose'],
+        ],
+      },
+      {
+        t: 'text',
+        title: 'Give the ritual room',
+        body: [
+          'Each tea has its own preparation. Use the individual brewing guidance to explore the selection, rather than treating every tea in the box the same way.',
+        ],
+        cta: [{ label: 'Explore Tea Rituals', href: '/tea-rituals' }],
+      },
+      {
+        t: 'faq',
+        title: 'Gift set questions',
+        items: [
+          ['Can I change the teas?', 'Contact us to discuss the available selection; customization is subject to confirmation.'],
+          ['Can I order several sets?', 'Tell us the quantity, delivery locations and date you have in mind through our gifting enquiry form.'],
+          ['How long does the tea keep?', 'Best before 12 months from the date of packaging. Store the set in a cool, dry place, away from direct sunlight.'],
+        ],
+        cta: [{ label: 'Discuss a Gifting Order', href: '/corporate-gifting' }],
+      },
+    ],
+  };
+}

@@ -22,7 +22,10 @@ const TOPICS = [
 const TOPIC_PARAMS: Record<string, [string, string]> = {
   ctc: ['Product and brewing question', 'CTC Tea'],
   ube: ['Product and brewing question', 'Ube'],
-  'tea-gift-set': ['Gifting', 'RejuveLuxe Tea Gift Set'],
+  'tea-gift-set': ['Gifting', 'Complete Tasting Gift Set'],
+  'complete-tasting': ['Gifting', 'Complete Tasting Gift Set'],
+  'heritage-duo': ['Gifting', 'Heritage Duo Gift Set'],
+  'vibrant-duo': ['Gifting', 'Vibrant Duo Gift Set'],
   'matcha-box': ['Gifting', 'Matcha Tea Box'],
   'matcha-ritual-set': ['Gifting', 'Matcha Ritual Set'],
   'retro-cup': ['Product and brewing question', 'Retro Cup with Lid'],

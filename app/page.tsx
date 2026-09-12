@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
+import Image, { getImageProps } from 'next/image';
 import Link from 'next/link';
-import { Button, Card, Icon } from '@/components/ds';
+import { Button } from '@/components/ds';
 import { NewsletterBand } from '@/components/site/NewsletterBand';
 import { Eyebrow, Greybox, SectionHead, TinBox } from '@/components/site/primitives';
+import { ProductRow, type PendingTea } from '@/components/site/ProductRow';
 import { ScrollShowcase } from '@/components/site/ScrollShowcase';
 import { listProducts } from '@/lib/catalogue';
 import { POSTS, readingMinutes } from '@/lib/content/journal';
 import { SITE_PHOTOS, isInterim } from '@/lib/data';
+import { PRESENTATION } from '@/lib/presentation';
 
 /** Homepage copy from the content handover (P01). Products and prices come from the database. */
 export const metadata: Metadata = {
@@ -16,27 +18,17 @@ export const metadata: Metadata = {
     'Discover Assam Matcha, Silver Needle Assam and Assam Golden Tips. Explore refined tea rituals and thoughtful gifting with RejuveLuxe.',
 };
 
-/** The three expressions, keyed by database slug, in the handover's order. */
-const EXPRESSIONS: { slug: string; eyebrow: string; body: string; cta: string }[] = [
-  {
-    slug: 'assam-matcha',
-    eyebrow: 'Focus',
-    body: 'A vibrant whole-leaf ritual. Sift, whisk and give the next few minutes your full attention.',
-    cta: 'Discover Assam Matcha',
-  },
-  {
-    slug: 'silver-needle-assam',
-    eyebrow: 'Elegance',
-    body: 'Delicate buds. Quiet character. A tea that rewards an unhurried cup.',
-    cta: 'Discover Silver Needle Assam',
-  },
-  {
-    slug: 'assam-golden-tips',
-    eyebrow: 'Legacy',
-    body: 'Selected golden tips and a rich black-tea character. Assam, with depth and distinction.',
-    cta: 'Discover Assam Golden Tips',
-  },
+/**
+ * Teas in the range that may not have a database row yet. While a row is
+ * missing the tea is listed by enquiry; once it exists it sells like the rest.
+ */
+const PENDING_TEAS: Omit<PendingTea, 'tin' | 'ink' | 'image' | 'tagline'>[] = [
+  { slug: 'ctc-tea', name: 'CTC Tea', teaType: 'CTC tea', netQuantity: '250 g', enquireHref: '/contact?topic=ctc' },
+  { slug: 'ube', name: 'Ube', teaType: 'Ube', netQuantity: '50 g', enquireHref: '/contact?topic=ube' },
 ];
+
+/** The three expressions featured in the spotlight, in the handover's order. */
+const HERO_SLUGS = ['assam-matcha', 'silver-needle-assam', 'assam-golden-tips'];
 
 function InterimTag({ label }: { label: string }) {
   return (
@@ -59,103 +51,145 @@ function InterimTag({ label }: { label: string }) {
 
 export default async function HomePage() {
   const products = await listProducts();
-  // An expression whose product is retired in the admin drops out rather than
-  // rendering a card for a tea that cannot be viewed.
-  const expressions = EXPRESSIONS.flatMap((e) => {
-    const p = products.find((q) => q.slug === e.slug);
-    return p ? [{ ...e, p }] : [];
+  // A product retired in the admin simply drops out of both sections.
+  const heroes = HERO_SLUGS.flatMap((slug) => products.filter((p) => p.slug === slug));
+  // Kits carry a components list; the row is for the teas themselves.
+  const teas = products.filter((p) => !p.components);
+  const pending: PendingTea[] = PENDING_TEAS.filter((t) => !products.some((p) => p.slug === t.slug)).map((t) => {
+    const art = PRESENTATION[t.slug];
+    return { ...t, tin: art.tin, ink: art.ink, image: art.image, tagline: art.tagline };
   });
   const stories = POSTS.slice(0, 2);
 
+  // One LCP candidate per viewport, so no preload (the docs advise against it
+  // when the image differs by viewport); eager with high fetch priority instead.
+  const heroCommon = {
+    alt: SITE_PHOTOS.heroAlt,
+    sizes: '100vw',
+    quality: 85,
+    loading: 'eager' as const,
+    fetchPriority: 'high' as const,
+  };
+  const {
+    props: { srcSet: heroDesktop },
+  } = getImageProps({ ...heroCommon, src: SITE_PHOTOS.heroDesktop, width: 1672, height: 941 });
+  const {
+    props: { srcSet: heroMobile, ...heroImg },
+  } = getImageProps({ ...heroCommon, src: SITE_PHOTOS.heroMobile, width: 941, height: 1672 });
+
   return (
     <main>
-      {/* Hero: full-bleed photograph, headline overlaid. */}
-      <section
-        data-theme="dark"
-        style={{
-          position: 'relative',
-          minHeight: 620,
-          display: 'grid',
-          alignItems: 'center',
-          background: 'var(--ink-800)',
-          color: 'var(--bone-100)',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          className="greybox"
-          style={{ position: 'absolute', inset: 0 }}
-          role="img"
-          aria-label={isInterim(SITE_PHOTOS.hero) ? 'Tea, interim photograph' : 'RejuveLuxe hero photograph'}
-        >
-          <Image src={SITE_PHOTOS.hero} alt="" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              // Sized so the eyebrow, headline and subhead all clear 4.5:1
-              // against this photograph (brief §12).
-              background:
-                'linear-gradient(90deg, rgba(20,19,17,.86) 0%, rgba(20,19,17,.60) 55%, rgba(20,19,17,.30) 100%)',
-            }}
-          />
-          {isInterim(SITE_PHOTOS.hero) && <InterimTag label="Hero · 21:9 · Interim" />}
-        </div>
-
-        <div className="wrap" style={{ position: 'relative', padding: '96px var(--gutter-lg)' }}>
-          <div className="stack g6" style={{ maxWidth: 620 }}>
-            <Eyebrow>The Assam Collection</Eyebrow>
-            <h1 className="display" style={{ color: 'var(--bone-100)' }}>
-              Earned, <em style={{ color: 'var(--gold-300)' }}>not indulged.</em>
+      {/* Hero: the supplied banner, landscape on wide screens and portrait on
+          narrow ones. The banner is light in both themes, so the copy uses fixed
+          ink and gold rather than theme tokens. */}
+      <section className="hero-banner">
+        <div className="wrap hero-banner-copy">
+          <div className="stack g6">
+            <Eyebrow style={{ color: 'var(--gold-700)' }}>The Assam Collection</Eyebrow>
+            <h1 className="display" style={{ color: 'var(--ink-900)' }}>
+              Earned, <em style={{ color: 'var(--gold-600)' }}>not indulged.</em>
             </h1>
-            <p className="lead" style={{ color: 'var(--ink-300)' }}>
+            <p className="lead" style={{ color: 'var(--ink-700)' }}>
               Exceptional Assam tea, selected with care and made part of a moment worth taking.
             </p>
             <div className="row g3" style={{ flexWrap: 'wrap' }}>
-              <Button size="lg" variant="inverse" href="/collections/assam-collection">
+              <Button
+                size="lg"
+                href="/collections/assam-collection"
+                style={{ background: 'var(--ink-900)', color: 'var(--bone-100)', borderColor: 'var(--ink-900)' }}
+              >
                 Explore the Assam Collection
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 href="/our-story"
-                style={{ color: 'var(--bone-100)', borderColor: 'var(--bone-100)' }}
+                style={{ color: 'var(--ink-900)', borderColor: 'var(--ink-900)' }}
               >
                 Discover Our Story
               </Button>
             </div>
           </div>
         </div>
+        <picture className="hero-banner-media">
+          <source media="(min-width: 801px)" srcSet={heroDesktop} />
+          <img {...heroImg} srcSet={heroMobile} />
+        </picture>
+        <div className="hero-banner-shade" aria-hidden="true" />
       </section>
 
-      {/* Three expressions. One origin. */}
+      {/* Spotlight: the collections to begin with */}
       <section className="wrap sec">
         <SectionHead
-          eyebrow="The Assam Collection"
-          title="Three expressions. One origin."
-          aside="The freshness of finely milled green tea. The delicacy of tender buds. The depth of carefully crafted black tea. Meet three distinct expressions of Assam, each with its own character and its own place in your day."
+          eyebrow="Spotlight"
+          title="Find your expression."
+          aside="Begin with the tea, the ritual or the person you are choosing for."
         />
-        <div className="grid cols-3">
-          {expressions.map(({ p, eyebrow, body, cta }) => (
-            <Card key={p.slug} padding={0} interactive>
-              <TinBox p={p} sizes="(max-width: 800px) 90vw, 380px" style={{ aspectRatio: '4 / 3' }} />
-              <div className="stack g3" style={{ padding: 24 }}>
-                <Eyebrow muted>{eyebrow}</Eyebrow>
-                <h3 className="h3">{p.name}</h3>
-                <p className="small">{body}</p>
-                <div style={{ paddingTop: 8 }}>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    href={`/shop/${p.slug}`}
-                    iconRight={<Icon name="arrow-right" size={14} />}
-                  >
-                    {cta}
-                  </Button>
-                </div>
+        <div className="spot">
+          <Link href="/collections/assam-collection" className="spot-card spot-feature">
+            <div className="spot-tins">
+              {heroes.map((p) => (
+                <TinBox key={p.slug} p={p} style={{ background: 'transparent' }} sizes="(max-width: 900px) 30vw, 240px" />
+              ))}
+            </div>
+            <div className="spot-body">
+              <Eyebrow style={{ color: 'var(--gold-300)' }}>The Assam Collection</Eyebrow>
+              <h3 className="h2" style={{ color: 'var(--bone-100)' }}>
+                Three expressions. One origin.
+              </h3>
+              <p className="small" style={{ color: 'var(--ink-300)' }}>
+                Three teas with a shared origin and distinctly different characters.
+              </p>
+              <span className="cap" style={{ color: 'var(--gold-300)' }}>
+                Explore the Assam Collection
+              </span>
+            </div>
+          </Link>
+          <div className="spot-side">
+            <Link href="/collections/gift-sets" className="spot-card">
+              <Greybox
+                label="A RejuveLuxe tea gift set, presented"
+                src="/assets/gift-sets/complete-tasting-open.jpg"
+                alt="Complete Tasting Gift Set open, showing four tea tubes, a cup, a tea infuser and a wooden spoon."
+                ratio="21 / 9"
+                sizes="(max-width: 900px) 100vw, 440px"
+              />
+              <div className="spot-body">
+                <Eyebrow muted>Tea Gift Sets</Eyebrow>
+                <h3 className="h3">A considered gift. A lasting ritual.</h3>
+                <p className="small">Considered selections for personal moments and meaningful occasions.</p>
+                <span className="cap" style={{ color: 'var(--accent)' }}>
+                  Explore Gift Sets
+                </span>
               </div>
-            </Card>
-          ))}
+            </Link>
+            <Link href="/shop/matcha-ritual-set" className="spot-card">
+              <Greybox label="Matcha bowl, whisk and tin" ratio="21 / 9" sizes="(max-width: 900px) 100vw, 440px" />
+              <div className="spot-body">
+                <Eyebrow muted>Matcha Ritual Set</Eyebrow>
+                <h3 className="h3">Preparation is part of the product.</h3>
+                <p className="small">The tea and the tools for a more deliberate preparation.</p>
+                <span className="cap" style={{ color: 'var(--accent)' }}>
+                  Discover the Ritual Set
+                </span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Every tea in one row, each with quantity and Add to cart */}
+      <section className="wrap sec rule-t">
+        <SectionHead
+          eyebrow="Shop Tea"
+          title="Tea, chosen with intention."
+          aside="A distinctive cup begins with a distinctive leaf. Explore our teas through their character, the way they are prepared and the moments you would like to make for them."
+        />
+        <ProductRow products={teas} pending={pending} />
+        <div style={{ paddingTop: 24 }}>
+          <Button variant="outline" href="/shop">
+            Shop All Tea
+          </Button>
         </div>
       </section>
 
@@ -208,18 +242,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* The full range, as the scroll-driven showcase */}
+      {/* The full range, as the scroll-driven showcase. Hidden on phones (see CSS). */}
+      <div className="home-showcase">
       <div id="collection" className="wrap" style={{ paddingTop: 96, paddingBottom: 40 }}>
         <div className="stack g3" style={{ textAlign: 'center', alignItems: 'center' }}>
-          <Eyebrow>All Tea</Eyebrow>
-          <h2 className="h1 it">Find your expression.</h2>
-          <p className="small" style={{ maxWidth: 520 }}>
-            Begin with the tea, the ritual or the person you are choosing for.
+          <Eyebrow>The collection</Eyebrow>
+          <h2 className="h1 it">Find a character you enjoy</h2>
+          <p className="small" style={{ maxWidth: 560 }}>
+            Choose Matcha for the whisked whole-leaf experience. Turn to Silver Needle for delicacy, or Golden Tips
+            for a fuller black tea.
           </p>
         </div>
       </div>
 
       <ScrollShowcase />
+      </div>
 
       {/* Ritual and gifting */}
       <section className="wrap sec">
@@ -239,7 +276,12 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="stack g4">
-            <Greybox label="A RejuveLuxe gift box, presented" ratio="3 / 2" />
+            <Greybox
+              label="A RejuveLuxe gift box, presented"
+              src="/assets/gift-sets/heritage-duo-open.jpg"
+              alt="Heritage Duo Gift Set open, showing two tea tubes, a cup, a tea infuser and a wooden spoon."
+              ratio="3 / 2"
+            />
             <Eyebrow>Gifting</Eyebrow>
             <h2 className="h2">A gift with something to say</h2>
             <p>

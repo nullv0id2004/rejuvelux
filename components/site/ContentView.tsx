@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { Suspense } from 'react';
 import { Button, Card } from '@/components/ds';
 import { CONTACT } from '@/lib/data';
@@ -72,8 +73,19 @@ function Block({ s }: { s: Section }) {
             )}
             <div className={`grid ${s.cards.length === 3 ? 'cols-3' : 'cols-2'}`}>
               {s.cards.map((c) => (
-                <Card key={c.title} padding={28}>
-                  <div className="stack g3" style={{ height: '100%' }}>
+                <Card key={c.title} padding={c.image ? 0 : 28}>
+                  {c.image && (
+                    <div className="card-media" style={{ aspectRatio: c.image.ratio ?? '1 / 1' }}>
+                      <Image
+                        src={c.image.src}
+                        alt={c.image.alt}
+                        fill
+                        sizes="(max-width: 800px) 100vw, 33vw"
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                  )}
+                  <div className="stack g3" style={{ flex: 1, padding: c.image ? 24 : 0 }}>
                     {c.eyebrow && <Eyebrow muted>{c.eyebrow}</Eyebrow>}
                     <h3 className="h3">{c.title}</h3>
                     <p className="small">{withSlots(c.body)}</p>
@@ -147,6 +159,31 @@ function Block({ s }: { s: Section }) {
         </section>
       );
     }
+
+    case 'gallery':
+      return (
+        <section className="wrap sec rule-t">
+          <div className="stack g6">
+            {s.title && <h2 className="h2">{s.title}</h2>}
+            <div className="grid cols-2">
+              {s.images.map((img) => (
+                <figure key={img.src} className="stack g2" style={{ margin: 0 }}>
+                  <div className="content-photo" style={{ aspectRatio: img.ratio ?? '1 / 1' }}>
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 800px) 100vw, 50vw"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                  {img.caption && <figcaption className="cap">{img.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
 
     case 'faq':
       return (
@@ -241,17 +278,42 @@ export function ContentView({ page }: { page: ContentPage }) {
   return (
     <main>
       <section className="wrap" style={{ padding: '96px 0 48px' }}>
-        <div className="editorial" style={{ gap: 24, alignItems: 'flex-start' }}>
-          {page.eyebrow && <Eyebrow>{page.eyebrow}</Eyebrow>}
-          <h1 className="display" style={{ fontSize: 'clamp(40px,4.6cqw,64px)' }}>
-            {page.title}
-          </h1>
-          {page.lead?.map((p) => (
-            <p key={p} className="lead">
-              {withSlots(p)}
-            </p>
-          ))}
-          <Ctas cta={page.cta} />
+        <div className={page.image ? 'split-wide' : undefined} style={page.image ? { alignItems: 'center' } : undefined}>
+          <div className="editorial" style={{ gap: 24, alignItems: 'flex-start' }}>
+            {page.eyebrow && <Eyebrow>{page.eyebrow}</Eyebrow>}
+            <h1 className="display" style={{ fontSize: 'clamp(40px,4.6cqw,64px)' }}>
+              {page.title}
+            </h1>
+            {page.lead?.map((p) => (
+              <p key={p} className="lead">
+                {withSlots(p)}
+              </p>
+            ))}
+            <Ctas cta={page.cta} />
+          </div>
+          {page.image?.photo ? (
+            <div className="content-photo" style={{ aspectRatio: page.image.ratio ?? '1 / 1' }}>
+              <Image
+                src={page.image.src}
+                alt={page.image.alt}
+                fill
+                sizes="(max-width: 800px) 100vw, 560px"
+                loading="eager"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+          ) : page.image ? (
+            <div className="tinbox" style={{ background: page.image.tin, aspectRatio: '1 / 1', width: '100%' }}>
+              <Image
+                src={page.image.src}
+                alt={page.image.alt}
+                width={900}
+                height={900}
+                sizes="(max-width: 800px) 90vw, 480px"
+                priority
+              />
+            </div>
+          ) : null}
         </div>
       </section>
       {page.sections.map((s, i) => (

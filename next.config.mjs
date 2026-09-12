@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
 
+  /** 85 is for the hero banner, where the tin labels must stay legible. */
+  images: {
+    qualities: [75, 85],
+  },
+
   /**
    * Retired routes, and the platform-style paths the content handover uses
    * (/pages, /products, /blogs/journal), mapped onto this site's routes.
@@ -10,6 +15,8 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/blog', destination: '/journal', permanent: false },
+      { source: '/shop/tea-gift-set', destination: '/shop/complete-tasting-gift-set', permanent: false },
+      { source: '/products/tea-gift-set', destination: '/shop/complete-tasting-gift-set', permanent: false },
       { source: '/blog/:slug', destination: '/journal', permanent: false },
       { source: '/garden', destination: '/assam-origin', permanent: false },
       { source: '/wholesale', destination: '/corporate-gifting', permanent: false },

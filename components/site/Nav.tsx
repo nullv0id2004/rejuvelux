@@ -23,6 +23,8 @@ const SHOP: Menu = {
     { href: '/shop/silver-needle-assam', label: 'Silver Needle Assam' },
     { href: '/shop/assam-golden-tips', label: 'Assam Golden Tips' },
     { href: '/shop/green-tea', label: 'Green Tea' },
+    { href: '/shop/ctc-tea', label: 'CTC Tea' },
+    { href: '/shop/ube', label: 'Ube' },
   ],
   match: ['/shop', '/collections'],
 };
@@ -33,6 +35,9 @@ const GIFTS: Menu = {
   items: [
     { href: '/gifting', label: 'Gifting' },
     { href: '/collections/gift-sets', label: 'Tea Gift Sets' },
+    { href: '/shop/complete-tasting-gift-set', label: 'Complete Tasting Set' },
+    { href: '/shop/heritage-duo-gift-set', label: 'Heritage Duo' },
+    { href: '/shop/vibrant-duo-gift-set', label: 'Vibrant Duo' },
     { href: '/shop/matcha-ritual-set', label: 'Matcha Ritual Set' },
     { href: '/corporate-gifting', label: 'Corporate Gifting' },
     { href: '/festive-gifting', label: 'Festive Gifting' },
@@ -86,6 +91,8 @@ export function Nav() {
   const pathname = usePathname();
   const [menu, setMenu] = useState(false);
   const [open, setOpen] = useState<Menu['id'] | null>(null);
+  const [group, setGroup] = useState<Menu['id'] | null>(null);
+  const [menuTop, setMenuTop] = useState(0);
   const header = useRef<HTMLElement>(null);
   const { count, setOpen: setCartOpen } = useCart();
 
@@ -93,6 +100,36 @@ export function Nav() {
     setMenu(false);
     setOpen(null);
   }, [pathname]);
+
+  /**
+   * The mobile drawer: pinned under the header wherever the page is scrolled,
+   * with the page behind it held still. Escape closes it and returns focus to
+   * the menu button; widening past the breakpoint closes it too.
+   */
+  useEffect(() => {
+    if (!menu) return;
+    setMenuTop(Math.max(0, Math.round(header.current?.getBoundingClientRect().bottom ?? 0)));
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = 'hidden';
+    const close = () => {
+      setMenu(false);
+      document.querySelector<HTMLButtonElement>('.menu-btn button')?.focus();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    const onResize = () => {
+      if (window.innerWidth > 800) setMenu(false);
+    };
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('resize', onResize);
+    return () => {
+      root.style.overflow = previous;
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [menu]);
 
   useEffect(() => {
     if (!open) return;
@@ -153,6 +190,7 @@ export function Nav() {
               label={menu ? 'Close menu' : 'Menu'}
               variant="ghost"
               aria-expanded={menu}
+              aria-controls="mobile-menu"
               onClick={() => setMenu(!menu)}
             >
               <Icon name={menu ? 'x' : 'menu'} size={20} />
@@ -195,22 +233,50 @@ export function Nav() {
       </header>
 
       {menu && (
-        <div className="mobile-menu">
-          {[SHOP, GIFTS].map((m) => (
-            <div key={m.id} className="mm-group">
-              <div className="mm-h">{m.label}</div>
-              {m.items.map((i) => (
-                <Link key={i.href} href={i.href} className="mm-sub" onClick={() => setMenu(false)}>
-                  {i.label}
-                </Link>
-              ))}
-            </div>
-          ))}
-          {[RITUALS, ...RIGHT].map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setMenu(false)}>
-              {l.label}
-            </Link>
-          ))}
+        <div id="mobile-menu" className="mobile-menu" style={{ top: menuTop }}>
+          <nav aria-label="Mobile">
+            {[SHOP, GIFTS].map((m) => {
+              const expanded = group === m.id;
+              return (
+                <div key={m.id} className="mm-group">
+                  <button
+                    type="button"
+                    className={'mm-toggle' + (matches(m.match, pathname) ? ' on' : '')}
+                    aria-expanded={expanded}
+                    aria-controls={`mm-${m.id}`}
+                    onClick={() => setGroup(expanded ? null : m.id)}
+                  >
+                    {m.label}
+                    <span className="caret" aria-hidden="true" />
+                  </button>
+                  {expanded && (
+                    <div id={`mm-${m.id}`} className="mm-list">
+                      {m.items.map((i) => (
+                        <Link
+                          key={i.href}
+                          href={i.href}
+                          className={'mm-sub' + (pathname === i.href ? ' on' : '')}
+                          onClick={() => setMenu(false)}
+                        >
+                          {i.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {[RITUALS, ...RIGHT].map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={matches(l.match, pathname) ? 'on' : ''}
+                onClick={() => setMenu(false)}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       )}
     </>

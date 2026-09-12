@@ -288,55 +288,42 @@ export const PRESENTATION: Record<string, Presentation> = {
     ],
     related: { label: 'Enquire About the Set', href: '/contact?topic=matcha-ritual-set' },
   },
-};
 
-/**
- * Withheld from the rendered catalogue, and kept rather than deleted.
- *
- * Neither product exists in the database, so neither has a price, a SKU or
- * stock. Both are held pending a **client decision**, not a technical one, and
- * their copy and assets stay here so that decision costs an afternoon rather
- * than a rewrite (`roadmap.md` §5.1 step 5, §8).
- *
- * - **`ctc`** — **R-52**, an open launch blocker. CTC is the commodity
- *   crush-tear-curl process; the risk row states it "must not share a shelf, a
- *   page module or a gift box with the heroes" until the client decides
- *   whether it is excluded, held in a separate line, or sold elsewhere.
- * - **`ube`** — appears in **no document in the suite**. The tin and colourway
- *   are confirmed; the copy below was authored to the house voice and has
- *   never been signed off. Blend composition, weight, cups, intensity scores
- *   and brew figures are all unconfirmed.
- *
- * To restore either: add the row to the database, then move its entry into
- * `PRESENTATION` above under the slug the database gives it.
- */
-export const WITHHELD: Record<string, Presentation> = {
-  ctc: {
+  /**
+   * CTC Tea and Ube, added on the client's instruction of 12 Sep 2026 that all
+   * six teas are sold (resolving the R-52 and ube catalogue calls). Copy is the
+   * content handover's enquiry copy: no origin, formulation, sensory or brewing
+   * claim is approved for either, so those fields stay as visible slots.
+   */
+  'ctc-tea': {
     descriptor: 'Strength',
     tin: 'var(--tea-ctc-tin)',
     ink: 'var(--tea-ctc-ink)',
     image: '/assets/ctc-tea-900.png',
-    body: 5,
-    brisk: 5,
-    why: 'Naturally rich in theaflavins and thearubigins with naturally occurring caffeine, CTC gives chai its strength and colour.',
-    tagline: 'Bold. Malty. Without apology.',
-    bullets: [
-      'Single-estate CTC, not a blend',
-      'Graded [GRADE] · even granule, fast colour',
-      'Deep red-brown liquor, malt, brisk',
+    tagline: 'Another expression in the RejuveLuxe range.',
+    intro: 'Explore another expression in the RejuveLuxe range, presented in our distinctive tea tin.',
+    sections: [
+      [
+        'Find the details for your cup',
+        'Ask us about the current pack, ingredients and recommended preparation for RejuveLuxe CTC Tea. We will help you understand the product before you choose.',
+      ],
     ],
+    preparation:
+      'Follow the guidance on your pack. For help with brewing, contact us with a photograph of the label.',
+    details: [
+      ['Tea type', 'CTC tea'],
+      ['Ingredients', '[APPROVED_CTC_INGREDIENTS]'],
+      ['Origin', '[APPROVED_CTC_ORIGIN]'],
+    ],
+    storage: 'Keep tightly closed in a cool, dry place away from direct sunlight and moisture.',
     faqs: [
       [
-        "Isn't CTC the cheap tea?",
-        'CTC is a process, not a grade. This is the finest version of the daily cup: one garden, one flush, graded and dated like the rest of the range.',
+        'Is this the same tea as Assam Golden Tips?',
+        'CTC Tea and Assam Golden Tips are different product names in the RejuveLuxe range. Please use the instructions and details for the product you select.',
       ],
-      [
-        'How do I make chai with it?',
-        'Boil 3 g in 100 ml water for two minutes, add 100 ml milk, boil one more. Strain.',
-      ],
-      ['Why 250 g?', 'Because it is a daily tea. The tin is sized for a month.'],
-      ['Does it work without milk?', 'Yes, at 2 g and a shorter boil. It will be strong.'],
+      ['Where can I get brewing guidance?', 'Follow the guidance on your pack or contact us with a photograph of the label.'],
     ],
+    related: { label: 'Explore Assam Golden Tips', href: '/shop/assam-golden-tips' },
   },
 
   ube: {
@@ -344,32 +331,26 @@ export const WITHHELD: Record<string, Presentation> = {
     tin: 'var(--tea-ube-tin)',
     ink: 'var(--tea-ube-ink)',
     image: '/assets/ube-900.png',
-    body: 3,
-    brisk: 2,
-    why: 'Built on the same estate leaf as the rest of the range and blended rather than flavoured, Ube is naturally rich in the polyphenols of its base tea, with naturally occurring caffeine. A different register, held to the same standard.',
-    tagline: 'Estate leaf. Real ube. Quietly different.',
-    bullets: [
-      'Single-estate Assam base, blended rather than flavoured',
-      'Violet liquor that deepens with the steep',
-      'Takes milk without thinning out',
+    tagline: 'The Ube expression from our gifting collection.',
+    intro:
+      'The Ube expression featured in our gifting materials. Ask us about its ingredients and the preparation that suits the format you choose.',
+    sections: [
+      [
+        'Begin with the right preparation',
+        'The way you prepare Ube depends on the product you choose. Contact us for the specific ingredient and preparation information before ordering.',
+      ],
     ],
+    preparation: 'Ask us for the preparation guide that matches the product you are ordering.',
+    details: [
+      ['Ingredients', '100% Ube'],
+      ['Caffeine', '[APPROVED_UBE_CAFFEINE_STATEMENT]'],
+    ],
+    storage: 'Keep tightly closed in a cool, dry place away from direct sunlight and moisture.',
     faqs: [
-      [
-        'What does ube taste like?',
-        'Earthy and mildly sweet: closer to chestnut or taro than to fruit. It rounds the Assam base rather than masking it.',
-      ],
-      [
-        'Is it sweetened?',
-        'No sugar is added. The sweetness is the ube’s own. Sweeten it yourself if you want it dessert-like. Draft: final formulation pending.',
-      ],
-      [
-        'Does it work with milk?',
-        'Yes, and it is the one in the range built for it. Steep 3 g in 150 ml of water, then add 50 ml of milk. The colour holds.',
-      ],
-      [
-        'Is the colour natural?',
-        'It comes from the ube itself; nothing is added to deepen it. Pending confirmation on the final blend sheet.',
-      ],
+      ['Does it contain tea?', 'Please ask for the ingredient list of the current format. Use the details for your selected product.'],
+      ['Can I prepare it with milk?', 'Ask for the preparation guide that matches the product you are ordering.'],
+      ['Is it available in a gift set?', 'Contact us to discuss the current gifting selection.'],
     ],
+    related: { label: 'Ask About Ube', href: '/contact?topic=ube' },
   },
 };

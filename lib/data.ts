@@ -59,8 +59,10 @@ export type ProductPhotos = {
  * disappears on its own.
  */
 export const SITE_PHOTOS = {
-  /** Homepage hero, full-bleed behind the headline. 21:9. */
-  hero: '/assets/hero.jpg',
+  /** Homepage hero banner, art-directed: landscape above the nav breakpoint, portrait below. */
+  heroDesktop: '/assets/hero-banner-desktop.jpg',
+  heroMobile: '/assets/hero-banner-mobile.jpg',
+  heroAlt: 'Six RejuveLuxe tea tins arranged on pale stone with tea leaves and flowers.',
   /** Dark story band, mid-homepage. 21:9. */
   storyBand: '/assets/tea-field.jpeg',
   /** The stand-in itself. */

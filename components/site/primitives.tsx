@@ -282,7 +282,7 @@ export function TinBox({
   priority,
   alt,
 }: {
-  p: CatalogueProduct;
+  p: Pick<CatalogueProduct, 'name' | 'tin' | 'ink' | 'image'>;
   className?: string;
   style?: CSSProperties;
   imgStyle?: CSSProperties;

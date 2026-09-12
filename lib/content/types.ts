@@ -9,11 +9,20 @@
 
 export type Cta = { label: string; href: string };
 
+export type Photo = {
+  src: string;
+  alt: string;
+  caption?: string;
+  /** CSS aspect ratio of the frame, e.g. '4 / 3'. Defaults to square. */
+  ratio?: string;
+};
+
 export type Card = {
   eyebrow?: string;
   title: string;
   body: string;
   cta?: Cta;
+  image?: Photo;
 };
 
 export type Section =
@@ -25,7 +34,8 @@ export type Section =
   | { t: 'details'; title?: string; rows: [string, string][] }
   | { t: 'band'; eyebrow?: string; title: string; body: string[]; cta?: Cta[] }
   | { t: 'form'; form: 'contact' | 'gifting'; title: string; intro?: string }
-  | { t: 'contact'; title: string };
+  | { t: 'contact'; title: string }
+  | { t: 'gallery'; title?: string; images: Photo[] };
 
 export type ContentPage = {
   /** Route segment. Unique within its registry. */
@@ -39,4 +49,9 @@ export type ContentPage = {
   cta?: Cta[];
   sections: Section[];
   noindex?: boolean;
+  /**
+   * Image beside the heading. A tin render sits on its tin colour; a photograph
+   * (`photo`) fills its frame.
+   */
+  image?: { src: string; alt: string; tin?: string; photo?: boolean; ratio?: string };
 };
