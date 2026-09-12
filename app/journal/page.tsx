@@ -23,7 +23,7 @@ export default function JournalPage() {
 
   return (
     <main>
-      <section className="wrap" style={{ padding: '96px 0 40px' }}>
+      <section className="wrap" style={{ paddingTop: 96, paddingBottom: 40 }}>
         <div className="editorial" style={{ gap: 24 }}>
           <Eyebrow>Journal</Eyebrow>
           <h1 className="display" style={{ fontSize: 'clamp(40px,4.6cqw,64px)' }}>

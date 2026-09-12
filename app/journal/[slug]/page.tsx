@@ -39,7 +39,7 @@ export default async function JournalPostPage({ params }: Params) {
 
   return (
     <main>
-      <section className="wrap" style={{ padding: '96px 0 40px' }}>
+      <section className="wrap" style={{ paddingTop: 96, paddingBottom: 40 }}>
         <div className="editorial" style={{ gap: 24 }}>
           <Eyebrow>{post.category}</Eyebrow>
           <h1 className="display" style={{ fontSize: 'clamp(36px,4.2cqw,58px)' }}>
@@ -74,7 +74,7 @@ export default async function JournalPostPage({ params }: Params) {
             <Eyebrow muted>Teas in this story</Eyebrow>
             <div className="row g6" style={{ flexWrap: 'wrap' }}>
               {mentioned.map((p) => (
-                <Link key={p.slug} href={`/shop/${p.slug}`} className="row g3" style={{ gap: 10 }}>
+                <Link key={p.slug} href={`/shop/${p.slug}`} className="row g3 tea-link" style={{ gap: 10 }}>
                   <Swatch p={p} size={28} />
                   <span>{p.name}</span>
                 </Link>

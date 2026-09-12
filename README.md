@@ -21,7 +21,7 @@ before running. See [`ENVIRONMENT.md`](ENVIRONMENT.md).
 |---|---|
 | `/` | Homepage: hero, the three expressions, story band, collection showcase, rituals and gifting, journal, sign-up |
 | `/shop` | All Tea, the database catalogue |
-| `/shop/[slug]` | Product page per database row; enquiry page for the handover's unlisted items (gift set, Matcha box, cup, CTC, Ube) |
+| `/shop/[slug]` | Product page per database row, including the gift sets, CTC, Ube, Matcha Tea Box and Retro Cup; an enquiry page only for a slug with no row |
 | `/collections`, `/collections/[slug]` | Collection directory; the Assam Collection, Gift Sets and Teaware |
 | `/our-story`, `/assam-origin`, `/craft` | Brand and origin |
 | `/choose-your-tea`, `/tea-rituals`, `/how-to-make-matcha` | Education and preparation |

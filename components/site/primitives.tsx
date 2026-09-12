@@ -282,7 +282,7 @@ export function TinBox({
   priority,
   alt,
 }: {
-  p: Pick<CatalogueProduct, 'name' | 'tin' | 'ink' | 'image'>;
+  p: Pick<CatalogueProduct, 'name' | 'tin' | 'ink' | 'image' | 'photo'>;
   className?: string;
   style?: CSSProperties;
   imgStyle?: CSSProperties;
@@ -292,7 +292,7 @@ export function TinBox({
 }) {
   return (
     <div
-      className={'tinbox ' + className}
+      className={'tinbox ' + (p.photo ? 'is-photo ' : '') + className}
       style={{ background: p.tin, ...style }}
       role={p.image ? undefined : 'img'}
       aria-label={p.image ? undefined : `${p.name} tin, render pending`}

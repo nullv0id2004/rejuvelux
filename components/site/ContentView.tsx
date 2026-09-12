@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Suspense } from 'react';
 import { Button, Card } from '@/components/ds';
+import { listProducts } from '@/lib/catalogue';
 import { CONTACT } from '@/lib/data';
 import type { ContentPage, Cta, Section } from '@/lib/content/types';
 import { ContactForm } from './ContactForm';
 import { GiftingForm } from './GiftingForm';
 import { Accordion } from './interactive';
 import { Evidence, Eyebrow, withSlots } from './primitives';
+import { ProductRow } from './ProductRow';
 
 /** Metadata straight from the content record. Titles are full strings, not the layout template. */
 export function contentMetadata(page: ContentPage): Metadata {
@@ -44,6 +46,26 @@ function Heading({ eyebrow, title, intro }: { eyebrow?: string; title?: string; 
       {title && <h2 className="h2">{title}</h2>}
       {intro && <p className="lead">{withSlots(intro)}</p>}
     </>
+  );
+}
+
+/** Products from the catalogue, in the order given, each with quantity and Add to cart. */
+async function ProductsSection({ s }: { s: Extract<Section, { t: 'products' }> }) {
+  const all = await listProducts();
+  const items = s.slugs.flatMap((slug) => all.filter((p) => p.slug === slug));
+  if (items.length === 0) return null;
+  return (
+    <section className="wrap sec rule-t">
+      <div className="stack g6">
+        {(s.title || s.intro) && (
+          <div className="stack g3" style={{ maxWidth: 720 }}>
+            <Heading title={s.title} intro={s.intro} />
+          </div>
+        )}
+        <ProductRow products={items} />
+        <Ctas cta={s.cta} />
+      </div>
+    </section>
   );
 }
 
@@ -159,6 +181,9 @@ function Block({ s }: { s: Section }) {
         </section>
       );
     }
+
+    case 'products':
+      return <ProductsSection s={s} />;
 
     case 'gallery':
       return (
@@ -277,7 +302,7 @@ function Block({ s }: { s: Section }) {
 export function ContentView({ page }: { page: ContentPage }) {
   return (
     <main>
-      <section className="wrap" style={{ padding: '96px 0 48px' }}>
+      <section className="wrap" style={{ paddingTop: 96, paddingBottom: 48 }}>
         <div className={page.image ? 'split-wide' : undefined} style={page.image ? { alignItems: 'center' } : undefined}>
           <div className="editorial" style={{ gap: 24, alignItems: 'flex-start' }}>
             {page.eyebrow && <Eyebrow>{page.eyebrow}</Eyebrow>}

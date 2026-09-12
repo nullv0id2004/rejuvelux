@@ -35,7 +35,8 @@ export type Section =
   | { t: 'band'; eyebrow?: string; title: string; body: string[]; cta?: Cta[] }
   | { t: 'form'; form: 'contact' | 'gifting'; title: string; intro?: string }
   | { t: 'contact'; title: string }
-  | { t: 'gallery'; title?: string; images: Photo[] };
+  | { t: 'gallery'; title?: string; images: Photo[] }
+  | { t: 'products'; title?: string; intro?: string; slugs: string[]; cta?: Cta[] };
 
 export type ContentPage = {
   /** Route segment. Unique within its registry. */

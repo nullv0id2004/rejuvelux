@@ -1,41 +1,4 @@
-import type { Card, ContentPage } from './types';
-
-/** The boxed gift sets as image cards: reused on the collection, gifting and festive pages. */
-const GIFT_SET_CARDS: Card[] = [
-  {
-    eyebrow: 'MRP ₹3,499',
-    title: 'Complete Tasting Gift Set',
-    body: 'Assam Golden Tips, Silver Needle Assam, Assam Matcha and Ube, with an infuser, a wooden spoon and a premium cup.',
-    image: {
-      src: '/assets/gift-sets/complete-tasting-open.jpg',
-      alt: 'Complete Tasting Gift Set open, showing four tea tubes, a cup, a tea infuser and a wooden spoon.',
-      ratio: '4 / 3',
-    },
-    cta: { label: 'Explore the Set', href: '/shop/complete-tasting-gift-set' },
-  },
-  {
-    eyebrow: 'MRP ₹2,999',
-    title: 'Heritage Duo Gift Set',
-    body: 'Assam Golden Tips and Silver Needle Assam, with an infuser, a wooden spoon and a premium cup.',
-    image: {
-      src: '/assets/gift-sets/heritage-duo-open.jpg',
-      alt: 'Heritage Duo Gift Set open, showing two tea tubes, a cup, a tea infuser and a wooden spoon.',
-      ratio: '4 / 3',
-    },
-    cta: { label: 'Explore the Set', href: '/shop/heritage-duo-gift-set' },
-  },
-  {
-    eyebrow: 'MRP ₹2,199',
-    title: 'Vibrant Duo Gift Set',
-    body: 'Assam Matcha and Ube, with an infuser, a wooden spoon and a premium cup.',
-    image: {
-      src: '/assets/gift-sets/vibrant-duo-open.jpg',
-      alt: 'Vibrant Duo Gift Set open, showing two tea tubes, a cup, a tea infuser and a wooden spoon.',
-      ratio: '4 / 3',
-    },
-    cta: { label: 'Explore the Set', href: '/shop/vibrant-duo-gift-set' },
-  },
-];
+import type { ContentPage } from './types';
 
 
 /**
@@ -144,23 +107,7 @@ export const COMMERCE_PAGES: ContentPage[] = [
       'Some gifts are enjoyed in a moment. Others create moments to return to. Explore tea gifts chosen for the pleasure of discovering, preparing and sharing something exceptional.',
     ],
     sections: [
-      { t: 'cards', cards: GIFT_SET_CARDS },
-      {
-        t: 'cards',
-        title: 'More ways to give',
-        cards: [
-          {
-            title: 'Matcha Ritual Set',
-            body: 'The tea and the tools for a more deliberate preparation.',
-            cta: { label: 'Explore the Ritual Set', href: '/shop/matcha-ritual-set' },
-          },
-          {
-            title: 'Matcha Tea Box',
-            body: 'A gift centred on the character of Assam Matcha.',
-            cta: { label: 'Explore the Matcha Box', href: '/shop/matcha-tea-box' },
-          },
-        ],
-      },
+      { t: 'products', slugs: [...['complete-tasting-gift-set', 'heritage-duo-gift-set', 'vibrant-duo-gift-set'], 'matcha-ritual-set', 'matcha-tea-box'] },
       {
         t: 'text',
         title: 'Choosing for a team or an occasion?',
@@ -183,21 +130,7 @@ export const COMMERCE_PAGES: ContentPage[] = [
       'The bowl you reach for. The whisk in your hand. A cup that makes you want to sit a little longer. Discover the pieces that support your tea ritual.',
     ],
     sections: [
-      {
-        t: 'cards',
-        cards: [
-          {
-            title: 'Retro Cup with Lid',
-            body: 'A ribbed 250 ml cup in soft, considered colours.',
-            cta: { label: 'Explore the Cup', href: '/shop/retro-cup-with-lid' },
-          },
-          {
-            title: 'Matcha Ritual Set',
-            body: 'Tea, a bowl and preparation tools brought together.',
-            cta: { label: 'Discover the Set', href: '/shop/matcha-ritual-set' },
-          },
-        ],
-      },
+      { t: 'products', slugs: ['retro-cup-with-lid', 'matcha-ritual-set'] },
       {
         t: 'text',
         title: 'Choose for the way you prepare',
@@ -239,7 +172,7 @@ export const COMMERCE_PAGES: ContentPage[] = [
         ],
         cta: [{ label: 'Explore Gift Sets', href: '/collections/gift-sets' }],
       },
-      { t: 'cards', title: 'Our gift sets', cards: GIFT_SET_CARDS },
+      { t: 'products', title: 'Our gift sets', slugs: ['complete-tasting-gift-set', 'heritage-duo-gift-set', 'vibrant-duo-gift-set'] },
       {
         t: 'text',
         title: 'For teams and business relationships',
@@ -309,7 +242,7 @@ export const COMMERCE_PAGES: ContentPage[] = [
         ],
         cta: [{ label: 'Explore Festive Gifts', href: '/collections/gift-sets' }],
       },
-      { t: 'cards', title: 'Gift sets for the season', cards: GIFT_SET_CARDS },
+      { t: 'products', title: 'Gift sets for the season', slugs: ['complete-tasting-gift-set', 'heritage-duo-gift-set', 'vibrant-duo-gift-set'] },
       {
         t: 'text',
         title: 'Planning gifts for a group?',

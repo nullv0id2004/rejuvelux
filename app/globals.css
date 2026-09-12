@@ -1996,3 +1996,157 @@ button {
   flex-shrink: 0;
 }
 
+/* ------------------------------------------------- mobile: tap targets -- */
+
+/* The announcement link fills its bar rather than only its line of text. */
+.ann a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+/* Inputs fill their field box, so the whole box takes the tap, not just the text line. */
+label > span > input:not([type='checkbox']):not([type='radio']) {
+  align-self: stretch;
+}
+.nl-opt input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.nl-privacy a,
+nav[aria-label='Breadcrumb'] a {
+  display: inline-block;
+  padding-block: 10px;
+}
+.tea-link {
+  min-height: 44px;
+}
+.tile h3 a,
+.prow-card h3 a {
+  display: inline-block;
+  padding-block: 6px;
+}
+.nav-c .row > button,
+.nav-c .row > .theme-slot button,
+.menu-btn button {
+  flex-shrink: 0;
+}
+/* A product with no tin render shows its label in the large frame only, never squeezed into a thumbnail. */
+.thumbs .tin-pending {
+  display: none;
+}
+/* Rows of actions wrap on narrow screens instead of pushing the page wider. */
+.wrapm .row {
+  flex-wrap: wrap;
+}
+.mobile-menu .mm-theme {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  /* The header keeps the menu, wordmark and bag; the theme switch lives in the menu. */
+  .nav .theme-slot {
+    display: none;
+  }
+  .nav .wrap.nav-c {
+    gap: 8px;
+  }
+  .nav-c > .row {
+    gap: 4px;
+  }
+  .mobile-menu .mm-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px var(--gutter);
+    border-bottom: var(--rule);
+    font: var(--type-eyebrow);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .mobile-menu .mm-theme button {
+    padding: 0;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .prow-body .qty {
+    height: 44px;
+  }
+  .prow-body .qty button {
+    width: 44px;
+  }
+}
+
+/* Product page "Continue exploring": three tiles stacked on a phone cost about
+   2,400px, so below the breakpoint they become one swipeable row. */
+@media (max-width: 800px) {
+  .grid.related-rail {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 78%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    padding-bottom: 12px;
+  }
+  .grid.related-rail > * {
+    scroll-snap-align: start;
+  }
+  .grid.related-rail .tile .tinbox {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Tab rows (design system Tabs) scroll within themselves on narrow screens. */
+[role='tablist'] {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+[role='tablist']::-webkit-scrollbar {
+  display: none;
+}
+
+/* Product page on narrow screens: the gallery column may shrink, and the
+   thumbnail strip scrolls within itself rather than widening the page. */
+@media (max-width: 800px) {
+  .pdp,
+  .pdp > *,
+  .gallery,
+  .gallery > * {
+    min-width: 0;
+  }
+  .thumbs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .thumbs::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Phone tea cards stack quantity above the button; the button keeps its own height
+   instead of taking the row's flex: 1 as a zero basis. */
+@media (max-width: 520px) {
+  .prow-body > .row > button {
+    flex: none !important;
+    height: 44px !important;
+  }
+}
+
+/* A photographed product fills its frame edge to edge, with no tin shadow. */
+.tinbox.is-photo {
+  overflow: hidden;
+}
+.tinbox.is-photo img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover;
+  filter: none !important;
+}
+

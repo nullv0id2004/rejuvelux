@@ -35,6 +35,13 @@ const inr = (paise: number) =>
  * the labelled interim stand-in where it does not.
  */
 function galleryShots(p: CatalogueProduct): { label: string; ratio: string; tin?: boolean; src?: string; alt?: string }[] {
+  // Photographed products (gift sets) show their own pictures, not the tea shot plan.
+  if (p.gallery?.length) {
+    return [
+      { label: 'Product', ratio: '4 / 5', tin: true },
+      ...p.gallery.map((g) => ({ label: g.label, ratio: '4 / 5', src: g.src, alt: g.alt })),
+    ];
+  }
   return [
     { label: 'Tin · front', ratio: '4 / 5', tin: true },
     {
@@ -96,7 +103,7 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
         </nav>
       </div>
 
-      <section className="wrap" style={{ padding: '24px 0 96px' }}>
+      <section className="wrap" style={{ paddingTop: 24, paddingBottom: 96 }}>
         <div className="pdp">
           <div className="gallery">
             <div className="thumbs">
@@ -109,7 +116,7 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
                   aria-pressed={i === img}
                 >
                   {s.tin ? (
-                    <TinBox p={p} sizes="72px" imgStyle={{ width: '70%' }} />
+                    <TinBox p={p} sizes="72px" imgStyle={p.photo ? undefined : { width: '70%' }} />
                   ) : s.src ? (
                     <Image src={s.src} alt="" width={72} height={90} sizes="72px" className="thumb-img" />
                   ) : (
@@ -123,7 +130,7 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
                 <TinBox
                   p={p}
                   style={{ aspectRatio: '4 / 5' }}
-                  alt={`${p.name} tin, front`}
+                  alt={p.photo ? p.name : `${p.name} tin, front`}
                   sizes="(max-width: 800px) 100vw, 520px"
                   priority
                 />
@@ -320,7 +327,7 @@ export function ProductView({ p }: { p: CatalogueProduct }) {
 
       <section className="wrap sec rule-t">
         <SectionHead eyebrow="Continue exploring" title="More from RejuveLuxe." />
-        <div className="grid cols-3">
+        <div className="grid cols-3 related-rail">
           {others.map((q) => (
             <Tile key={q.slug} p={q} />
           ))}

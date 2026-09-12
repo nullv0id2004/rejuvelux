@@ -23,3 +23,6 @@ export default async function CollectionPage({ params }: Params) {
   if (!known(slug)) notFound();
   return <ContentView page={page(slug)} />;
 }
+
+/** Lists live products, so prices and stock refresh on the same hour as the shop. */
+export const revalidate = 3600;

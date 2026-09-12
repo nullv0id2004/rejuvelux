@@ -21,7 +21,7 @@
  * database's own net quantity and brewing leaf, so it cannot drift from them.
  */
 
-import type { ProductPhotos } from './data';
+import { CONTACT, type ProductPhotos } from './data';
 
 export type Presentation = {
   /** One-word register: Focus / Elegance / Legacy / Clarity … */
@@ -58,7 +58,62 @@ export type Presentation = {
   storage?: string;
   /** The onward action the content handover gives this product. */
   related?: { label: string; href: string };
+  /** `image` is a photograph that fills its frame, not a transparent tin render. */
+  photo?: boolean;
+  /** Further photographs for the product page gallery, after `image`. */
+  gallery?: { src: string; alt: string; label: string }[];
+  /** Which part of the range a product belongs to. Defaults to tea. */
+  range?: 'tea' | 'gift' | 'teaware';
 };
+
+/** Pack details printed on every boxed gift set (supplied pack photography, 12 Sep 2026). */
+const giftSetDetails = (mrp: string): [string, string][] => [
+  ['MRP', `${mrp} (inclusive of all taxes)`],
+  ['Best before', '12 months from date of packaging'],
+  ['Country of origin', 'India'],
+  ['Packed and marketed by', `${CONTACT.entity}, ${CONTACT.address}`],
+  ['FSSAI Lic. No.', CONTACT.fssai],
+  ['Note', 'Combination package, not to be sold loose'],
+];
+
+function giftSet(key: string, colour: string, mrp: string, tagline: string, intro: string, contents: string[]): Presentation {
+  const dir = `/assets/gift-sets/${key}`;
+  return {
+    descriptor: 'Gifting',
+    tin: 'var(--bone-300)',
+    ink: 'var(--ink-900)',
+    image: `${dir}-open.jpg`,
+    photo: true,
+    range: 'gift',
+    gallery: [
+      { src: `${dir}-front.jpg`, alt: `${colour} RejuveLuxe gift box, closed.`, label: 'Box · front' },
+      { src: `${dir}-back.jpg`, alt: 'Back of the gift box, printed with its contents, nutrition and packing details.', label: 'Box · back' },
+    ],
+    eyebrow: 'TEA GIFT SETS',
+    tagline,
+    intro,
+    // The printed "bio-degradable" cup claim is left off until it is substantiated.
+    bullets: [...contents, 'Tea infuser', 'Wooden spoon', 'Premium cup'],
+    sections: [
+      [
+        'Give the ritual room',
+        'Each tea has its own preparation. Use the individual brewing guidance to explore the selection, rather than treating every tea in the box the same way.',
+      ],
+      [
+        'For the occasion you have in mind',
+        'A thank-you, a milestone or a festive visit. Choose a tea gift when you want the gesture to continue beyond the moment it is opened.',
+      ],
+    ],
+    details: giftSetDetails(mrp),
+    storage: 'Store in a cool, dry place, away from direct sunlight.',
+    faqs: [
+      ['Can I change the teas?', 'Contact us to discuss the available selection; customization is subject to confirmation.'],
+      ['Can I order several sets?', 'Tell us the quantity, delivery locations and date you have in mind through our gifting enquiry form.'],
+      ['How long does the tea keep?', 'Best before 12 months from the date of packaging. Store the set in a cool, dry place, away from direct sunlight.'],
+    ],
+    related: { label: 'Discuss a Gifting Order', href: '/corporate-gifting' },
+  };
+}
 
 /**
  * The rendered range. Keys are database slugs. Editorial copy is transcribed
@@ -250,6 +305,7 @@ export const PRESENTATION: Record<string, Presentation> = {
    */
   'matcha-ritual-set': {
     descriptor: 'Ritual',
+    range: 'gift',
     tin: 'var(--tea-matcha-tin)',
     ink: 'var(--tea-matcha-ink)',
     image: null,
@@ -353,4 +409,81 @@ export const PRESENTATION: Record<string, Presentation> = {
     ],
     related: { label: 'Ask About Ube', href: '/contact?topic=ube' },
   },
+
+  'complete-tasting-gift-set': giftSet(
+    'complete-tasting',
+    'Maroon',
+    '₹3,499',
+    'Four teas with the tools to prepare them.',
+    'Four teas. One considered box. Move from the depth of Golden Tips to the delicacy of Silver Needle, the whisked ritual of Matcha and the distinctive character of Ube.',
+    ['Assam Golden Tips · 10 g', 'Silver Needle Assam · 10 g', 'Assam Matcha · 15 g', 'Ube · 25 g'],
+  ),
+
+  'heritage-duo-gift-set': giftSet(
+    'heritage-duo',
+    'Black',
+    '₹2,999',
+    'Golden Tips and Silver Needle, side by side.',
+    'Two expressions of Assam, side by side. The depth of Golden Tips and the quiet refinement of Silver Needle, presented with the tools for an unhurried cup.',
+    ['Assam Golden Tips · 10 g', 'Silver Needle Assam · 10 g'],
+  ),
+
+  'vibrant-duo-gift-set': giftSet(
+    'vibrant-duo',
+    'Green',
+    '₹2,199',
+    'Matcha and Ube for a hands-on ritual.',
+    'Two colourful expressions for a hands-on ritual. The fresh green character of Assam Matcha beside the distinctive violet of Ube, with the tools to prepare them.',
+    ['Assam Matcha · 15 g', 'Ube · 25 g'],
+  ),
+
+  'matcha-tea-box': {
+    descriptor: 'Gifting',
+    tin: 'var(--tea-matcha-tin)',
+    ink: 'var(--tea-matcha-ink)',
+    image: null,
+    range: 'gift',
+    eyebrow: 'TEA GIFT SETS',
+    tagline: 'A gift centred on Assam Matcha.',
+    intro:
+      'A gift centred on the tea. A thoughtful way to introduce someone to the fresh character and deliberate preparation of Assam Matcha.',
+    sections: [
+      [
+        'One tea, given your attention',
+        'Some people enjoy discovering a whole collection. Others prefer to spend time with one expression. The Matcha Tea Box is for the latter: a focused gift built around the pleasure of preparing Matcha.',
+      ],
+    ],
+    details: [['Contents', '[APPROVED_MATCHA_TEA_BOX_CONTENTS]']],
+    faqs: [['Does the box include a whisk or bowl?', 'Ask us to confirm the current contents before ordering. The Matcha Ritual Set brings the tea together with preparation tools.']],
+    related: { label: 'Discover the Ritual Set', href: '/shop/matcha-ritual-set' },
+  },
+
+  'retro-cup-with-lid': {
+    descriptor: 'Teaware',
+    tin: 'var(--bone-300)',
+    ink: 'var(--ink-900)',
+    image: null,
+    range: 'teaware',
+    eyebrow: 'TEAWARE',
+    tagline: 'A ribbed 250 ml cup in soft colours.',
+    intro: 'A ribbed form, a soft palette and the RejuveLuxe signature. A considered vessel for your tea setting.',
+    sections: [
+      [
+        'A quieter detail',
+        'The textured surface and gently ribbed shape give this cup its character. Choose a colour that feels at home in your space or ask about the options available for your gift set.',
+      ],
+    ],
+    details: [
+      ['Capacity', '250 ml'],
+      ['Colours', 'Sand Castle, Innocent, Azure, Celeste'],
+      ['Material', '[APPROVED_CUP_MATERIAL]'],
+      ['Care', '[APPROVED_CUP_CARE]'],
+    ],
+    faqs: [
+      ['Does it have a lid?', 'Yes, the supplied design includes a lid. It is not described here as leakproof.'],
+      ['Can I choose a colour?', 'Tell us the colour you would like in your order notes or contact us before ordering.'],
+    ],
+    related: { label: 'Explore Gift Sets', href: '/collections/gift-sets' },
+  },
+
 };

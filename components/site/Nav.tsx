@@ -203,7 +203,9 @@ export function Nav() {
             <nav className="nav-links" aria-label="Secondary">
               {RIGHT.map(link)}
             </nav>
-            <ThemeToggle />
+            <span className="theme-slot">
+              <ThemeToggle />
+            </span>
             <IconButton
               label={count ? `Shopping bag, ${count} item${count === 1 ? '' : 's'}` : 'Shopping bag'}
               variant="ghost"
@@ -276,6 +278,10 @@ export function Nav() {
                 {l.label}
               </Link>
             ))}
+            <div className="mm-theme">
+              <span>Theme</span>
+              <ThemeToggle />
+            </div>
           </nav>
         </div>
       )}

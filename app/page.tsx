@@ -54,7 +54,8 @@ export default async function HomePage() {
   // A product retired in the admin simply drops out of both sections.
   const heroes = HERO_SLUGS.flatMap((slug) => products.filter((p) => p.slug === slug));
   // Kits carry a components list; the row is for the teas themselves.
-  const teas = products.filter((p) => !p.components);
+  const teas = products.filter((p) => (p.range ?? 'tea') === 'tea' && !p.components);
+  const gifts = products.filter((p) => p.range === 'gift');
   const pending: PendingTea[] = PENDING_TEAS.filter((t) => !products.some((p) => p.slug === t.slug)).map((t) => {
     const art = PRESENTATION[t.slug];
     return { ...t, tin: art.tin, ink: art.ink, image: art.image, tagline: art.tagline };
@@ -192,6 +193,23 @@ export default async function HomePage() {
           </Button>
         </div>
       </section>
+
+      {/* Gift sets, each with quantity and Add to cart */}
+      {gifts.length > 0 && (
+        <section className="wrap sec rule-t">
+          <SectionHead
+            eyebrow="Gift Sets"
+            title="A considered gift. A lasting ritual."
+            aside="Tea gifts chosen for the pleasure of discovering, preparing and sharing something exceptional."
+          />
+          <ProductRow products={gifts} />
+          <div style={{ paddingTop: 24 }}>
+            <Button variant="outline" href="/collections/gift-sets">
+              Explore Gift Sets
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* The search behind the cup */}
       <section
